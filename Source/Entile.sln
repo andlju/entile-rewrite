@@ -1,0 +1,71 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.Server", "Entile.Server\Entile.Server.csproj", "{1298068A-40C9-46B6-90B6-67A1B2020038}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7FCD05B4-C632-42F2-862E-E879740A7294}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6C454820-E099-4C42-8480-F8423E85489E}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.Server.Tests", "Entile.Server.Tests\Entile.Server.Tests.csproj", "{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{AFB33751-6604-4112-B812-F86F75E8E764}"
+	ProjectSection(SolutionItems) = preProject
+		..\Build\build.ps1 = ..\Build\build.ps1
+		..\Build\default.ps1 = ..\Build\default.ps1
+		..\Build\run-tests.proj = ..\Build\run-tests.proj
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nuget", "Nuget", "{C3DB5957-2233-4D66-9E7D-379F975456A2}"
+	ProjectSection(SolutionItems) = preProject
+		..\NuGet\entile-client.nuspec = ..\NuGet\entile-client.nuspec
+		..\NuGet\entile-server.nuspec = ..\NuGet\entile-server.nuspec
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.WcfTestHost", "Entile.WcfTestHost\Entile.WcfTestHost.csproj", "{A5D87092-155E-49A8-AD05-620CF3C558CC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.Notifier.Tests", "Entile.Notifier.Tests\Entile.Notifier.Tests.csproj", "{3CB395D0-9D4A-4FB4-8254-23D752C60712}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.Notifier", "Entile.Notifier\Entile.Notifier.csproj", "{A11670DF-B1FE-4DAC-B20F-7A7EE4C4BFE3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1298068A-40C9-46B6-90B6-67A1B2020038}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1298068A-40C9-46B6-90B6-67A1B2020038}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1298068A-40C9-46B6-90B6-67A1B2020038}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1298068A-40C9-46B6-90B6-67A1B2020038}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5D87092-155E-49A8-AD05-620CF3C558CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5D87092-155E-49A8-AD05-620CF3C558CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5D87092-155E-49A8-AD05-620CF3C558CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5D87092-155E-49A8-AD05-620CF3C558CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CB395D0-9D4A-4FB4-8254-23D752C60712}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CB395D0-9D4A-4FB4-8254-23D752C60712}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CB395D0-9D4A-4FB4-8254-23D752C60712}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CB395D0-9D4A-4FB4-8254-23D752C60712}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A11670DF-B1FE-4DAC-B20F-7A7EE4C4BFE3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A11670DF-B1FE-4DAC-B20F-7A7EE4C4BFE3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A11670DF-B1FE-4DAC-B20F-7A7EE4C4BFE3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A11670DF-B1FE-4DAC-B20F-7A7EE4C4BFE3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BC0FD963-1B2D-4ED2-80B1-502EEBB3E78C} = {7FCD05B4-C632-42F2-862E-E879740A7294}
+		{3CB395D0-9D4A-4FB4-8254-23D752C60712} = {7FCD05B4-C632-42F2-862E-E879740A7294}
+		{AFB33751-6604-4112-B812-F86F75E8E764} = {6C454820-E099-4C42-8480-F8423E85489E}
+		{C3DB5957-2233-4D66-9E7D-379F975456A2} = {6C454820-E099-4C42-8480-F8423E85489E}
+	EndGlobalSection
+EndGlobal

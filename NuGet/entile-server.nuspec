@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<package> 
+  <metadata> 
+    <id>entile-server</id> 
+    <version>0.3.0</version> 
+    <authors>Anders Ljusberg</authors>
+    <description>Entile Notification Framework for Windows Phone 7 (Server)</description> 
+    <language>en-US</language>
+    <licenseUrl>https://github.com/andlju/entile/raw/master/LICENSE.txt</licenseUrl>
+    <projectUrl>http://coding-insomnia.com/entile</projectUrl>
+    <dependencies>
+      <dependency id="WebActivator" version="1.0.0.0" />
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.ServiceModel" />
+      <frameworkAssembly assemblyName="System.ServiceModel.Web" />
+    </frameworkAssemblies>
+  </metadata>
+  <files>
+    <file src="..\BuildArtifacts\Entile.Server.dll" target="lib"/>
+  </files>
+</package>
