@@ -47,6 +47,11 @@ namespace Entile.Server.Domain
             return _eventList;
         }
 
+        public void ClearUncommittedEvents()
+        {
+            _eventList.Clear();
+        }
+
         public abstract string UniqueId { get; }
         protected int SequenceNumber { get; set; }
     }

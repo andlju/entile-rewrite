@@ -5,6 +5,7 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
+using Entile.Server.ViewHandlers;
 
 namespace Entile.Server
 {
@@ -13,19 +14,24 @@ namespace Entile.Server
         public static Func<IMessageRouter, IBus> BusFactoryMethod = DefaultBusFactory;
         public static Func<IMessageRouter> MessageRouterFactoryMethod = DefaultMessageRouterFactory;
         public static Func<string, IEventStore> EventStoreFactoryMethod = DefaultEventStoreFactory;
-        public static Func<IRepository<Client>> RegistrationRepositoryFactoryMethod = DefaultRegistrationRepositoryFactory;
+        public static Func<IBus, IRepository<Client>> RegistrationRepositoryFactoryMethod = DefaultRegistrationRepositoryFactory;
         public static Func<IEventSerializer> EventSerializerFactoryMethod = DefaultEventSerializerFactory;
 
         public static IRegistrator CreateRegistrator()
         {
-            var commandMessageRouter = MessageRouterFactoryMethod();
+            var messageRouter = MessageRouterFactoryMethod();
 
-            var bus = BusFactoryMethod(commandMessageRouter);
-            var registrationRepository = RegistrationRepositoryFactoryMethod();
+            var bus = BusFactoryMethod(messageRouter);
+            var registrationRepository = RegistrationRepositoryFactoryMethod(bus);
 
-            commandMessageRouter.RegisterHandler<RegisterClientCommand>(new RegisterClientCommandHandler(registrationRepository).Execute);
-            commandMessageRouter.RegisterHandler<UnregisterClientCommand>(new UnregisterClientCommandHandler(registrationRepository).Execute);
+            // Commands
+            messageRouter.RegisterHandler<RegisterClientCommand>(new RegisterClientCommandHandler(registrationRepository).Execute);
+            messageRouter.RegisterHandler<UnregisterClientCommand>(new UnregisterClientCommandHandler(registrationRepository).Execute);
 
+            // Events
+            messageRouter.RegisterHandler<ClientRegisteredEvent>(new RegistrationViewHandler().Handle);
+            messageRouter.RegisterHandler<ClientUnregisteredEvent>(new RegistrationViewHandler().Handle);
+            messageRouter.RegisterHandler<ClientRegistrationUpdatedEvent>(new RegistrationViewHandler().Handle);
             var registrator = new Registrator(bus);
 
             return registrator;
@@ -51,10 +57,10 @@ namespace Entile.Server
             return new EntityFrameworkEventStore(serializer);
         }
 
-        public static IRepository<Client> DefaultRegistrationRepositoryFactory()
+        public static IRepository<Client> DefaultRegistrationRepositoryFactory(IBus bus)
         {
             var eventStore = EventStoreFactoryMethod("Registration");
-            return new EventStoreRepository<Client>(eventStore);
+            return new EventStoreRepository<Client>(eventStore, bus);
         }
 
         public static IMessageRouter DefaultMessageRouterFactory()

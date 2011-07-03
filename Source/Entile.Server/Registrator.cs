@@ -17,8 +17,7 @@ namespace Entile.Server
             SendCommand(
                 new RegisterClientCommand(
                     uniqueId, 
-                    notificationChannel,
-                    new Dictionary<string, string>()));
+                    notificationChannel));
 
         }
 

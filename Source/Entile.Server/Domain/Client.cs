@@ -33,10 +33,14 @@ namespace Entile.Server.Domain
 
         public void UpdateRegistration(string notificationChannel)
         {
-            if (!_isActive)
-                throw new ClientNotRegisteredException(UniqueId);
-
-            ApplyEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
+            if (_isActive)
+            {
+                ApplyEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
+            }
+            else
+            {
+                ApplyEvent(new ClientRegisteredEvent(UniqueId, notificationChannel));
+            }
         }
 
         public void SetExtendedInformationItem(string key, string value)

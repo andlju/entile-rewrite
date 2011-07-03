@@ -25,12 +25,6 @@ namespace Entile.Server.CommandHandlers
                 registration = new Client(command.UniqueId, command.NotificationChannel);
             }
 
-            registration.RemoveAllExtendedInformationItems();
-            foreach (var extendedInfo in command.ExtendedInformation)
-            {
-                registration.SetExtendedInformationItem(extendedInfo.Key, extendedInfo.Value);
-            }
-
             _clientRepository.SaveChanges(registration);
         }
     }

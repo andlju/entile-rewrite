@@ -8,10 +8,12 @@ namespace Entile.Server
         where TDomain : Aggregate<TDomain>, new()
     {
         private readonly IEventStore _eventStore;
+        private readonly IBus _eventBus;
 
-        public EventStoreRepository(IEventStore eventStore)
+        public EventStoreRepository(IEventStore eventStore, IBus eventBus)
         {
             _eventStore = eventStore;
+            _eventBus = eventBus;
         }
 
         public TDomain GetById(string uniqueId)
@@ -29,8 +31,13 @@ namespace Entile.Server
 
         public void SaveChanges(TDomain aggregate)
         {
-            var events = aggregate.GetUncommittedEvents();
+            var events = aggregate.GetUncommittedEvents().ToArray();
+            aggregate.ClearUncommittedEvents();
             _eventStore.SaveEvents(aggregate.UniqueId, events);
+            foreach(var ev in events)
+            {
+                _eventBus.Publish(ev);
+            }
         }
     }
 }

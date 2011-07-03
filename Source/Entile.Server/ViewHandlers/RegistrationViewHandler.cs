@@ -27,7 +27,7 @@ namespace Entile.Server.ViewHandlers
         public ClientView ClientView { get; set; }
     }
 
-    public class SqlCodeFirstContext : DbContext
+    public class EntileViews : DbContext
     {
         public DbSet<ClientView> ClientViews { get; set; }
 
@@ -39,16 +39,15 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientRegisteredEvent @event)
         {
-            using (var context = new SqlCodeFirstContext())
+            using (var context = new EntileViews())
             {
-                var clientView = context.ClientViews.Find(@event.UniqueId);
-                if (clientView == null)
-                {
-                    clientView = new ClientView();
-                    context.ClientViews.Add(clientView);
-                }
-                clientView.UniqueId = @event.UniqueId;
-                clientView.NotificationChannel = @event.NotificationChannel;
+                var clientView = new ClientView
+                                     {
+                                         UniqueId = @event.UniqueId, 
+                                         NotificationChannel = @event.NotificationChannel
+                                     };
+
+                context.ClientViews.Add(clientView);
                 
                 context.SaveChanges();
             }
@@ -56,13 +55,23 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientUnregisteredEvent @event)
         {
-            using (var context = new SqlCodeFirstContext())
+            using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(@event.UniqueId);
-                if (clientView != null)
-                {
-                    context.ClientViews.Remove(clientView);
-                }
+
+                context.ClientViews.Remove(clientView);
+                
+                context.SaveChanges();
+            }
+        }
+
+        public void Handle(ClientRegistrationUpdatedEvent @event)
+        {
+            using (var context = new EntileViews())
+            {
+                var clientView = context.ClientViews.Find(@event.UniqueId);
+                clientView.NotificationChannel = @event.NotificationChannel;
+
                 context.SaveChanges();
             }
         }

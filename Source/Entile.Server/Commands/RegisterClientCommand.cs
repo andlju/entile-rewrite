@@ -7,13 +7,10 @@ namespace Entile.Server.Commands
         public string UniqueId { get; private set; }
         public string NotificationChannel { get; private set; }
 
-        public IDictionary<string, string> ExtendedInformation { get; private set; }
-
-        public RegisterClientCommand(string uniqueId, string notificationChannel, IDictionary<string, string> extendedInformation)
+        public RegisterClientCommand(string uniqueId, string notificationChannel)
         {
             UniqueId = uniqueId;
             NotificationChannel = notificationChannel;
-            ExtendedInformation = extendedInformation;
         }
     }
 }
