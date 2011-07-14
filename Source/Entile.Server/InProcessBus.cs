@@ -1,37 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Entile.Server
 {
+
     public class MessageRouter : IMessageRouter
     {
-        private readonly IDictionary<Type, LinkedList<Action<object>>> _handlers;
+        private readonly IDictionary<Type, LinkedList<Action<IMessage>>> _handlers;
 
         public MessageRouter()
         {
-            _handlers = new Dictionary<Type, LinkedList<Action<object>>>();
+            _handlers = new Dictionary<Type, LinkedList<Action<IMessage>>>();
         }
 
-        public void RegisterHandler<TMessage>(Action<TMessage> handler)
+        public void RegisterHandler(Type messageType, Action<IMessage> action)
         {
-            LinkedList<Action<object>> handlerList;
-            if (!_handlers.TryGetValue(typeof(TMessage), out handlerList))
+            LinkedList<Action<IMessage>> handlerList;
+            if (!_handlers.TryGetValue(messageType, out handlerList))
             {
-                handlerList = new LinkedList<Action<object>>();
-                _handlers[typeof(TMessage)] = handlerList;
+                handlerList = new LinkedList<Action<IMessage>>();
+                _handlers[messageType] = handlerList;
             }
-            handlerList.AddLast(msg => handler((TMessage)msg));
+            handlerList.AddLast(action);
         }
+        
 
-        public IEnumerable<Action<object>> GetHandlersFor(Type type)
+        public IEnumerable<Action<IMessage>> GetHandlersFor(Type type)
         {
-            LinkedList<Action<object>> handlerList;
+            LinkedList<Action<IMessage>> handlerList;
             if (_handlers.TryGetValue(type, out handlerList))
             {
                 return handlerList.ToArray();
             }
-            return new Action<object>[0];
+            return new Action<IMessage>[0];
         }
     }
 
@@ -44,7 +47,7 @@ namespace Entile.Server
             _messageRouter = messageRouter;
         }
 
-        public void Publish(object message)
+        public void Publish(IMessage message)
         {
             var handlers = _messageRouter.GetHandlersFor(message.GetType());
             foreach(var handler in handlers)

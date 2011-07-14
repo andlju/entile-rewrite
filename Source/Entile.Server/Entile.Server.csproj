@@ -48,8 +48,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Bootstrapper.cs" />
+    <Compile Include="IEventConsumer.cs" />
+    <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />
-    <Compile Include="CommandHandlers\ICommandHandler.cs" />
     <Compile Include="CommandHandlers\RegisterClientCommandHandler.cs" />
     <Compile Include="CommandHandlers\UnregisterClientCommandHandler.cs" />
     <Compile Include="Commands\ICommand.cs" />
@@ -59,7 +61,6 @@
     <Compile Include="Domain\Aggregate.cs" />
     <Compile Include="Domain\Client.cs" />
     <Compile Include="Domain\ClientNotRegisteredException.cs" />
-    <Compile Include="EntileBootstrapper.cs" />
     <Compile Include="EntityFrameworkEventStore.cs" />
     <Compile Include="EventStoreRepository.cs" />
     <Compile Include="Events\AllExtendedInformationItemsRemovedEvent.cs" />
@@ -69,7 +70,7 @@
     <Compile Include="Events\ClientUnregisteredEvent.cs" />
     <Compile Include="Events\ExtendedInformationUpdatedEvent.cs" />
     <Compile Include="Events\IEvent.cs" />
-    <Compile Include="Events\RemoveExtendedInformation.cs" />
+    <Compile Include="Events\ExtendedInformationItemRemovedEvent.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IEventSerializer.cs" />
     <Compile Include="IEventStore.cs" />
@@ -81,7 +82,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registrator.cs" />
     <Compile Include="Sagas\SendNotificationSaga.cs" />
-    <Compile Include="ViewHandlers\RegistrationViewHandler.cs" />
+    <Compile Include="ViewHandlers\RegistrationView.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -3,7 +3,7 @@ using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
-    public class RegisterClientCommandHandler : ICommandHandler<RegisterClientCommand>
+    public class RegisterClientCommandHandler : IMessageHandler<RegisterClientCommand>
     {
         private readonly IRepository<Client> _clientRepository;
 
@@ -12,7 +12,7 @@ namespace Entile.Server.CommandHandlers
             _clientRepository = clientRepository;
         }
 
-        public void Execute(RegisterClientCommand command)
+        public void Handle(RegisterClientCommand command)
         {
             var registration = _clientRepository.GetById(command.UniqueId);
 

@@ -3,24 +3,24 @@ using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
-    public class UnregisterClientCommandHandler : ICommandHandler<UnregisterClientCommand>
+    public class UnregisterClientCommandHandler : IMessageHandler<UnregisterClientCommand>
     {
-        private readonly IRepository<Client> _registrationRepository;
+        private readonly IRepository<Client> _clientRepository;
 
-        public UnregisterClientCommandHandler(IRepository<Client> registrationRepository)
+        public UnregisterClientCommandHandler(IRepository<Client> clientRepository)
         {
-            _registrationRepository = registrationRepository;
+            _clientRepository = clientRepository;
         }
 
-        public void Execute(UnregisterClientCommand command)
+        public void Handle(UnregisterClientCommand command)
         {
-            var registration = _registrationRepository.GetById(command.UniqueId);
+            var registration = _clientRepository.GetById(command.UniqueId);
 
             if (registration != null)
             {
                 registration.Unregister();
             }
-            _registrationRepository.SaveChanges(registration);
+            _clientRepository.SaveChanges(registration);
         }
 
     }

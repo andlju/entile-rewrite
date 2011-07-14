@@ -40,7 +40,9 @@ namespace Entile.Server
             {
                 var evts = (from e in context.Events
                          where e.UniqueId == uniqueId
+                         orderby e.SequenceNumber
                          select e.SerializedEvent).ToArray();
+
                 if (evts.Length == 0)
                     return null;
                 return evts.Select(ev => _serializer.Deserialize(ev)).Cast<IEvent>();

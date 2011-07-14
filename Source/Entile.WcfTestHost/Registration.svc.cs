@@ -8,14 +8,14 @@ using Entile.Server;
 
 namespace Entile.WcfTestHost
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Registration" in code, svc and config file together.
+
     public class Registration : IRegistration
     {
         private readonly IRegistrator _registrator;
 
         public Registration()
         {
-            _registrator = EntileBootstrapper.CreateRegistrator();
+            _registrator = Bootstrapper.CurrentServer.Registrator;
         }
 
         public void Register(string uniqueId, string notificationChannel)

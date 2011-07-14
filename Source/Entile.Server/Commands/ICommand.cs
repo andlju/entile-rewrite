@@ -1,6 +1,6 @@
 ﻿namespace Entile.Server.Commands
 {
-    public interface ICommand
+    public interface ICommand : IMessage
     {
 
     }
