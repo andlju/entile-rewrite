@@ -58,10 +58,10 @@
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Unregistered_Client.cs" />
     <Compile Include="Domain\With.cs" />
+    <Compile Include="EventStreamConsumerTest.cs" />
     <Compile Include="JsonEventSerializerTest.cs" />
     <Compile Include="MessageRouterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RegistrationStoreTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

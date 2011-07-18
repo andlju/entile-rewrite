@@ -29,6 +29,10 @@ namespace Entile.Server.ViewHandlers
 
     public class EntileViews : DbContext
     {
+        public EntileViews() : base("EntileViews")
+        {
+        }
+        
         public DbSet<ClientView> ClientViews { get; set; }
 
         public DbSet<ExtendedInformationView> ExtendedInformationViews { get; set; }

@@ -19,7 +19,7 @@ namespace Entile.Server.Commands
         public string Body { get; set; }
     }
 
-    public class SendNotificationCommand : ICommand
+    public class SendNotificationCommand : CommandBase
     {
         public string UniqueId { get; private set; }
         public Notification Notification { get; private set; }

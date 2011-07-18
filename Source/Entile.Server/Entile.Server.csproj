@@ -49,7 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="IEventConsumer.cs" />
+    <Compile Include="EventStreamDispatcher.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />
     <Compile Include="CommandHandlers\RegisterClientCommandHandler.cs" />

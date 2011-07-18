@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -39,6 +40,11 @@ namespace Entile.Server
                 var formatter = new BinaryFormatter();
                 formatter.Serialize(stream, oldEvents.Union(events).ToArray());
             }
+        }
+
+        public IEnumerable<IEvent> GetAllEventsSince(long timestamp)
+        {
+            throw new NotImplementedException();
         }
 
         private string BuildPath(string uniqueId)

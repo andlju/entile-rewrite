@@ -2,7 +2,7 @@
 
 namespace Entile.Server.Commands
 {
-    public class RegisterClientCommand : ICommand
+    public class RegisterClientCommand : CommandBase
     {
         public string UniqueId { get; private set; }
         public string NotificationChannel { get; private set; }

@@ -1,4 +1,7 @@
-﻿using Entile.Server.CommandHandlers;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
@@ -10,14 +13,17 @@ namespace Entile.Server
     {
         private readonly object _lock = new object();
         private bool _isInitialized = false;
-        private IBus _bus;
-        private IMessageRouter _messageRouter;
+
+        private IBus _commandBus;
+        private IMessageRouter _commandRouter;
+
+        private IBus _viewCreatorsBus;
+        private IMessageRouter _viewCreatorsEventRouter;
+
         private IRegistrator _registrator;
 
         public void Initialize()
         {
-            _messageRouter = new MessageRouter();
-            _bus = new InProcessBus(_messageRouter);
 
             var jsonEventSerializer = new JsonEventSerializer();
             
@@ -31,16 +37,45 @@ namespace Entile.Server
 
             var entityFrameworkEventStore = new EntityFrameworkEventStore(jsonEventSerializer);
 
-            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _bus);
+            InitializeRegistrator(entityFrameworkEventStore);
+            InitializeViewCreators(entityFrameworkEventStore);
+        }
+
+        private void InitializeRegistrator(EntityFrameworkEventStore entityFrameworkEventStore)
+        {
+            _commandRouter = new MessageRouter();
+            _commandBus = new InProcessBus(_commandRouter);
+
+            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus);
 
             // Register Command Handlers
-            _messageRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
-            _messageRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
+
+            _registrator = new Registrator(_commandBus);
+        }
+
+        private void InitializeViewCreators(EntityFrameworkEventStore entityFrameworkEventStore)
+        {
+            _viewCreatorsEventRouter = new MessageRouter();
+            _viewCreatorsBus = new InProcessBus(_viewCreatorsEventRouter);
 
             // Register Event Handlers
-            _messageRouter.RegisterHandlersIn(new RegistrationView());
+            _viewCreatorsEventRouter.RegisterHandlersIn(new RegistrationView());
 
-            _registrator = new Registrator(_bus);
+            var dispatcher = new EventStreamDispatcher(_viewCreatorsBus, entityFrameworkEventStore);
+
+            var createViewsTask = new Task(() =>
+                                               {
+                                                   var lastUpdate = entityFrameworkEventStore.GetLastUpdate("Views");
+                                                   while (true)
+                                                   {
+                                                       lastUpdate = dispatcher.Dispatch(lastUpdate);
+                                                       entityFrameworkEventStore.SetLastUpdate("Views", lastUpdate);
+                                                       Thread.Sleep(1000);
+                                                   }
+                                               });
+            createViewsTask.Start();
         }
 
         public IRegistrator Registrator

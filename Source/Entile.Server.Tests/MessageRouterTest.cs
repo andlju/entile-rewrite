@@ -7,11 +7,13 @@ namespace Entile.Server.Tests
     class FirstTestMessage : IMessage
     {
         public string MyProperty { get; set; }
+        public long Timestamp { get; set; }
     }
     
     class SecondTestMessage : IMessage
     {
         public int AnInt { get; set; }
+        public long Timestamp { get; set; }
     }
 
     class MessageHandlerExample : IMessageHandler<FirstTestMessage>, IMessageHandler<SecondTestMessage>
@@ -30,6 +32,7 @@ namespace Entile.Server.Tests
         }
     }
 
+    
     public class MessageRouterTest
     {
         [Fact] 

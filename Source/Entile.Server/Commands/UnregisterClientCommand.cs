@@ -1,6 +1,18 @@
-﻿namespace Entile.Server.Commands
+﻿using System;
+
+namespace Entile.Server.Commands
 {
-    public class UnregisterClientCommand : ICommand
+    public class CommandBase : ICommand
+    {
+        public long Timestamp { get; set; }
+
+        public CommandBase()
+        {
+            Timestamp = DateTime.Now.Ticks;
+        }
+    }
+
+    public class UnregisterClientCommand : CommandBase
     {
         public string UniqueId { get; private set; }
 
