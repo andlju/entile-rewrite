@@ -41,10 +41,30 @@ namespace Entile.Server.ViewHandlers
     public class ClientViewHandler :
         IMessageHandler<ClientRegisteredEvent>,
         IMessageHandler<ClientRegistrationUpdatedEvent>,
+        IMessageHandler<ClientReregisteredEvent>, 
         IMessageHandler<ClientUnregisteredEvent>
     {
 
         public void Handle(ClientRegisteredEvent @event)
+        {
+            using (var context = new EntileViews())
+            {
+                var clientView = context.ClientViews.Find(@event.UniqueId);
+                if (clientView == null)
+                {
+                    clientView = new ClientView
+                    {
+                        UniqueId = @event.UniqueId,
+                    };
+
+                    context.ClientViews.Add(clientView);
+                }
+                clientView.NotificationChannel = @event.NotificationChannel;
+                context.SaveChanges();
+            }
+        }
+
+        public void Handle(ClientReregisteredEvent @event)
         {
             using (var context = new EntileViews())
             {

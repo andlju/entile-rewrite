@@ -6,7 +6,8 @@ namespace Entile.Server.ViewHandlers
     public class ExtendedInformationViewHandler : 
         IMessageHandler<ExtendedInformationItemSetEvent>,
         IMessageHandler<ExtendedInformationItemRemovedEvent>,
-        IMessageHandler<AllExtendedInformationItemsRemovedEvent>
+        IMessageHandler<AllExtendedInformationItemsRemovedEvent>,
+        IMessageHandler<ClientUnregisteredEvent>
     {
         public void Handle(ExtendedInformationItemSetEvent command)
         {
@@ -43,7 +44,22 @@ namespace Entile.Server.ViewHandlers
                 var items = from i in context.ExtendedInformationViews
                             where i.ClientViewUniqueId == command.UniqueId
                             select i;
-                foreach(var item in items)
+                foreach (var item in items)
+                {
+                    context.ExtendedInformationViews.Remove(item);
+                }
+                context.SaveChanges();
+            }
+        }
+
+        public void Handle(ClientUnregisteredEvent command)
+        {
+            using (var context = new EntileViews())
+            {
+                var items = from i in context.ExtendedInformationViews
+                            where i.ClientViewUniqueId == command.UniqueId
+                            select i;
+                foreach (var item in items)
                 {
                     context.ExtendedInformationViews.Remove(item);
                 }

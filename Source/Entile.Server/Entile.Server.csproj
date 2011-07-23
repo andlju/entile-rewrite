@@ -51,12 +51,16 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CommandHandlers\RemoveAllExtendedInformationItemsCommandHandler.cs" />
     <Compile Include="CommandHandlers\RemoveExtendedInformationItemsCommandHandler.cs" />
+    <Compile Include="CommandHandlers\SendNotificationCommandHandler.cs" />
     <Compile Include="CommandHandlers\SetExtendedInformationItemCommandHandler.cs" />
     <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
     <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
     <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
+    <Compile Include="Domain\InvalidExtendedInformationItemException.cs" />
     <Compile Include="EventStreamDispatcher.cs" />
     <Compile Include="Events\ClientReregisteredEvent.cs" />
+    <Compile Include="Events\NotificationFailedEvent.cs" />
+    <Compile Include="Events\NotificationSucceededEvent.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />
     <Compile Include="CommandHandlers\RegisterClientCommandHandler.cs" />

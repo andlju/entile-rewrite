@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
@@ -12,19 +13,19 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         protected override IMessageHandler<SendNotificationCommand> CreateHandler(IRepository<Client> repository)
         {
-            throw new NotImplementedException();
-
-            // return new SendNotificationComandHandler(repository);
+            return new SendNotificationCommandHandler(repository, _notificationSender);
         }
+
         protected override IEnumerable<IEvent> Given()
         {
+            _notificationSender.ResponseToReturn = new NotificationResponse("Sent");
+
             yield return new ClientRegisteredEvent("1337", "http://test.com/mychannel");
         }
 
         protected override SendNotificationCommand When()
         {
-            throw new NotImplementedException();
-            // return new SendNotificationCommand("1234", "Title", "Body");
+            return new SendNotificationCommand("1234", "Title", "Body");
         }
 
         [Fact]

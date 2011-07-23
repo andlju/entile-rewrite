@@ -12,6 +12,11 @@ namespace Entile.Server.Domain
     public class NotificationResponse
     {
         public string Status { get; private set; }
+
+        public NotificationResponse(string status)
+        {
+            Status = status;
+        }
     }
 
     public class Client : Aggregate<Client>
@@ -86,9 +91,18 @@ namespace Entile.Server.Domain
             ApplyEvent(new ClientUnregisteredEvent());
         }
 
-        public void SendNotification(string title, string body)
+        public void SendNotification(string title, string body, INotificationSender notificationSender)
         {
-            throw new NotImplementedException();
+            var response = notificationSender.SendNotification(_notificationChannel, title, body);
+
+            if (response.Status == "Failed")
+            {
+                ApplyEvent(new NotificationFailedEvent(title, body));
+            }
+            else
+            {
+                ApplyEvent(new NotificationSucceededEvent(title, body));
+            }
         }
 
         private void OnClientRegistered(ClientRegisteredEvent @event)
