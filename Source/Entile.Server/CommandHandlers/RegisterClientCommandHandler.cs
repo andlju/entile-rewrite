@@ -14,18 +14,18 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(RegisterClientCommand command)
         {
-            var registration = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.UniqueId);
 
-            if (registration != null)
+            if (client != null)
             {
-                registration.UpdateRegistration(command.NotificationChannel);
+                client.UpdateRegistration(command.NotificationChannel);
             } 
             else
             {
-                registration = new Client(command.UniqueId, command.NotificationChannel);
+                client = new Client(command.UniqueId, command.NotificationChannel, null); // TODO Use Factory Method
             }
 
-            _clientRepository.SaveChanges(registration);
+            _clientRepository.SaveChanges(client);
         }
     }
 }

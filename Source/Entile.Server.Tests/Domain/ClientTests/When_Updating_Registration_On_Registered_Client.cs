@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Updating_Registration_On_Registered_Client : With<Client>
+    public class When_Updating_Registration_On_Registered_Client : WithClient
     {
         protected 
             override IEnumerable<IEvent> Given()

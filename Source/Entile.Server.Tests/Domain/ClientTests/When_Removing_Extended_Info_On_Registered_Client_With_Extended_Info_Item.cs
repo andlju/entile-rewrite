@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Removing_Extended_Info_On_Registered_Client_With_Extended_Info_Item : With<Client>
+    public class When_Removing_Extended_Info_On_Registered_Client_With_Extended_Info_Item : WithClient
     {
         protected override IEnumerable<IEvent> Given()
         {

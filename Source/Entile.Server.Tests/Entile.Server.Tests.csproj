@@ -51,12 +51,14 @@
     <Compile Include="Domain\ClientTests\When_Removing_ExtendedInformationItem_On_Registered_Client_With_No_Such_Item.cs" />
     <Compile Include="Domain\ClientTests\When_Removing_Extended_Info_On_Registered_Client_With_Extended_Info_Item.cs" />
     <Compile Include="Domain\ClientTests\When_Removing_Extended_Info_On_Registered_Client_With_Other_Extended_Info_Items.cs" />
+    <Compile Include="Domain\ClientTests\When_Sending_Notification_To_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Setting_Extended_Information_On_Unregistered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Setting_Extended_Info_On_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Unregistering_An_Unregistered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Unregistering_A_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Unregistered_Client.cs" />
+    <Compile Include="Domain\ClientTests\WithClient.cs" />
     <Compile Include="Domain\With.cs" />
     <Compile Include="EventStreamConsumerTest.cs" />
     <Compile Include="JsonEventSerializerTest.cs" />

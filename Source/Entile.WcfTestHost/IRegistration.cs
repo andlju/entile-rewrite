@@ -16,5 +16,14 @@ namespace Entile.WcfTestHost
 
         [OperationContract]
         void Unregister(string uniqueId);
+
+        [OperationContract]
+        void SetExtendedInformationItem(string uniqueId, string key, string value);
+
+        [OperationContract]
+        void RemoveExtendedInformationItem(string uniqueId, string key);
+
+        [OperationContract]
+        void RemoveAllExtendedInformationItems(string uniqueId);
     }
 }

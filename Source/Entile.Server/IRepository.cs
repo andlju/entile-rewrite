@@ -2,7 +2,7 @@
 
 namespace Entile.Server
 {
-    public interface IRepository<TDomain> where TDomain : Aggregate<TDomain>, new()
+    public interface IRepository<TDomain> where TDomain : Aggregate<TDomain>
     {
         TDomain GetById(string uniqueId);
 

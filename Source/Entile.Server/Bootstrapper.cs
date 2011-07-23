@@ -24,7 +24,6 @@ namespace Entile.Server
 
         public void Initialize()
         {
-
             var jsonEventSerializer = new JsonEventSerializer();
             
             // Register known events to serialize
@@ -46,11 +45,15 @@ namespace Entile.Server
             _commandRouter = new MessageRouter();
             _commandBus = new InProcessBus(_commandRouter);
 
-            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus);
+            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus, () => new Client(null));
 
             // Register Command Handlers
             _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
             _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new SetExtendedInformationCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RemoveExtendedInformationCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RemoveAllExtendedInformationCommandHandler(clientRepository));
+            
 
             _registrator = new Registrator(_commandBus);
         }
@@ -61,7 +64,8 @@ namespace Entile.Server
             _viewCreatorsBus = new InProcessBus(_viewCreatorsEventRouter);
 
             // Register Event Handlers
-            _viewCreatorsEventRouter.RegisterHandlersIn(new RegistrationView());
+            _viewCreatorsEventRouter.RegisterHandlersIn(new ClientViewHandler());
+            _viewCreatorsEventRouter.RegisterHandlersIn(new ExtendedInformationViewHandler());
 
             var dispatcher = new EventStreamDispatcher(_viewCreatorsBus, entityFrameworkEventStore);
 

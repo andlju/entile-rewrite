@@ -38,7 +38,7 @@ namespace Entile.Server.ViewHandlers
         public DbSet<ExtendedInformationView> ExtendedInformationViews { get; set; }
     }
 
-    public class RegistrationView :
+    public class ClientViewHandler :
         IMessageHandler<ClientRegisteredEvent>,
         IMessageHandler<ClientRegistrationUpdatedEvent>,
         IMessageHandler<ClientUnregisteredEvent>
@@ -48,14 +48,17 @@ namespace Entile.Server.ViewHandlers
         {
             using (var context = new EntileViews())
             {
-                var clientView = new ClientView
-                                     {
-                                         UniqueId = @event.UniqueId, 
-                                         NotificationChannel = @event.NotificationChannel
-                                     };
+                var clientView = context.ClientViews.Find(@event.UniqueId);
+                if (clientView == null)
+                {
+                    clientView = new ClientView
+                    {
+                        UniqueId = @event.UniqueId,
+                    };
 
-                context.ClientViews.Add(clientView);
-                
+                    context.ClientViews.Add(clientView);
+                }
+                clientView.NotificationChannel = @event.NotificationChannel;
                 context.SaveChanges();
             }
         }

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Unregistering_An_Unregistered_Client : With<Client>
+    public class When_Unregistering_An_Unregistered_Client : WithClient
     {
         protected override IEnumerable<IEvent> Given()
         {
@@ -16,6 +16,12 @@ namespace Entile.Server.Tests.Domain.ClientTests
         protected override void When(Client client)
         {
             client.Unregister();
+        }
+
+        [Fact]
+        public void Then_No_Event_Is_Sent()
+        {
+            Assert.Empty(Events);
         }
 
         [Fact]

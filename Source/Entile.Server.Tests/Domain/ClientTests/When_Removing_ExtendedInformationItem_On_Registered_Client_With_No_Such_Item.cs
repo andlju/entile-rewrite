@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Removing_ExtendedInformationItem_On_Registered_Client_With_No_Such_Item : With<Client>
+    public class When_Removing_ExtendedInformationItem_On_Registered_Client_With_No_Such_Item : WithClient
     {
         protected override IEnumerable<IEvent> Given()
         {
@@ -15,6 +15,12 @@ namespace Entile.Server.Tests.Domain.ClientTests
         protected override void When(Client target)
         {
             target.RemoveExtendedInformationItem("MyKey");
+        }
+
+        [Fact]
+        public void Then_No_Event_Is_Sent()
+        {
+            Assert.Empty(Events);
         }
 
         [Fact]

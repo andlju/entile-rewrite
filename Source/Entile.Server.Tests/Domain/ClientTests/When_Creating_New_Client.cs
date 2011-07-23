@@ -8,12 +8,12 @@ namespace Entile.Server.Tests.Domain.ClientTests
 {
     // ReSharper disable InconsistentNaming
 
-    public class When_Creating_New_Client : With<Client>
+    public class When_Creating_New_Client : WithClient
     {
         protected override 
             Client Create()
         {
-            return new Client("1234", "http://my.channel.com");
+            return new Client("1234", "http://my.channel.com", null);
         }
 
         [Fact]

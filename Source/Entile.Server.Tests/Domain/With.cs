@@ -8,7 +8,7 @@ using Xunit;
 namespace Entile.Server.Tests.Domain
 {
     public abstract class With<T>
-        where T : Aggregate<T>, new()
+        where T : Aggregate<T>
     {
         private Exception _exceptionThrown;
         private IEvent[] _events;
@@ -22,11 +22,8 @@ namespace Entile.Server.Tests.Domain
         {
             
         }
-        
-        protected virtual T Create()
-        {
-            return new T();
-        }
+
+        protected abstract T Create();
 
         protected With()
         {

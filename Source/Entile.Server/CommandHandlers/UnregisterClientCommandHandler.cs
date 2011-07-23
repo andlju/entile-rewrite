@@ -14,13 +14,13 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(UnregisterClientCommand command)
         {
-            var registration = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.UniqueId);
 
-            if (registration != null)
+            if (client != null)
             {
-                registration.Unregister();
+                client.Unregister();
             }
-            _clientRepository.SaveChanges(registration);
+            _clientRepository.SaveChanges(client);
         }
 
     }

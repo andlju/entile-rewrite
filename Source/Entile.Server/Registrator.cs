@@ -27,6 +27,24 @@ namespace Entile.Server
                 new UnregisterClientCommand(uniqueId));
         }
 
+        public void SetExtendedInformation(string uniqueId, string key, string value)
+        {
+            SendCommand(
+                new SetExtendedInformationCommand(uniqueId, key, value));
+        }
+
+        public void RemoveExtendedInformation(string uniqueId, string key)
+        {
+            SendCommand(
+                new RemoveExtendedInformationCommand(uniqueId, key));
+        }
+
+        public void RemoveAllExtendedInformation(string uniqueId)
+        {
+            SendCommand(
+                new RemoveAllExtendedInformationCommand(uniqueId));
+        }
+
         private void SendCommand(ICommand command)
         {
             _messageBus.Publish(command);

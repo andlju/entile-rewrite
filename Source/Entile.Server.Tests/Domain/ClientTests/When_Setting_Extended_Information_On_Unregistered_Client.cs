@@ -5,7 +5,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Setting_Extended_Information_On_Unregistered_Client: With<Client>
+    public class When_Setting_Extended_Information_On_Unregistered_Client: WithClient
     {
         protected override IEnumerable<IEvent> Given()
         {
