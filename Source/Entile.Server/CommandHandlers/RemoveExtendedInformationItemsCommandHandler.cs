@@ -3,16 +3,16 @@ using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
-    public class RemoveExtendedInformationCommandHandler : IMessageHandler<RemoveExtendedInformationCommand>
+    public class RemoveExtendedInformationItemsCommandHandler : IMessageHandler<RemoveExtendedInformationItemCommand>
     {
         private readonly IRepository<Client> _clientRepository;
 
-        public RemoveExtendedInformationCommandHandler(IRepository<Client> clientRepository)
+        public RemoveExtendedInformationItemsCommandHandler(IRepository<Client> clientRepository)
         {
             _clientRepository = clientRepository;
         }
 
-        public void Handle(RemoveExtendedInformationCommand command)
+        public void Handle(RemoveExtendedInformationItemCommand command)
         {
             var client = _clientRepository.GetById(command.UniqueId);
 

@@ -45,14 +45,14 @@ namespace Entile.Server
             _commandRouter = new MessageRouter();
             _commandBus = new InProcessBus(_commandRouter);
 
-            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus, () => new Client(null));
+            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus);
 
             // Register Command Handlers
             _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
             _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new SetExtendedInformationCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new RemoveExtendedInformationCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new RemoveAllExtendedInformationCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new SetExtendedInformationItemCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RemoveExtendedInformationItemsCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RemoveAllExtendedInformationItemsCommandHandler(clientRepository));
             
 
             _registrator = new Registrator(_commandBus);

@@ -58,7 +58,7 @@
     <Compile Include="Domain\ClientTests\When_Unregistering_A_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Registered_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Unregistered_Client.cs" />
-    <Compile Include="Domain\ClientTests\WithClient.cs" />
+    <Compile Include="Domain\ClientTests\MockNotificationSender.cs" />
     <Compile Include="Domain\With.cs" />
     <Compile Include="EventStreamConsumerTest.cs" />
     <Compile Include="JsonEventSerializerTest.cs" />

@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
@@ -8,12 +10,21 @@ namespace Entile.Server.Tests.Domain.ClientTests
 {
     // ReSharper disable InconsistentNaming
 
-    public class When_Creating_New_Client : WithClient
+    public class When_Registering_New_Client : With<Client, RegisterClientCommand>
     {
-        protected override 
-            Client Create()
+        protected override IMessageHandler<RegisterClientCommand> CreateHandler(IRepository<Client> repository)
         {
-            return new Client("1234", "http://my.channel.com", null);
+            return new RegisterClientCommandHandler(repository);
+        }
+
+        protected override System.Collections.Generic.IEnumerable<IEvent> Given()
+        {
+            return null;
+        }
+
+        protected override RegisterClientCommand When()
+        {
+            return new RegisterClientCommand("1234", "http://my.channel.com");
         }
 
         [Fact]

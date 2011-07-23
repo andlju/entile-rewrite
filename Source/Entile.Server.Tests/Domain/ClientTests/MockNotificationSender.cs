@@ -28,15 +28,4 @@ namespace Entile.Server.Tests.Domain.ClientTests
         }
     }
 
-
-    public abstract class WithClient : With<Client>
-    {
-        protected MockNotificationSender NotificationSender { get; private set; }
-
-        protected override Client Create()
-        {
-            NotificationSender = new MockNotificationSender();
-            return new Client(NotificationSender);
-        }
-    }
 }

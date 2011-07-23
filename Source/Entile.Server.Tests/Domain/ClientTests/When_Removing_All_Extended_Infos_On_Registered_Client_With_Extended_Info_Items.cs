@@ -1,12 +1,19 @@
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Removing_All_Extended_Infos_On_Registered_Client_With_Extended_Info_Items : WithClient
+    public class When_Removing_All_Extended_Infos_On_Registered_Client_With_Extended_Info_Items : With<Client, RemoveAllExtendedInformationItemsCommand>
     {
+        protected override IMessageHandler<RemoveAllExtendedInformationItemsCommand> CreateHandler(IRepository<Client> repository)
+        {
+            return new RemoveAllExtendedInformationItemsCommandHandler(repository);
+        }
+
         protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
@@ -14,9 +21,9 @@ namespace Entile.Server.Tests.Domain.ClientTests
             yield return new ExtendedInformationItemSetEvent("MyOtherKey", "MyOtherValue");
         }
 
-        protected override void When(Client target)
+        protected override RemoveAllExtendedInformationItemsCommand When()
         {
-            target.RemoveAllExtendedInformationItems();
+            return new RemoveAllExtendedInformationItemsCommand("1234");
         }
 
         [Fact]

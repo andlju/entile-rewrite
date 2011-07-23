@@ -16,7 +16,6 @@ namespace Entile.Server.Domain
 
     public class Client : Aggregate<Client>
     {
-        private readonly INotificationSender _notificationSender;
         private string _uniqueId;
         private bool _isActive;
         private string _notificationChannel;
@@ -25,9 +24,8 @@ namespace Entile.Server.Domain
 
         public IDictionary<string, string> ExtendedInformation { get; private set; }
 
-        public Client(INotificationSender notificationSender)
+        public Client()
         {
-            _notificationSender = notificationSender;
             ExtendedInformation = new Dictionary<string, string>();
 
             RegisterEvent<ClientRegisteredEvent>(OnClientRegistered);
@@ -38,8 +36,8 @@ namespace Entile.Server.Domain
             RegisterEvent<ClientUnregisteredEvent>(OnClientUnregistered);
         }
 
-        public Client(string uniqueId, string notificationChannel, INotificationSender notificationSender)
-            : this(notificationSender)
+        public Client(string uniqueId, string notificationChannel)
+            : this()
         {
             ApplyEvent(new ClientRegisteredEvent(uniqueId, notificationChannel));
         }
@@ -52,7 +50,7 @@ namespace Entile.Server.Domain
             }
             else
             {
-                ApplyEvent(new ClientRegisteredEvent(UniqueId, notificationChannel));
+                ApplyEvent(new ClientReregisteredEvent(UniqueId, notificationChannel));
             }
         }
 

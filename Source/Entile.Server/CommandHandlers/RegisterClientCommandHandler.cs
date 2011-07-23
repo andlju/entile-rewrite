@@ -22,7 +22,7 @@ namespace Entile.Server.CommandHandlers
             } 
             else
             {
-                client = new Client(command.UniqueId, command.NotificationChannel, null); // TODO Use Factory Method
+                client = new Client(command.UniqueId, command.NotificationChannel); 
             }
 
             _clientRepository.SaveChanges(client);

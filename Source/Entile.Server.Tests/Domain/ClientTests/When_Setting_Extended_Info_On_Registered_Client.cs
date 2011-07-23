@@ -1,20 +1,27 @@
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Setting_Extended_Info_On_Registered_Client : WithClient
+    public class When_Setting_Extended_Info_On_Registered_Client : With<Client, SetExtendedInformationItemCommand>
     {
+        protected override IMessageHandler<SetExtendedInformationItemCommand> CreateHandler(IRepository<Client> repository)
+        {
+            return new SetExtendedInformationItemCommandHandler(repository);
+        }
+
         protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
         }
 
-        protected override void When(Client target)
+        protected override SetExtendedInformationItemCommand When()
         {
-            target.SetExtendedInformationItem("MyKey", "MyValue");
+            return new SetExtendedInformationItemCommand("1234", "MyKey", "MyValue");
         }
 
         [Fact]

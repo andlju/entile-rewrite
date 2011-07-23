@@ -1,27 +1,34 @@
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Unregistering_An_Unregistered_Client : WithClient
+    public class When_Unregistering_An_Unregistered_Client : With<Client, UnregisterClientCommand>
     {
+        protected override IMessageHandler<UnregisterClientCommand> CreateHandler(IRepository<Client> repository)
+        {
+            return new UnregisterClientCommandHandler(repository);
+        }
+
         protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
             yield return new ClientUnregisteredEvent();
         }
 
-        protected override void When(Client client)
+        protected override UnregisterClientCommand When()
         {
-            client.Unregister();
+            return new UnregisterClientCommand("1234");
         }
 
         [Fact]
         public void Then_No_Event_Is_Sent()
         {
-            Assert.Empty(Events);
+            Assert.Null(Events);
         }
 
         [Fact]

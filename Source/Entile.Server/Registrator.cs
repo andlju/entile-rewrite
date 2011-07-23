@@ -30,19 +30,19 @@ namespace Entile.Server
         public void SetExtendedInformation(string uniqueId, string key, string value)
         {
             SendCommand(
-                new SetExtendedInformationCommand(uniqueId, key, value));
+                new SetExtendedInformationItemCommand(uniqueId, key, value));
         }
 
         public void RemoveExtendedInformation(string uniqueId, string key)
         {
             SendCommand(
-                new RemoveExtendedInformationCommand(uniqueId, key));
+                new RemoveExtendedInformationItemCommand(uniqueId, key));
         }
 
         public void RemoveAllExtendedInformation(string uniqueId)
         {
             SendCommand(
-                new RemoveAllExtendedInformationCommand(uniqueId));
+                new RemoveAllExtendedInformationItemsCommand(uniqueId));
         }
 
         private void SendCommand(ICommand command)

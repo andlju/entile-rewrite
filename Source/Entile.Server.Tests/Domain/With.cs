@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain
 {
-    public abstract class With<T>
-        where T : Aggregate<T>
+    public abstract class With<TAgg, TCmd>
+        where TAgg : Aggregate<TAgg>, new()
+        where TCmd : ICommand
     {
         private Exception _exceptionThrown;
         private IEvent[] _events;
@@ -18,27 +20,21 @@ namespace Entile.Server.Tests.Domain
             yield break;
         }
 
-        protected virtual void When(T target)
-        {
-            
-        }
-
-        protected abstract T Create();
+        protected abstract IMessageHandler<TCmd> CreateHandler(IRepository<TAgg> repository);
+ 
+        protected abstract TCmd When();
 
         protected With()
         {
-            var target = Create();
-
-            target.LoadEvents(Given());
             try
             {
-                When(target);
+                var handler = CreateHandler(new InternalTestRepository(this));
+                handler.Handle(When());
             } 
             catch(Exception ex)
             {
                 _exceptionThrown = ex;
             }
-            _events = target.GetUncommittedEvents().ToArray();
         }
 
         protected IEvent[] Events
@@ -59,11 +55,38 @@ namespace Entile.Server.Tests.Domain
             get { return new Assertions(this);}
         }
 
+        private class InternalTestRepository : IRepository<TAgg>
+        {
+            private readonly With<TAgg, TCmd> _with;
+
+            public InternalTestRepository(With<TAgg, TCmd> with)
+            {
+                _with = with;
+            }
+
+            public TAgg GetById(string uniqueId)
+            {
+                var givenEvents = _with.Given();
+                if (givenEvents == null)
+                    return null;
+
+                var agg = new TAgg();
+                agg.LoadEvents(givenEvents);
+
+                return agg;
+            }
+
+            public void SaveChanges(TAgg aggregate)
+            {
+                _with._events = aggregate.GetUncommittedEvents().ToArray();
+            }
+        }
+
         public class Assertions
         {
-            private readonly With<T> _parent;
+            private readonly With<TAgg, TCmd> _parent;
 
-            public Assertions(With<T> parent)
+            public Assertions(With<TAgg, TCmd> parent)
             {
                 _parent = parent;
             }

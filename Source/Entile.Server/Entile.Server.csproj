@@ -49,13 +49,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
-    <Compile Include="CommandHandlers\RemoveAllExtendedInformationCommandHandler.cs" />
-    <Compile Include="CommandHandlers\RemoveExtendedInformationCommandHandler.cs" />
-    <Compile Include="CommandHandlers\SetExtendedInfoCommandHandler.cs" />
-    <Compile Include="Commands\RemoveAllExtendedInfoCommand.cs" />
-    <Compile Include="Commands\RemoveExtendedInfoCommand.cs" />
-    <Compile Include="Commands\SetExtendedInfoCommand.cs" />
+    <Compile Include="CommandHandlers\RemoveAllExtendedInformationItemsCommandHandler.cs" />
+    <Compile Include="CommandHandlers\RemoveExtendedInformationItemsCommandHandler.cs" />
+    <Compile Include="CommandHandlers\SetExtendedInformationItemCommandHandler.cs" />
+    <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
+    <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
+    <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
     <Compile Include="EventStreamDispatcher.cs" />
+    <Compile Include="Events\ClientReregisteredEvent.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />
     <Compile Include="CommandHandlers\RegisterClientCommandHandler.cs" />

@@ -5,17 +5,15 @@ using Entile.Server.Domain;
 namespace Entile.Server
 {
     public class EventStoreRepository<TDomain> : IRepository<TDomain>
-        where TDomain : Aggregate<TDomain>
+        where TDomain : Aggregate<TDomain>, new()
     {
         private readonly IEventStore _eventStore;
         private readonly IBus _eventBus;
-        private readonly Func<TDomain> _factoryMethod;
 
-        public EventStoreRepository(IEventStore eventStore, IBus eventBus, Func<TDomain> factoryMethod)
+        public EventStoreRepository(IEventStore eventStore, IBus eventBus)
         {
             _eventStore = eventStore;
             _eventBus = eventBus;
-            _factoryMethod = factoryMethod;
         }
 
         public TDomain GetById(string uniqueId)
@@ -24,7 +22,7 @@ namespace Entile.Server
             if (events == null)
                 return null;
 
-            var aggregate = _factoryMethod();
+            var aggregate = new TDomain();
 
             aggregate.LoadEvents(events);
 

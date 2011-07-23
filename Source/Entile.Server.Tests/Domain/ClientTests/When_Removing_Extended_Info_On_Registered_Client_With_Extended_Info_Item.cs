@@ -1,21 +1,28 @@
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Removing_Extended_Info_On_Registered_Client_With_Extended_Info_Item : WithClient
+    public class When_Removing_Extended_Info_On_Registered_Client_With_Extended_Info_Item : With<Client, RemoveExtendedInformationItemCommand>
     {
+        protected override IMessageHandler<RemoveExtendedInformationItemCommand> CreateHandler(IRepository<Client> repository)
+        {
+            return new RemoveExtendedInformationItemsCommandHandler(repository);
+        }
+
         protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
             yield return new ExtendedInformationItemSetEvent("MyKey", "MyValue");
         }
 
-        protected override void When(Client target)
+        protected override RemoveExtendedInformationItemCommand When()
         {
-            target.RemoveExtendedInformationItem("MyKey");
+            return new RemoveExtendedInformationItemCommand("1234", "MyKey");
         }
 
         [Fact]

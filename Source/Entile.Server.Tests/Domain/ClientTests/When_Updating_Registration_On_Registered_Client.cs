@@ -1,22 +1,27 @@
 using System.Collections.Generic;
+using Entile.Server.CommandHandlers;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Updating_Registration_On_Registered_Client : WithClient
+    public class When_Registering_Already_Registered_Client : With<Client, RegisterClientCommand>
     {
-        protected 
-            override IEnumerable<IEvent> Given()
+        protected override IMessageHandler<RegisterClientCommand> CreateHandler(IRepository<Client> repository)
+        {
+            return new RegisterClientCommandHandler(repository);
+        }
+
+        protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
         }
 
-        protected 
-            override void When(Client client)
+        protected override RegisterClientCommand When()
         {
-            client.UpdateRegistration("http://new.channel.com");
+            return new RegisterClientCommand("1234", "http://new.channel.com");
         }
 
         [Fact]
