@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Entile.Server.Commands;
 using Entile.Server.Events;
 
 namespace Entile.Server.Domain
@@ -91,12 +92,14 @@ namespace Entile.Server.Domain
             ApplyEvent(new ClientUnregisteredEvent());
         }
 
-        public void SendNotification(string title, string body, INotificationSender notificationSender)
+        public void SendNotification(string title, string body, INotificationSender notificationSender, ICommandScheduler commandScheduler)
         {
             var response = notificationSender.SendNotification(_notificationChannel, title, body);
 
             if (response.Status == "Failed")
             {
+                // Retry one minute from now
+                commandScheduler.ScheduleCommand(new Commands.SendNotificationCommand(this.UniqueId, title, body), DateTime.Now.AddMinutes(1));
                 ApplyEvent(new NotificationFailedEvent(title, body));
             }
             else

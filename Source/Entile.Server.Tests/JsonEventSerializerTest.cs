@@ -21,7 +21,7 @@ namespace Entile.Server.Tests
         [Fact]
         public void SimpleObjectSerializesToJson()
         {
-            var target = new JsonEventSerializer();
+            var target = new JsonMessageSerializer();
             var simpleEvent = new SimpleEvent("Simple string", 1337);
 
             var result = target.Serialize(simpleEvent);
@@ -34,8 +34,8 @@ namespace Entile.Server.Tests
         [Fact]
         public void SimpleObjectDeserializesFromJson()
         {
-            var target = new JsonEventSerializer();
-            target.RegisterKnownEventType<SimpleEvent>();
+            var target = new JsonMessageSerializer();
+            target.RegisterKnownMessageType<SimpleEvent>();
 
             var eventString = "{\"MyString\":\"Simple string\",\"MyInt\":1337}";
 

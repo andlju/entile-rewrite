@@ -1,21 +1,16 @@
-using System;
-using Entile.Server.Commands;
-
-namespace Entile.Server
+﻿namespace Entile.Server.Commands
 {
-    public class SendNotificationCommand : CommandBase
+    public class CreateNotificationCommand : CommandBase
     {
         public string UniqueId { get; private set; }
-
         public string Title { get; private set; }
         public string Body { get; private set; }
 
-        public SendNotificationCommand(string uniqueId, string title, string body)
+        public CreateNotificationCommand(string uniqueId, string title, string body)
         {
             UniqueId = uniqueId;
             Title = title;
             Body = body;
         }
     }
-
 }

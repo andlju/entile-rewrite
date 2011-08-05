@@ -7,11 +7,11 @@ using Newtonsoft.Json.Linq;
 
 namespace Entile.Server
 {
-    public class JsonEventSerializer : IEventSerializer
+    public class JsonMessageSerializer : IMessageSerializer
     {
         private Dictionary<string, Type> _knownTypes = new Dictionary<string, Type>();
 
-        public void RegisterKnownEventType<T>()
+        public void RegisterKnownMessageType<T>()
         {
             var type = typeof(T);
             _knownTypes[type.Name] = type;
@@ -32,7 +32,7 @@ namespace Entile.Server
             Type type;
 
             if (!_knownTypes.TryGetValue(typeName, out type))
-                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Serializer doesn't know the event type {0}", typeName));
+                throw new InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Serializer doesn't know the message type {0}", typeName));
 
             return JsonConvert.DeserializeObject(prop.Value.ToString(Formatting.None), type);
         }

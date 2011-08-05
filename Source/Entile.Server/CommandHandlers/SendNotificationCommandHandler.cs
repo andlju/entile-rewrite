@@ -1,3 +1,4 @@
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
@@ -6,11 +7,13 @@ namespace Entile.Server.CommandHandlers
     {
         private readonly IRepository<Client> _clientRepository;
         private readonly INotificationSender _notificationSender;
+        private readonly ICommandScheduler _commandScheduler;
 
-        public SendNotificationCommandHandler(IRepository<Client> clientRepository, INotificationSender notificationSender)
+        public SendNotificationCommandHandler(IRepository<Client> clientRepository, INotificationSender notificationSender, ICommandScheduler commandScheduler)
         {
             _clientRepository = clientRepository;
             _notificationSender = notificationSender;
+            _commandScheduler = commandScheduler;
         }
 
         public void Handle(SendNotificationCommand command)
@@ -20,7 +23,9 @@ namespace Entile.Server.CommandHandlers
             if (client == null)
                 throw new ClientNotRegisteredException(command.UniqueId);
 
-            client.SendNotification(command.Title, command.Body, _notificationSender);
+            client.SendNotification(command.Title, command.Body, _notificationSender, _commandScheduler);
+
+            _clientRepository.SaveChanges(client);
         }
     }
 }

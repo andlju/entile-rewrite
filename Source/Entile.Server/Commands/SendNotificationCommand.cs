@@ -3,7 +3,7 @@ using System;
 namespace Entile.Server.Commands
 {
 
-    public abstract class Notification
+/*    public abstract class Notification
     {
         protected Notification()
         {
@@ -18,16 +18,18 @@ namespace Entile.Server.Commands
         public string Title { get; set; }
         public string Body { get; set; }
     }
-
+    */
     public class SendNotificationCommand : CommandBase
     {
         public string UniqueId { get; private set; }
-        public Notification Notification { get; private set; }
+        public string Title { get; set; }
+        public string Body { get; set; }
 
-        public SendNotificationCommand(string uniqueId, Notification notification)
+        public SendNotificationCommand(string uniqueId, string title, string body)
         {
             UniqueId = uniqueId;
-            Notification = notification;
+            Title = title;
+            Body = body;
         }
     }
 }

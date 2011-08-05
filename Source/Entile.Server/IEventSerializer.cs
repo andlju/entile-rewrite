@@ -2,7 +2,7 @@
 
 namespace Entile.Server
 {
-    public interface IEventSerializer
+    public interface IMessageSerializer
     {
         string Serialize(object obj);
         object Deserialize(string json);

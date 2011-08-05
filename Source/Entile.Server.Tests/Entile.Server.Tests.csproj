@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandSchedulerTest.cs" />
     <Compile Include="Domain\ClientTests\When_Creating_New_Client.cs" />
     <Compile Include="Domain\ClientTests\When_Removing_All_Extended_Infos_On_Registered_Client_With_Extended_Info_Items.cs" />
     <Compile Include="Domain\ClientTests\When_Removing_ExtendedInformationItem_On_Registered_Client_With_No_Such_Item.cs" />

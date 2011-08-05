@@ -53,6 +53,8 @@
     <Compile Include="CommandHandlers\RemoveExtendedInformationItemsCommandHandler.cs" />
     <Compile Include="CommandHandlers\SendNotificationCommandHandler.cs" />
     <Compile Include="CommandHandlers\SetExtendedInformationItemCommandHandler.cs" />
+    <Compile Include="Commands\CommandBase.cs" />
+    <Compile Include="Commands\CreateNotificationCommand.cs" />
     <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
     <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
     <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="Events\ClientReregisteredEvent.cs" />
     <Compile Include="Events\NotificationFailedEvent.cs" />
     <Compile Include="Events\NotificationSucceededEvent.cs" />
+    <Compile Include="ICommandScheduler.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />
     <Compile Include="CommandHandlers\RegisterClientCommandHandler.cs" />
@@ -85,7 +88,6 @@
     <Compile Include="IBus.cs" />
     <Compile Include="IEventSerializer.cs" />
     <Compile Include="IEventStore.cs" />
-    <Compile Include="INotifier.cs" />
     <Compile Include="FileSystemEventStore.cs" />
     <Compile Include="IRegistrator.cs" />
     <Compile Include="IRepository.cs" />
@@ -99,6 +101,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

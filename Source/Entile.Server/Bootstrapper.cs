@@ -24,15 +24,18 @@ namespace Entile.Server
 
         public void Initialize()
         {
-            var jsonEventSerializer = new JsonEventSerializer();
+            var jsonEventSerializer = new JsonMessageSerializer();
             
             // Register known events to serialize
-            jsonEventSerializer.RegisterKnownEventType<ClientRegisteredEvent>();
-            jsonEventSerializer.RegisterKnownEventType<ClientRegistrationUpdatedEvent>();
-            jsonEventSerializer.RegisterKnownEventType<ClientUnregisteredEvent>();
-            jsonEventSerializer.RegisterKnownEventType<ExtendedInformationItemSetEvent>();
-            jsonEventSerializer.RegisterKnownEventType<ExtendedInformationItemRemovedEvent>();
-            jsonEventSerializer.RegisterKnownEventType<AllExtendedInformationItemsRemovedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ClientRegisteredEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ClientRegistrationUpdatedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ClientUnregisteredEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ExtendedInformationItemSetEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ExtendedInformationItemRemovedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<AllExtendedInformationItemsRemovedEvent>();
+
+            var jsonCommandSerializer = new JsonMessageSerializer();
+            jsonCommandSerializer.RegisterKnownMessageType<SendNotificationCommand>();
 
             var entityFrameworkEventStore = new EntityFrameworkEventStore(jsonEventSerializer);
 

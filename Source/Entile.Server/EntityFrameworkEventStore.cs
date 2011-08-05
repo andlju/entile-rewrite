@@ -41,9 +41,9 @@ namespace Entile.Server
 
     public class EntityFrameworkEventStore : IEventStore, IEventConsumer
     {
-        private readonly IEventSerializer _serializer;
+        private readonly IMessageSerializer _serializer;
 
-        public EntityFrameworkEventStore(IEventSerializer serializer)
+        public EntityFrameworkEventStore(IMessageSerializer serializer)
         {
             _serializer = serializer;
         }

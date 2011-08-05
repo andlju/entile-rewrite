@@ -93,6 +93,7 @@ namespace Entile.Server.Tests.Domain
 
             public void IsType<TEvent>(int eventNumber)
             {
+                Assert.NotNull(_parent.Events[eventNumber]);
                 Assert.IsType<TEvent>(_parent.Events[eventNumber]);
             }
 
