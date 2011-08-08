@@ -26,22 +26,22 @@ namespace Entile.Server.Tests.Domain.ClientTests
         }
 
         [Fact]
-        public void Then_ClientReregisteredEvent_Is_Sent()
+        public void Then_ClientRegistrationUpdatedEventIs_Sent()
         {
-            AssertEvent.IsType<ClientReregisteredEvent>(0);
+            AssertEvent.IsType<ClientRegistrationUpdatedEvent>(0);
         }
 
         [Fact]
         public void Then_The_UniqueId_On_The_Event_Is_Correct()
         {
-            AssertEvent.Contents<ClientReregisteredEvent>(0,
+            AssertEvent.Contents<ClientRegistrationUpdatedEvent>(0,
                                                         ev => Assert.Equal("1234", ev.UniqueId));
         }
 
         [Fact]
         public void Then_The_NotificationChannel_On_The_Event_Is_Correct()
         {
-            AssertEvent.Contents<ClientReregisteredEvent>(0,
+            AssertEvent.Contents<ClientRegistrationUpdatedEvent>(0,
                                                         ev => Assert.Equal("http://new.channel.com", ev.NotificationChannel));
         }
     }

@@ -5,21 +5,6 @@ using Entile.Server.Events;
 
 namespace Entile.Server.Domain
 {
-    public interface INotificationSender
-    {
-        NotificationResponse SendNotification(string channel, string title, string body);
-    }
-    
-    public class NotificationResponse
-    {
-        public string Status { get; private set; }
-
-        public NotificationResponse(string status)
-        {
-            Status = status;
-        }
-    }
-
     public class Client : Aggregate<Client>
     {
         private string _uniqueId;
@@ -50,14 +35,7 @@ namespace Entile.Server.Domain
 
         public void UpdateRegistration(string notificationChannel)
         {
-            if (_isActive)
-            {
-                ApplyEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
-            }
-            else
-            {
-                ApplyEvent(new ClientReregisteredEvent(UniqueId, notificationChannel));
-            }
+            ApplyEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
         }
 
         public void SetExtendedInformationItem(string key, string value)
@@ -92,19 +70,19 @@ namespace Entile.Server.Domain
             ApplyEvent(new ClientUnregisteredEvent());
         }
 
-        public void SendNotification(string title, string body, INotificationSender notificationSender, ICommandScheduler commandScheduler)
+        public void SendNotification(NotificationBase notification, INotificationSender notificationSender, IMessageScheduler commandScheduler)
         {
-            var response = notificationSender.SendNotification(_notificationChannel, title, body);
+            var response = notificationSender.SendNotification(_notificationChannel, notification);
 
-            if (response.Status == "Failed")
+            if (response.HttpStatusCode == 404)
             {
                 // Retry one minute from now
-                commandScheduler.ScheduleCommand(new Commands.SendNotificationCommand(this.UniqueId, title, body), DateTime.Now.AddMinutes(1));
-                ApplyEvent(new NotificationFailedEvent(title, body));
+                //commandScheduler.ScheduleCommand(new SendToastNotificationCommand(this.UniqueId, notificationtitle, body), DateTime.Now.AddMinutes(1));
+                //ApplyEvent(new NotificationFailedEvent(title, body));
             }
             else
             {
-                ApplyEvent(new NotificationSucceededEvent(title, body));
+                //ApplyEvent(new NotificationSucceededEvent(title, body));
             }
         }
 
@@ -117,6 +95,7 @@ namespace Entile.Server.Domain
 
         private void OnClientRegistrationUpdated(ClientRegistrationUpdatedEvent @event)
         {
+            _isActive = true;
             _notificationChannel = @event.NotificationChannel;
         }
 

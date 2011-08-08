@@ -17,7 +17,15 @@ namespace Entile.Server
         public long Timestamp { get; set; }
 
         public string SerializedEvent { get; set; }
+    }
 
+    public class ScheduledMessage
+    {
+        [Key]
+        public Guid MessageId { get; set; }
+
+        public string SerializedMessage { get; set; }
+        public DateTime SendTime { get; set; }
     }
 
     public class Consumer
@@ -37,9 +45,11 @@ namespace Entile.Server
         public DbSet<Event> Events { get; set; }
 
         public DbSet<Consumer> Consumers { get; set; }
+
+        public DbSet<ScheduledMessage> ScheduledMessages { get; set; }
     }
 
-    public class EntityFrameworkEventStore : IEventStore, IEventConsumer
+    public class EntityFrameworkEventStore : IEventStore, IEventConsumer, ISchedulerStore
     {
         private readonly IMessageSerializer _serializer;
 
@@ -124,6 +134,34 @@ namespace Entile.Server
 
                 consumer.LastUpdate = lastUpdate;
                 context.SaveChanges();
+            }
+        }
+
+        public void PushScheduledMessage(IMessage message, DateTime sendTime)
+        {
+            var serializedMessage = _serializer.Serialize(message);
+            using (var context = new EventContext())
+            {
+                context.ScheduledMessages.Add(new ScheduledMessage()
+                                                  {
+                                                      MessageId = Guid.NewGuid(),
+                                                      SerializedMessage = serializedMessage,
+                                                      SendTime = sendTime
+                                                  });
+                context.SaveChanges();
+            }
+        }
+
+        public IEnumerable<IMessage> PopMessages(int maxNumberOfMessages)
+        {
+            using (var context = new EventContext())
+            {
+                var messages = from m in context.ScheduledMessages
+                               where m.SendTime >= DateTime.Now
+                               orderby m.SendTime
+                               select m.SerializedMessage;
+
+                return messages.ToArray().Select(m=>_serializer.Deserialize(m)).Cast<IMessage>();
             }
         }
     }

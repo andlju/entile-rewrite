@@ -8,15 +8,15 @@ namespace Entile.Server.Tests
 {
     public class MockSchedulerStore : ISchedulerStore
     {
-        public List<Tuple<string, DateTime>> PushedMessages = new List<Tuple<string, DateTime>>();
-        public List<string> MessagesToPop = new List<string>();
+        public List<Tuple<IMessage, DateTime>> PushedMessages = new List<Tuple<IMessage, DateTime>>();
+        public List<IMessage> MessagesToPop = new List<IMessage>();
 
-        public void PushScheduledMessage(string message, DateTime sendTime)
+        public void PushScheduledMessage(IMessage message, DateTime sendTime)
         {
-            PushedMessages.Add(new Tuple<string, DateTime>(message, sendTime));
+            PushedMessages.Add(new Tuple<IMessage, DateTime>(message, sendTime));
         }
 
-        public IEnumerable<string> PopMessages(int maxNumberOfMessages)
+        public IEnumerable<IMessage> PopMessages(int maxNumberOfMessages)
         {
             return MessagesToPop.Take(maxNumberOfMessages);
         }
@@ -36,11 +36,8 @@ namespace Entile.Server.Tests
         public void When_Scheduling_A_Command_It_Is_Pushed_To_The_Store()
         {
             var schedulerStore = new MockSchedulerStore();
-            var serializer = new JsonMessageSerializer();
-            
-            serializer.RegisterKnownMessageType<TestCommand>();
 
-            var commandScheduler = new CommandScheduler(schedulerStore, serializer);
+            var commandScheduler = new MessageScheduler(schedulerStore);
 
             commandScheduler.ScheduleCommand(new TestCommand() { Test = "TestText"}, new DateTime(2012, 06, 24, 13, 37, 42));
 

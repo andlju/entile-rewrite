@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="Entile.WcfTestHost.Notification" CodeBehind="Notification.svc.cs" %>

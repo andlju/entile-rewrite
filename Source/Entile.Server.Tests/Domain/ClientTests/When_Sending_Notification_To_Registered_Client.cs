@@ -8,66 +8,25 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Sending_Notification_To_Registered_Client_With_QueueFull_Response : With<Client, SendNotificationCommand>
+    public class When_Successfully_Sending_Notification_To_Registered_Client : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
 
-        protected override IMessageHandler<SendNotificationCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository<Client> repository)
         {
             return new SendNotificationCommandHandler(repository, _notificationSender, null);
         }
 
         protected override IEnumerable<IEvent> Given()
         {
-            _notificationSender.ResponseToReturn = new NotificationResponse("QueueFull");
+            _notificationSender.ResponseToReturn = new NotificationResponse(200, "OK", "", "");
 
             yield return new ClientRegisteredEvent("1337", "http://test.com/mychannel");
         }
 
-        protected override SendNotificationCommand When()
+        protected override SendToastNotificationCommand When()
         {
-            return new SendNotificationCommand("1337", "Title", "Body");
-        }
-
-        [Fact]
-        public void Then_Notification_Failed_Event_Is_Sent()
-        {
-            AssertEvent.IsType<NotificationFailedEvent>(0);
-        }
-
-        [Fact]
-        public void Then_Failed_Notification_Title_Is_Correct()
-        {
-            AssertEvent.Contents<NotificationFailedEvent>(0, e => Assert.Equal("Title", e.Title));
-        }
-
-        [Fact]
-        public void Then_Failed_Notification_Body_Is_Correct()
-        {
-            AssertEvent.Contents<NotificationFailedEvent>(0, e => Assert.Equal("Body", e.Body));
-        }
-    }
-
-
-    public class When_Successfully_Sending_Notification_To_Registered_Client : With<Client, SendNotificationCommand>
-    {
-        private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
-
-        protected override IMessageHandler<SendNotificationCommand> CreateHandler(IRepository<Client> repository)
-        {
-            return new SendNotificationCommandHandler(repository, _notificationSender, null);
-        }
-
-        protected override IEnumerable<IEvent> Given()
-        {
-            _notificationSender.ResponseToReturn = new NotificationResponse("Sent");
-
-            yield return new ClientRegisteredEvent("1337", "http://test.com/mychannel");
-        }
-
-        protected override SendNotificationCommand When()
-        {
-            return new SendNotificationCommand("1234", "Title", "Body");
+            return new SendToastNotificationCommand("1234", Guid.NewGuid(), "Title", "Body", null, 3);
         }
 
         [Fact]
@@ -91,13 +50,13 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_Sent_Notification_Title_Is_Correct()
         {
-            Assert.Equal("Title", _notificationSender.Title);
+            Assert.Equal("Title", ((ToastNotification)_notificationSender.NotificationMessage).Title);
         }
 
         [Fact]
         public void Then_Sent_Notification_Body_Is_Correct()
         {
-            Assert.Equal("Body", _notificationSender.Body);
+            Assert.Equal("Body", ((ToastNotification)_notificationSender.NotificationMessage).Body);
         }
 
         [Fact]

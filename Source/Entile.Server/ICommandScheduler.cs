@@ -6,41 +6,34 @@ namespace Entile.Server
 {
     public interface ISchedulerStore
     {
-        void PushScheduledMessage(string message, DateTime sendTime);
-        IEnumerable<string> PopMessages(int maxNumberOfMessages);
+        void PushScheduledMessage(IMessage message, DateTime sendTime);
+        IEnumerable<IMessage> PopMessages(int maxNumberOfMessages);
     }
 
-    public interface ICommandScheduler
+    public interface IMessageScheduler
     {
-        void ScheduleCommand(ICommand command, DateTime sendTime);
-        IEnumerable<ICommand> GetMessagesToProcess();
+        void ScheduleCommand(IMessage command, DateTime sendTime);
+        IEnumerable<IMessage> GetMessagesToProcess();
     }
 
-    public class CommandScheduler : ICommandScheduler
+    public class MessageScheduler : IMessageScheduler
     {
         private readonly ISchedulerStore _schedulerStore;
-        private readonly IMessageSerializer _serializer;
         private readonly int _maximumNumberOfMessagesPerBatch = 10;
 
-        public CommandScheduler(ISchedulerStore schedulerStore, IMessageSerializer serializer)
+        public MessageScheduler(ISchedulerStore schedulerStore)
         {
             _schedulerStore = schedulerStore;
-            _serializer = serializer;
         }
 
-        public void ScheduleCommand(ICommand command, DateTime sendTime)
+        public void ScheduleCommand(IMessage message, DateTime sendTime)
         {
-            var message = _serializer.Serialize(command);
             _schedulerStore.PushScheduledMessage(message, sendTime);
         }
 
-        public IEnumerable<ICommand> GetMessagesToProcess()
+        public IEnumerable<IMessage> GetMessagesToProcess()
         {
-            var messages = _schedulerStore.PopMessages(_maximumNumberOfMessagesPerBatch);
-            foreach(var message in messages)
-            {
-                yield return (ICommand)_serializer.Deserialize(message);
-            }
+            return _schedulerStore.PopMessages(_maximumNumberOfMessagesPerBatch);
         }
     }
 }
