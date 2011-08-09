@@ -8,9 +8,10 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Successfully_Sending_Notification_To_Registered_Client : With<Client, SendToastNotificationCommand>
+    public class When_Successfully_Sending_ToastNotification_To_Registered_Client : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
+        private readonly Guid _notificationId = Guid.NewGuid();
 
         protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository<Client> repository)
         {
@@ -19,14 +20,15 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         protected override IEnumerable<IEvent> Given()
         {
-            _notificationSender.ResponseToReturn = new NotificationResponse(200, "OK", "", "");
+            _notificationSender.ResponseToReturn = new NotificationResponse(200, "Received", "Connected", "Active");
 
             yield return new ClientRegisteredEvent("1337", "http://test.com/mychannel");
         }
 
         protected override SendToastNotificationCommand When()
         {
-            return new SendToastNotificationCommand("1234", Guid.NewGuid(), "Title", "Body", null, 3);
+            
+            return new SendToastNotificationCommand("1234", _notificationId, "Title", "Body", "/Test.xaml?test=value", 3);
         }
 
         [Fact]
@@ -60,9 +62,15 @@ namespace Entile.Server.Tests.Domain.ClientTests
         }
 
         [Fact]
+        public void Then_Sent_Notification_ParamUri_Is_Correct()
+        {
+            Assert.Equal("/Test.xaml?test=value", ((ToastNotification)_notificationSender.NotificationMessage).ParamUri);
+        }
+
+        [Fact]
         public void Then_Notification_Succeeded_Event_Is_Pushed()
         {
-            AssertEvent.IsType<NotificationSucceededEvent>(0);
+            AssertEvent.IsType<ToastNotificationSucceededEvent>(0);
         }
 
         [Fact]
@@ -74,13 +82,25 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_Notification_Succeeded_Title_Is_Correct()
         {
-            AssertEvent.Contents<NotificationSucceededEvent>(0, e => Assert.Equal("Title", e.Title));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("Title", e.Title));
         }
 
         [Fact]
         public void Then_Notification_Succeeded_Body_Is_Correct()
         {
-            AssertEvent.Contents<NotificationSucceededEvent>(0, e => Assert.Equal("Body", e.Body));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("Body", e.Body));
+        }
+
+        [Fact]
+        public void Then_Notification_Succeeded_ParamUri_Is_Correct()
+        {
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("/Test.xaml?test=value", e.ParamUri));
+        }
+
+        [Fact]
+        public void Then_Notification_Succeeded_NotificationId_Is_Correct()
+        {
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal(_notificationId, e.NotificationId));
         }
 
     }

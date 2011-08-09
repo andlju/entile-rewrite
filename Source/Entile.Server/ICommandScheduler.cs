@@ -12,7 +12,7 @@ namespace Entile.Server
 
     public interface IMessageScheduler
     {
-        void ScheduleCommand(IMessage command, DateTime sendTime);
+        void ScheduleMessage(IMessage message, DateTime sendTime);
         IEnumerable<IMessage> GetMessagesToProcess();
     }
 
@@ -26,7 +26,7 @@ namespace Entile.Server
             _schedulerStore = schedulerStore;
         }
 
-        public void ScheduleCommand(IMessage message, DateTime sendTime)
+        public void ScheduleMessage(IMessage message, DateTime sendTime)
         {
             _schedulerStore.PushScheduledMessage(message, sendTime);
         }

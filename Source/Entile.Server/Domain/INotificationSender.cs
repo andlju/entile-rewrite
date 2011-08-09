@@ -10,7 +10,9 @@ namespace Entile.Server.Domain
     {
         public NotificationResponse SendNotification(string channel, INotificationMessage notification)
         {
-            throw new System.NotImplementedException();
+            return new NotificationResponse(200, "Received", "Connected", "Active");
         }
     }
+
+
 }

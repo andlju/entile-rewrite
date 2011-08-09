@@ -37,11 +37,17 @@ namespace Entile.Server
             jsonEventSerializer.RegisterKnownMessageType<ExtendedInformationItemRemovedEvent>();
             jsonEventSerializer.RegisterKnownMessageType<AllExtendedInformationItemsRemovedEvent>();
 
-            jsonEventSerializer.RegisterKnownMessageType<NotificationSucceededEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<NotificationFailedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ToastNotificationSucceededEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<RawNotificationSucceededEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<TileNotificationSucceededEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<ToastNotificationFailedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<RawNotificationFailedEvent>();
+            jsonEventSerializer.RegisterKnownMessageType<TileNotificationFailedEvent>();
 
             var jsonCommandSerializer = new JsonMessageSerializer();
             jsonCommandSerializer.RegisterKnownMessageType<SendToastNotificationCommand>();
+            jsonCommandSerializer.RegisterKnownMessageType<SendRawNotificationCommand>();
+            jsonCommandSerializer.RegisterKnownMessageType<SendTileNotificationCommand>();
 
             var entityFrameworkEventStore = new EntityFrameworkEventStore(jsonEventSerializer);
 

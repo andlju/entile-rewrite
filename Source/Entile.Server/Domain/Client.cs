@@ -70,20 +70,80 @@ namespace Entile.Server.Domain
             ApplyEvent(new ClientUnregisteredEvent());
         }
 
-        public void SendNotification(NotificationBase notification, INotificationSender notificationSender, IMessageScheduler commandScheduler)
+        public void SendNotification(NotificationBase notification, int attemptsLeft, INotificationSender notificationSender, IMessageScheduler commandScheduler)
         {
             var response = notificationSender.SendNotification(_notificationChannel, notification);
 
-            if (response.HttpStatusCode == 404)
+            var toastNotification = notification as ToastNotification;
+            var rawNotification = notification as RawNotification;
+            var tileNotification = notification as TileNotification;
+
+            if (response.HttpStatusCode == 200)
             {
-                // Retry one minute from now
-                //commandScheduler.ScheduleCommand(new SendToastNotificationCommand(this.UniqueId, notificationtitle, body), DateTime.Now.AddMinutes(1));
-                //ApplyEvent(new NotificationFailedEvent(title, body));
+                if (response.NotificationStatus == "Received")
+                {
+                    if (toastNotification != null)
+                        ApplyEvent(new ToastNotificationSucceededEvent(toastNotification.NotificationId, attemptsLeft, toastNotification.Title, toastNotification.Body, toastNotification.ParamUri));
+                    else if (rawNotification != null)
+                        ApplyEvent(new RawNotificationSucceededEvent(rawNotification.NotificationId, attemptsLeft, rawNotification.RawContent));
+                    else if (tileNotification != null)
+                        ApplyEvent(new TileNotificationSucceededEvent(tileNotification.NotificationId, attemptsLeft, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, tileNotification.ParamUri));
+                    return;
+                }
             }
-            else
+
+            // Something went wrong somehow. First, let's publish an event saing so.
+            if (toastNotification != null)
+                ApplyEvent(new ToastNotificationFailedEvent(toastNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, toastNotification.Title, toastNotification.Body, toastNotification.ParamUri));
+            else if (rawNotification != null)
+                ApplyEvent(new RawNotificationFailedEvent(rawNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, rawNotification.RawContent));
+            else if (tileNotification != null)
+                ApplyEvent(new TileNotificationFailedEvent(tileNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, tileNotification.ParamUri));
+
+            // Next let's figure out what to do next
+            var resendTime = DateTime.Now;
+            var shouldAttemptAgain = false;
+
+            if (response.NotificationStatus == "QueueFull"  || response.HttpStatusCode == 503)
             {
-                //ApplyEvent(new NotificationSucceededEvent(title, body));
+                // Service currently full or unavailable. 
+                resendTime = resendTime.AddMinutes(1); // TODO Increase exponentially
+                shouldAttemptAgain = true;
+            } 
+            else if (response.NotificationStatus == "Suppressed")
+            {
+                shouldAttemptAgain = false;
+            } 
+            else if (response.NotificationStatus == "Dropped" && response.SubscriptionStatus == "Expired")
+            {
+                // Subscription Expired. Don't attempt again and unregister this client.
+                shouldAttemptAgain = false;
+                Unregister();
+            } 
+            else if (response.NotificationStatus == "Dropped" && response.SubscriptionStatus == "Active")
+            {
+                // Rate limit reached. Attempt to resend in one hour
+                resendTime = resendTime.AddHours(1);
+                shouldAttemptAgain = true;
+            } 
+            else if (response.NotificationStatus == "Dropped" && response.DeviceConnectionStatus == "Inactive")
+            {
+                resendTime = resendTime.AddHours(1);
+                shouldAttemptAgain = true;
             }
+
+            // Should we re-try?
+            if (shouldAttemptAgain)
+            {
+                attemptsLeft--;
+                if (toastNotification != null)
+                    commandScheduler.ScheduleMessage(new SendToastNotificationCommand(this.UniqueId, toastNotification.NotificationId, toastNotification.Title, toastNotification.Body, toastNotification.ParamUri, attemptsLeft), resendTime);
+                else if (rawNotification != null)
+                    commandScheduler.ScheduleMessage(new SendRawNotificationCommand(this.UniqueId, rawNotification.NotificationId, rawNotification.RawContent, attemptsLeft), resendTime);
+                else if (tileNotification != null)
+                    commandScheduler.ScheduleMessage(new SendTileNotificationCommand(this.UniqueId, tileNotification.NotificationId, tileNotification.ParamUri, tileNotification.Title, tileNotification.Counter, tileNotification.BackgroundUri, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, attemptsLeft), resendTime);
+            }
+
         }
 
         private void OnClientRegistered(ClientRegisteredEvent @event)

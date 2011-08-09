@@ -57,6 +57,8 @@
     <Compile Include="Commands\CreateNotificationCommand.cs" />
     <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
     <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
+    <Compile Include="Commands\SendRawTileNotificationCommand.cs" />
+    <Compile Include="Commands\SendToastNotificationCommand.cs" />
     <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
     <Compile Include="Domain\INotificationSender.cs" />
     <Compile Include="Domain\InvalidExtendedInformationItemException.cs" />
@@ -71,7 +73,7 @@
     <Compile Include="CommandHandlers\UnregisterClientCommandHandler.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\RegisterClientCommand.cs" />
-    <Compile Include="Commands\SendNotificationCommand.cs" />
+    <Compile Include="Commands\SendTileNotificationCommand.cs" />
     <Compile Include="Commands\UnregisterClientCommand.cs" />
     <Compile Include="Domain\Aggregate.cs" />
     <Compile Include="Domain\Client.cs" />

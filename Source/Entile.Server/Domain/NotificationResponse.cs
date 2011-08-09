@@ -12,7 +12,7 @@ namespace Entile.Server.Domain
 
     public class NotificationBase : INotificationMessage
     {
-        public Guid UniqueNotificationId { get; set; }
+        public Guid NotificationId { get; set; }
 
         public string AsXml()
         {
@@ -88,15 +88,15 @@ namespace Entile.Server.Domain
     {
         public int HttpStatusCode { get; set; }
         public string NotificationStatus { get; set; }
-        public string SubscriptionStatus { get; set; }
         public string DeviceConnectionStatus { get; set; }
+        public string SubscriptionStatus { get; set; }
 
-        public NotificationResponse(int httpStatusCode, string notificationStatus, string subscriptionStatus, string deviceConnectionStatus)
+        public NotificationResponse(int httpStatusCode, string notificationStatus, string deviceConnectionStatus, string subscriptionStatus)
         {
             HttpStatusCode = httpStatusCode;
             NotificationStatus = notificationStatus;
-            SubscriptionStatus = subscriptionStatus;
             DeviceConnectionStatus = deviceConnectionStatus;
+            SubscriptionStatus = subscriptionStatus;
         }
     }
 }

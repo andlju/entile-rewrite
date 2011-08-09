@@ -39,7 +39,7 @@ namespace Entile.Server.Tests
 
             var commandScheduler = new MessageScheduler(schedulerStore);
 
-            commandScheduler.ScheduleCommand(new TestCommand() { Test = "TestText"}, new DateTime(2012, 06, 24, 13, 37, 42));
+            commandScheduler.ScheduleMessage(new TestCommand() { Test = "TestText"}, new DateTime(2012, 06, 24, 13, 37, 42));
 
             Assert.Equal(1, schedulerStore.PushedMessages.Count);
             Assert.Equal(new DateTime(2012, 06, 24, 13, 37, 42), schedulerStore.PushedMessages[0].Item2);
