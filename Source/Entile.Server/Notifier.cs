@@ -23,7 +23,7 @@ namespace Entile.Server
             var context = new EntileViews();
             foreach (var client in context.ClientViews)
             {
-                var clientId = client.UniqueId;
+                var clientId = Guid.Parse(client.UniqueId);
                 SendCommand(new SendToastNotificationCommand(clientId, Guid.NewGuid(), title, body, null, 3));
             }
         }

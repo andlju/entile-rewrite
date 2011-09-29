@@ -1,10 +1,12 @@
+using System;
+
 namespace Entile.Server.Commands
 {
     public class RemoveAllExtendedInformationItemsCommand : CommandBase
     {
-        public string UniqueId { get; private set; }
+        public Guid UniqueId { get; private set; }
 
-        public RemoveAllExtendedInformationItemsCommand(string uniqueId)
+        public RemoveAllExtendedInformationItemsCommand(Guid uniqueId)
         {
             UniqueId = uniqueId;
         }

@@ -16,13 +16,13 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         protected override IEnumerable<IEvent> Given()
         {
-            yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
+            yield return new ClientRegisteredEvent(UniqueId, "http://my.channel.com");
             yield return new ExtendedInformationItemSetEvent("MyKey", "MyValue");
         }
 
         protected override RemoveExtendedInformationItemCommand When()
         {
-            return new RemoveExtendedInformationItemCommand("1234", "MyKey");
+            return new RemoveExtendedInformationItemCommand(UniqueId, "MyKey");
         }
 
         [Fact]
@@ -35,7 +35,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         public void Then_UniqueId_On_Event_Is_Correct()
         {
             AssertEvent.Contents<ExtendedInformationItemRemovedEvent>(0,
-                                                                      ev => Assert.Equal("1234", ev.UniqueId));
+                                                                      ev => Assert.Equal(UniqueId, ev.UniqueId));
         }
 
         [Fact]

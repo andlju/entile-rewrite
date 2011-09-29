@@ -7,7 +7,7 @@ namespace Entile.Server.Events
     {
         public string NotificationChannel { get; private set; }
 
-        public ClientRegisteredEvent(string uniqueId, string notificationChannel)
+        public ClientRegisteredEvent(Guid uniqueId, string notificationChannel)
         {
             UniqueId = uniqueId;
             NotificationChannel = notificationChannel;

@@ -16,13 +16,13 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         protected override IEnumerable<IEvent> Given()
         {
-            yield return new ClientRegisteredEvent("1234", "http://my.channel.com");
+            yield return new ClientRegisteredEvent(UniqueId, "http://my.channel.com");
             yield return new ClientUnregisteredEvent();
         }
 
         protected override SetExtendedInformationItemCommand When()
         {
-            return new SetExtendedInformationItemCommand("1234", "MyKey", "MyValue");
+            return new SetExtendedInformationItemCommand(UniqueId, "MyKey", "MyValue");
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_UniqueId_In_The_Exception_Is_Correct()
         {
-            Assert.Equal("1234", ((ClientNotRegisteredException)ExceptionThrown).UniqueId);
+            Assert.Equal(UniqueId, ((ClientNotRegisteredException)ExceptionThrown).UniqueId);
         }
     }
 }

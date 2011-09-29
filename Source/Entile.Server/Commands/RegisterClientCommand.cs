@@ -1,13 +1,14 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Entile.Server.Commands
 {
     public class RegisterClientCommand : CommandBase
     {
-        public string UniqueId { get; private set; }
+        public Guid UniqueId { get; private set; }
         public string NotificationChannel { get; private set; }
 
-        public RegisterClientCommand(string uniqueId, string notificationChannel)
+        public RegisterClientCommand(Guid uniqueId, string notificationChannel)
         {
             UniqueId = uniqueId;
             NotificationChannel = notificationChannel;

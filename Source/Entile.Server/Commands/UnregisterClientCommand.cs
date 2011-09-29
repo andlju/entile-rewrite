@@ -1,10 +1,12 @@
-﻿namespace Entile.Server.Commands
+﻿using System;
+
+namespace Entile.Server.Commands
 {
     public class UnregisterClientCommand : CommandBase
     {
-        public string UniqueId { get; private set; }
+        public Guid UniqueId { get; private set; }
 
-        public UnregisterClientCommand(string uniqueId)
+        public UnregisterClientCommand(Guid uniqueId)
         {
             UniqueId = uniqueId;
         }

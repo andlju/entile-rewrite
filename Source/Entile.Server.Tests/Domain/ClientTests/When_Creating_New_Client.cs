@@ -24,7 +24,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         protected override RegisterClientCommand When()
         {
-            return new RegisterClientCommand("1234", "http://my.channel.com");
+            return new RegisterClientCommand(UniqueId, "http://my.channel.com");
         }
 
         [Fact]
@@ -36,8 +36,8 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_The_UniqueId_On_The_Event_Is_Correct()
         {
-            AssertEvent.Contents<ClientRegisteredEvent>(0, 
-                ev => Assert.Equal("1234", ev.UniqueId)
+            AssertEvent.Contents<ClientRegisteredEvent>(0,
+                ev => Assert.Equal(UniqueId, ev.UniqueId)
                 );
         }
 

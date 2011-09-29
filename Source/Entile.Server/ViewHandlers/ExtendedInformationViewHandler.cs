@@ -11,12 +11,13 @@ namespace Entile.Server.ViewHandlers
     {
         public void Handle(ExtendedInformationItemSetEvent command)
         {
+            var idStr = command.UniqueId.ToString();
             using (var context = new EntileViews())
             {
                 var item = context.ExtendedInformationViews.Find(command.UniqueId, command.Key);
                 if (item == null)
                 {
-                    item = new ExtendedInformationView() { ClientViewUniqueId = command.UniqueId, Key = command.Key};
+                    item = new ExtendedInformationView() { ClientViewUniqueId = idStr, Key = command.Key };
                     context.ExtendedInformationViews.Add(item);
                 }
                 item.Value = command.Value;
@@ -26,9 +27,10 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ExtendedInformationItemRemovedEvent command)
         {
+            var idStr = command.UniqueId.ToString();
             using (var context = new EntileViews())
             {
-                var item = context.ExtendedInformationViews.Find(command.UniqueId, command.Key);
+                var item = context.ExtendedInformationViews.Find(idStr, command.Key);
                 if (item != null)
                 {
                     context.ExtendedInformationViews.Remove(item);
@@ -39,10 +41,11 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(AllExtendedInformationItemsRemovedEvent command)
         {
+            var idStr = command.UniqueId.ToString();
             using (var context = new EntileViews())
             {
                 var items = from i in context.ExtendedInformationViews
-                            where i.ClientViewUniqueId == command.UniqueId
+                            where i.ClientViewUniqueId == idStr
                             select i;
                 foreach (var item in items)
                 {
@@ -54,10 +57,11 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientUnregisteredEvent command)
         {
+            var idStr = command.UniqueId.ToString();
             using (var context = new EntileViews())
             {
                 var items = from i in context.ExtendedInformationViews
-                            where i.ClientViewUniqueId == command.UniqueId
+                            where i.ClientViewUniqueId == idStr
                             select i;
                 foreach (var item in items)
                 {

@@ -22,13 +22,13 @@ namespace Entile.Server.Tests.Domain.ClientTests
         {
             _notificationSender.ResponseToReturn = new NotificationResponse(200, "Received", "Connected", "Active");
 
-            yield return new ClientRegisteredEvent("1337", "http://test.com/mychannel");
+            yield return new ClientRegisteredEvent(UniqueId, "http://test.com/mychannel");
         }
 
         protected override SendToastNotificationCommand When()
         {
-            
-            return new SendToastNotificationCommand("1234", _notificationId, "Title", "Body", "/Test.xaml?test=value", 3);
+
+            return new SendToastNotificationCommand(UniqueId, _notificationId, "Title", "Body", "/Test.xaml?test=value", 3);
         }
 
         [Fact]

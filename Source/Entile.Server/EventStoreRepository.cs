@@ -16,7 +16,7 @@ namespace Entile.Server
             _eventBus = eventBus;
         }
 
-        public TDomain GetById(string uniqueId)
+        public TDomain GetById(Guid uniqueId)
         {
             var events = _eventStore.GetAllEvents(uniqueId);
             if (events == null)

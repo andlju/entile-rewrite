@@ -30,7 +30,7 @@ namespace Entile.Server
             return timestamp;
         }
 
-        public long Dispatch(string uniqueId)
+        public long Dispatch(Guid uniqueId)
         {
             var events = _eventStore.GetAllEvents(uniqueId);
 

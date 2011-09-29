@@ -13,6 +13,9 @@ namespace Entile.Server.Tests.Domain
         where TCmd : ICommand
     {
         private Exception _exceptionThrown;
+        
+        protected Guid UniqueId = Guid.NewGuid();
+
         private IEvent[] _events;
 
         protected virtual IEnumerable<IEvent> Given()
@@ -64,7 +67,7 @@ namespace Entile.Server.Tests.Domain
                 _with = with;
             }
 
-            public TAgg GetById(string uniqueId)
+            public TAgg GetById(Guid uniqueId)
             {
                 var givenEvents = _with.Given();
                 if (givenEvents == null)

@@ -12,18 +12,18 @@ namespace Entile.WcfTestHost
     public interface IRegistration
     {
         [OperationContract]
-        void Register(string uniqueId, string notificationChannel);
+        void Register(Guid uniqueId, string notificationChannel);
 
         [OperationContract]
-        void Unregister(string uniqueId);
+        void Unregister(Guid uniqueId);
 
         [OperationContract]
-        void SetExtendedInformationItem(string uniqueId, string key, string value);
+        void SetExtendedInformationItem(Guid uniqueId, string key, string value);
 
         [OperationContract]
-        void RemoveExtendedInformationItem(string uniqueId, string key);
+        void RemoveExtendedInformationItem(Guid uniqueId, string key);
 
         [OperationContract]
-        void RemoveAllExtendedInformationItems(string uniqueId);
+        void RemoveAllExtendedInformationItems(Guid uniqueId);
     }
 }

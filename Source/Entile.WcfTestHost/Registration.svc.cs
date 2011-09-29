@@ -18,27 +18,27 @@ namespace Entile.WcfTestHost
             _registrator = Bootstrapper.CurrentServer.Registrator;
         }
 
-        public void Register(string uniqueId, string notificationChannel)
+        public void Register(Guid uniqueId, string notificationChannel)
         {
             _registrator.Register(uniqueId, notificationChannel);
         }
 
-        public void Unregister(string uniqueId)
+        public void Unregister(Guid uniqueId)
         {
             _registrator.Unregister(uniqueId);
         }
 
-        public void SetExtendedInformationItem(string uniqueId, string key, string value)
+        public void SetExtendedInformationItem(Guid uniqueId, string key, string value)
         {
             _registrator.SetExtendedInformation(uniqueId, key, value);
         }
 
-        public void RemoveExtendedInformationItem(string uniqueId, string key)
+        public void RemoveExtendedInformationItem(Guid uniqueId, string key)
         {
             _registrator.RemoveExtendedInformation(uniqueId, key);
         }
 
-        public void RemoveAllExtendedInformationItems(string uniqueId)
+        public void RemoveAllExtendedInformationItems(Guid uniqueId)
         {
             _registrator.RemoveAllExtendedInformation(uniqueId);
         }

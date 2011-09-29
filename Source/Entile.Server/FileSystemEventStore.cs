@@ -16,7 +16,7 @@ namespace Entile.Server
             _rootPath = rootPath;
         }
 
-        public IEnumerable<IEvent> GetAllEvents(string uniqueId)
+        public IEnumerable<IEvent> GetAllEvents(Guid uniqueId)
         {
             var path = BuildPath(uniqueId);
             if (!File.Exists(path))
@@ -29,7 +29,7 @@ namespace Entile.Server
             }
         }
 
-        public void SaveEvents(string uniqueId, IEnumerable<IEvent> events)
+        public void SaveEvents(Guid uniqueId, IEnumerable<IEvent> events)
         {
             // TODO This is completely not thread-safe...
             var oldEvents = GetAllEvents(uniqueId) ?? new IEvent[0];
@@ -47,7 +47,7 @@ namespace Entile.Server
             throw new NotImplementedException();
         }
 
-        private string BuildPath(string uniqueId)
+        private string BuildPath(Guid uniqueId)
         {
             return Path.Combine(_rootPath, uniqueId + ".bin");
         }

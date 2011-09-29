@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Entile.Server.Commands;
 
 namespace Entile.Server
@@ -12,7 +13,7 @@ namespace Entile.Server
             _messageBus = messageBus;
         }
 
-        public void Register(string uniqueId, string notificationChannel)
+        public void Register(Guid uniqueId, string notificationChannel)
         {
             SendCommand(
                 new RegisterClientCommand(
@@ -21,25 +22,25 @@ namespace Entile.Server
 
         }
 
-        public void Unregister(string uniqueId)
+        public void Unregister(Guid uniqueId)
         {
             SendCommand(
                 new UnregisterClientCommand(uniqueId));
         }
 
-        public void SetExtendedInformation(string uniqueId, string key, string value)
+        public void SetExtendedInformation(Guid uniqueId, string key, string value)
         {
             SendCommand(
                 new SetExtendedInformationItemCommand(uniqueId, key, value));
         }
 
-        public void RemoveExtendedInformation(string uniqueId, string key)
+        public void RemoveExtendedInformation(Guid uniqueId, string key)
         {
             SendCommand(
                 new RemoveExtendedInformationItemCommand(uniqueId, key));
         }
 
-        public void RemoveAllExtendedInformation(string uniqueId)
+        public void RemoveAllExtendedInformation(Guid uniqueId)
         {
             SendCommand(
                 new RemoveAllExtendedInformationItemsCommand(uniqueId));

@@ -58,13 +58,14 @@ namespace Entile.Server
             _serializer = serializer;
         }
 
-        public IEnumerable<IEvent> GetAllEvents(string uniqueId)
+        public IEnumerable<IEvent> GetAllEvents(Guid uniqueId)
         {
             string[] evts;
+            var idStr = uniqueId.ToString();
             using(var context = new EventContext())
             {
                 evts = (from e in context.Events
-                        where e.UniqueId == uniqueId
+                        where e.UniqueId == idStr
                         orderby e.SequenceNumber
                         select e.SerializedEvent).ToArray();
 
@@ -74,16 +75,17 @@ namespace Entile.Server
             return evts.Select(ev => _serializer.Deserialize(ev)).Cast<IEvent>();
         }
 
-        public void SaveEvents(string uniqueId, IEnumerable<IEvent> events)
+        public void SaveEvents(Guid uniqueId, IEnumerable<IEvent> events)
         {
-            using(var context = new EventContext())
+            var idStr = uniqueId.ToString();
+            using (var context = new EventContext())
             {
                 foreach(var e in events)
                 {
                     context.Events.Add(new Event()
                                            {
                                                EventId = Guid.NewGuid(),
-                                               UniqueId = uniqueId, 
+                                               UniqueId = idStr, 
                                                SequenceNumber = e.SequenceNumber, 
                                                Timestamp = e.Timestamp,
                                                SerializedEvent = _serializer.Serialize(e)

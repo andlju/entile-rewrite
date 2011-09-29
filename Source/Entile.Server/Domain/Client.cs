@@ -7,11 +7,11 @@ namespace Entile.Server.Domain
 {
     public class Client : Aggregate<Client>
     {
-        private string _uniqueId;
+        private Guid _uniqueId;
         private bool _isActive;
         private string _notificationChannel;
 
-        public override string UniqueId { get { return _uniqueId; } }
+        public override Guid UniqueId { get { return _uniqueId; } }
 
         public IDictionary<string, string> ExtendedInformation { get; private set; }
 
@@ -27,7 +27,7 @@ namespace Entile.Server.Domain
             RegisterEvent<ClientUnregisteredEvent>(OnClientUnregistered);
         }
 
-        public Client(string uniqueId, string notificationChannel)
+        public Client(Guid uniqueId, string notificationChannel)
             : this()
         {
             ApplyEvent(new ClientRegisteredEvent(uniqueId, notificationChannel));
