@@ -5,8 +5,8 @@ namespace Entile.Server.Events
     [Serializable]
     public class ExtendedInformationItemSetEvent : EventBase
     {
-        public string Key { get; private set; }
-        public string Value { get; private set; }
+        public readonly string Key;
+        public readonly string Value;
 
         public ExtendedInformationItemSetEvent(string key, string value) 
         {

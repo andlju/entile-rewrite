@@ -4,12 +4,12 @@ namespace Entile.Server.Commands
 {
     public class RemoveExtendedInformationItemCommand : CommandBase
     {
-        public Guid UniqueId { get; private set; }
-        public string Key { get; private set; }
+        public readonly Guid ClientId;
+        public readonly string Key;
 
-        public RemoveExtendedInformationItemCommand(Guid uniqueId, string key)
+        public RemoveExtendedInformationItemCommand(Guid clientId, string key)
         {
-            UniqueId = uniqueId;
+            ClientId = clientId;
             Key = key;
         }
     }

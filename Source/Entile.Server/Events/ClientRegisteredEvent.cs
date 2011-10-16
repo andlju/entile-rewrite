@@ -5,11 +5,11 @@ namespace Entile.Server.Events
     [Serializable]
     public class ClientRegisteredEvent : EventBase
     {
-        public string NotificationChannel { get; private set; }
+        public readonly string NotificationChannel;
 
-        public ClientRegisteredEvent(Guid uniqueId, string notificationChannel)
+        public ClientRegisteredEvent(Guid aggregateId, string notificationChannel)
         {
-            UniqueId = uniqueId;
+            AggregateId = aggregateId;
             NotificationChannel = notificationChannel;
         }
     }

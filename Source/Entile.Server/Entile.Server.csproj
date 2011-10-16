@@ -53,23 +53,30 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
+    <Compile Include="CommandHandlers\RegisterSubscriptionCommandHandler.cs" />
     <Compile Include="CommandHandlers\RemoveAllExtendedInformationItemsCommandHandler.cs" />
     <Compile Include="CommandHandlers\RemoveExtendedInformationItemsCommandHandler.cs" />
     <Compile Include="CommandHandlers\SendNotificationCommandHandler.cs" />
     <Compile Include="CommandHandlers\SetExtendedInformationItemCommandHandler.cs" />
+    <Compile Include="CommandHandlers\UnregisterSubscriptionCommandHandler.cs" />
     <Compile Include="Commands\CommandBase.cs" />
-    <Compile Include="Commands\CreateNotificationCommand.cs" />
+    <Compile Include="Commands\RegisterSubscriptionCommand.cs" />
     <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
     <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
     <Compile Include="Commands\SendRawTileNotificationCommand.cs" />
     <Compile Include="Commands\SendToastNotificationCommand.cs" />
     <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
+    <Compile Include="Commands\UnregisterForNotificationCommand.cs" />
+    <Compile Include="Commands\UnregisterSubscriptionCommand.cs" />
     <Compile Include="Domain\INotificationSender.cs" />
     <Compile Include="Domain\InvalidExtendedInformationItemException.cs" />
+    <Compile Include="Domain\NotificationKind.cs" />
     <Compile Include="Domain\NotificationResponse.cs" />
     <Compile Include="EventStreamDispatcher.cs" />
     <Compile Include="Events\NotificationFailedEvent.cs" />
     <Compile Include="Events\NotificationSucceededEvent.cs" />
+    <Compile Include="Events\RegisteredForNotificationEvent.cs" />
+    <Compile Include="Events\SubscriptionUnregisteredEvent.cs" />
     <Compile Include="ICommandScheduler.cs" />
     <Compile Include="IMessageHandler.cs" />
     <Compile Include="InProcessBus.cs" />

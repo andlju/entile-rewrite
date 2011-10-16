@@ -8,7 +8,7 @@ namespace Entile.Server.Tests
 {
     class TestEvent : IEvent
     {
-        public Guid UniqueId { get; set; }
+        public Guid AggregateId { get; set; }
         public int SequenceNumber { get; set; }
         public long Timestamp { get; set; }
 
@@ -48,7 +48,7 @@ namespace Entile.Server.Tests
         public IEnumerable<IEvent> GetAllEvents(Guid uniqueId)
         {
             return from e in _events
-                   where e.UniqueId == uniqueId
+                   where e.AggregateId == uniqueId
                    select e;
         }
 
@@ -80,10 +80,10 @@ namespace Entile.Server.Tests
             var eventStore = new DummyEventStore();
             eventStore.SaveEvents(_testUniqueId, new[]
                                               {
-                                                  new TestEvent() { UniqueId = _testUniqueId, SequenceNumber = 1, Test = "Test", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 12).Ticks},
-                                                  new TestEvent() { UniqueId = _testUniqueId, SequenceNumber = 2, Test = "Test 2", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 45).Ticks},
-                                                  new TestEvent() { UniqueId = _testUniqueId, SequenceNumber = 3, Test = "Test 3", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 450).Ticks},
-                                                  new TestEvent() { UniqueId = _testUniqueId, SequenceNumber = 4, Test = "Test 4", Timestamp = new DateTime(2013, 06, 24, 9, 12, 35, 12).Ticks},
+                                                  new TestEvent() { AggregateId = _testUniqueId, SequenceNumber = 1, Test = "Test", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 12).Ticks},
+                                                  new TestEvent() { AggregateId = _testUniqueId, SequenceNumber = 2, Test = "Test 2", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 45).Ticks},
+                                                  new TestEvent() { AggregateId = _testUniqueId, SequenceNumber = 3, Test = "Test 3", Timestamp = new DateTime(2013, 06, 24, 9, 12, 34, 450).Ticks},
+                                                  new TestEvent() { AggregateId = _testUniqueId, SequenceNumber = 4, Test = "Test 4", Timestamp = new DateTime(2013, 06, 24, 9, 12, 35, 12).Ticks},
                                               });
 
             var target = new EventStreamDispatcher(bus, eventStore);

@@ -11,10 +11,10 @@ namespace Entile.Server.ViewHandlers
     {
         public void Handle(ExtendedInformationItemSetEvent command)
         {
-            var idStr = command.UniqueId.ToString();
+            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
-                var item = context.ExtendedInformationViews.Find(command.UniqueId, command.Key);
+                var item = context.ExtendedInformationViews.Find(command.AggregateId, command.Key);
                 if (item == null)
                 {
                     item = new ExtendedInformationView() { ClientViewUniqueId = idStr, Key = command.Key };
@@ -27,7 +27,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ExtendedInformationItemRemovedEvent command)
         {
-            var idStr = command.UniqueId.ToString();
+            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var item = context.ExtendedInformationViews.Find(idStr, command.Key);
@@ -41,7 +41,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(AllExtendedInformationItemsRemovedEvent command)
         {
-            var idStr = command.UniqueId.ToString();
+            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var items = from i in context.ExtendedInformationViews
@@ -57,7 +57,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientUnregisteredEvent command)
         {
-            var idStr = command.UniqueId.ToString();
+            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var items = from i in context.ExtendedInformationViews

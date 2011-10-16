@@ -4,8 +4,8 @@ namespace Entile.Server.Events
 {
     public class NotificationSucceededEvent : EventBase
     {
-        public Guid NotificationId { get; private set; }
-        public int AttemptsLeft { get; private set; }
+        public readonly Guid NotificationId;
+        public readonly int AttemptsLeft;
 
         public NotificationSucceededEvent(Guid notificationId, int attemptsLeft)
         {
@@ -16,9 +16,9 @@ namespace Entile.Server.Events
 
     public class ToastNotificationSucceededEvent : NotificationSucceededEvent
     {
-        public string Title { get; private set; }
-        public string Body { get; private set; }
-        public string ParamUri { get; private set; }
+        public readonly string Title;
+        public readonly string Body;
+        public readonly string ParamUri;
 
         public ToastNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string title, string body, string paramUri) : base(notificationId, attemptsLeft)
         {
@@ -30,7 +30,7 @@ namespace Entile.Server.Events
 
     public class RawNotificationSucceededEvent : NotificationSucceededEvent
     {
-        public string Content { get; private set; }
+        public readonly string Content;
 
         public RawNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string content) : base(notificationId, attemptsLeft)
         {
@@ -40,15 +40,15 @@ namespace Entile.Server.Events
 
     public class TileNotificationSucceededEvent : NotificationSucceededEvent
     {
-        public string Title { get; private set; }
-        public string BackgroundUri { get; private set; }
-        public int Count { get; private set; }
+        public readonly string Title;
+        public readonly string BackgroundUri;
+        public readonly int Count;
 
-        public string BackTitle { get; private set; }
-        public string BackContent { get; private set; }
-        public string BackBackgroundUri { get; private set; }
+        public readonly string BackTitle;
+        public readonly string BackContent;
+        public readonly string BackBackgroundUri;
 
-        public string ParamUri { get; private set; }
+        public readonly string ParamUri;
 
         public TileNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string title, string backgroundUri, int count, string backTitle, string backContent, string backBackgroundUri, string paramUri) : base(notificationId, attemptsLeft)
         {

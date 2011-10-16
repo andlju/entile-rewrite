@@ -35,7 +35,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         public void Then_The_UniqueId_On_The_Event_Is_Correct()
         {
             AssertEvent.Contents<ClientRegistrationUpdatedEvent>(0,
-                                                        ev => Assert.Equal(UniqueId, ev.UniqueId));
+                                                        ev => Assert.Equal(UniqueId, ev.AggregateId));
         }
 
         [Fact]

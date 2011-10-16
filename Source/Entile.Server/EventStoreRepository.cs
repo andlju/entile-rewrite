@@ -33,7 +33,7 @@ namespace Entile.Server
         {
             var events = aggregate.GetUncommittedEvents().ToArray();
             aggregate.ClearUncommittedEvents();
-            _eventStore.SaveEvents(aggregate.UniqueId, events);
+            _eventStore.SaveEvents(aggregate.Id, events);
             foreach(var ev in events)
             {
                 _eventBus.Publish(ev);

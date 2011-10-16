@@ -14,7 +14,7 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(RemoveExtendedInformationItemCommand command)
         {
-            var client = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.ClientId);
 
             client.RemoveExtendedInformationItem(command.Key);
             

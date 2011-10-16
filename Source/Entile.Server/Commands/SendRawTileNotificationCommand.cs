@@ -4,14 +4,14 @@ namespace Entile.Server.Commands
 {
     public class SendRawNotificationCommand : CommandBase
     {
-        public Guid UniqueId { get; private set; }
-        public Guid NotificationId { get; private set; }
-        public string Content { get; private set; }
-        public int NumberOfAttempts { get; private set; }
+        public readonly Guid ClientId;
+        public readonly Guid NotificationId;
+        public readonly string Content;
+        public readonly int NumberOfAttempts;
 
-        public SendRawNotificationCommand(Guid uniqueId, Guid notificationId, string content, int numberOfAttempts)
+        public SendRawNotificationCommand(Guid clientId, Guid notificationId, string content, int numberOfAttempts)
         {
-            UniqueId = uniqueId;
+            ClientId = clientId;
             NotificationId = notificationId;
             Content = content;
             NumberOfAttempts = numberOfAttempts;

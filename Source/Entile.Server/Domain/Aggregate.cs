@@ -18,8 +18,8 @@ namespace Entile.Server.Domain
 
         protected void ApplyEvent(IEvent @event)
         {
-            if (@event.UniqueId == Guid.Empty)
-                @event.UniqueId = UniqueId;
+            if (@event.AggregateId == Guid.Empty)
+                @event.AggregateId = Id;
             @event.SequenceNumber = ++SequenceNumber;
 
             _eventList.Add(@event);
@@ -53,7 +53,7 @@ namespace Entile.Server.Domain
             _eventList.Clear();
         }
 
-        public abstract Guid UniqueId { get; }
+        public abstract Guid Id { get; }
         protected int SequenceNumber { get; set; }
     }
 }

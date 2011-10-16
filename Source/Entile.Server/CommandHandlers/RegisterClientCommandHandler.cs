@@ -14,7 +14,7 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(RegisterClientCommand command)
         {
-            var client = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.ClientId);
 
             if (client != null)
             {
@@ -22,7 +22,7 @@ namespace Entile.Server.CommandHandlers
             } 
             else
             {
-                client = new Client(command.UniqueId, command.NotificationChannel); 
+                client = new Client(command.ClientId, command.NotificationChannel); 
             }
 
             _clientRepository.SaveChanges(client);

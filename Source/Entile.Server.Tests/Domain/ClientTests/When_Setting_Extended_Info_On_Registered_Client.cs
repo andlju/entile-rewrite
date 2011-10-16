@@ -34,7 +34,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         public void Then_UniqueId_On_The_Event_Is_Correct()
         {
             AssertEvent.Contents<ExtendedInformationItemSetEvent>(0,
-                                                                  ev => Assert.Equal(UniqueId, ev.UniqueId));
+                                                                  ev => Assert.Equal(UniqueId, ev.AggregateId));
         }
 
         [Fact]

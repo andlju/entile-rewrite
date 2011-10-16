@@ -4,13 +4,13 @@ namespace Entile.Server.Events
 {
     public class NotificationFailedEvent : EventBase
     {
-        public Guid NotificationId { get; private set; }
-        public int AttemptsLeft { get; private set; }
-        public DateTime LastAttempt { get; private set; }
-        public int HttpStatusCode { get; private set; }
-        public string NotificationStatus { get; private set; }
-        public string DeviceConnectionStatus { get; private set; }
-        public string SubscriptionStatus { get; private set; }
+        public readonly Guid NotificationId;
+        public readonly int AttemptsLeft;
+        public readonly DateTime LastAttempt;
+        public readonly int HttpStatusCode;
+        public readonly string NotificationStatus;
+        public readonly string DeviceConnectionStatus;
+        public readonly string SubscriptionStatus;
 
         public NotificationFailedEvent(Guid notificationId, int attemptsLeft, DateTime lastAttempt, int httpStatusCode, string notificationStatus, string deviceConnectionStatus, string subscriptionStatus)
         {
@@ -26,9 +26,9 @@ namespace Entile.Server.Events
 
     public class ToastNotificationFailedEvent : NotificationFailedEvent
     {
-        public string Title { get; private set; }
-        public string Body { get; private set; }
-        public string ParamUri { get; private set; }
+        public readonly string Title;
+        public readonly string Body;
+        public readonly string ParamUri;
 
         public ToastNotificationFailedEvent(Guid notificationId, int attemptsLeft, DateTime lastAttempt, int httpStatusCode, string notificationStatus, string deviceConnectionStatus, string subscriptionStatus, string title, string body, string paramUri) : base(notificationId, attemptsLeft, lastAttempt, httpStatusCode, notificationStatus, deviceConnectionStatus, subscriptionStatus)
         {
@@ -40,7 +40,7 @@ namespace Entile.Server.Events
 
     public class RawNotificationFailedEvent : NotificationFailedEvent
     {
-        public string Content { get; private set; }
+        public readonly string Content;
 
         public RawNotificationFailedEvent(Guid notificationId, int attemptsLeft, DateTime lastAttempt, int httpStatusCode, string notificationStatus, string deviceConnectionStatus, string subscriptionStatus, string content) : base(notificationId, attemptsLeft, lastAttempt, httpStatusCode, notificationStatus, deviceConnectionStatus, subscriptionStatus)
         {
@@ -50,15 +50,15 @@ namespace Entile.Server.Events
 
     public class TileNotificationFailedEvent : NotificationFailedEvent
     {
-        public string Title { get; private set; }
-        public string BackgroundUri { get; private set; }
-        public int Count { get; private set; }
+        public readonly string Title;
+        public readonly string BackgroundUri;
+        public readonly int Count;
 
-        public string BackTitle { get; private set; }
-        public string BackContent { get; private set; }
-        public string BackBackgroundUri { get; private set; }
+        public readonly string BackTitle;
+        public readonly string BackContent;
+        public readonly string BackBackgroundUri;
 
-        public string ParamUri { get; private set; }
+        public readonly string ParamUri;
 
         public TileNotificationFailedEvent(Guid notificationId, int attemptsLeft, DateTime lastAttempt, int httpStatusCode, string notificationStatus, string deviceConnectionStatus, string subscriptionStatus, string title, string backgroundUri, int count, string backTitle, string backContent, string backBackgroundUri, string paramUri) : base(notificationId, attemptsLeft, lastAttempt, httpStatusCode, notificationStatus, deviceConnectionStatus, subscriptionStatus)
         {

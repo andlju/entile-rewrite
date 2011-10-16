@@ -4,7 +4,7 @@ namespace Entile.Server
 {
     public interface IMessage
     {
-        long Timestamp { get; set; }
+        long Timestamp { get; }
     }
 
     public interface IMessageHandler<TMessage> where TMessage : IMessage

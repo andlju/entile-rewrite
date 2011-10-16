@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using Entile.Server.Commands;
 using Entile.Server.Events;
 
+namespace Entile.Server.Events
+{
+}
+
 namespace Entile.Server.Domain
 {
     public class Client : Aggregate<Client>
@@ -11,13 +15,15 @@ namespace Entile.Server.Domain
         private bool _isActive;
         private string _notificationChannel;
 
-        public override Guid UniqueId { get { return _uniqueId; } }
+        public override Guid Id { get { return _uniqueId; } }
 
-        public IDictionary<string, string> ExtendedInformation { get; private set; }
+        private IDictionary<string, string> ExtendedInformation { get; set; }
+        private HashSet<Guid> _subscriptions { get; set; } 
 
         public Client()
         {
             ExtendedInformation = new Dictionary<string, string>();
+            _subscriptions = new HashSet<Guid>();
 
             RegisterEvent<ClientRegisteredEvent>(OnClientRegistered);
             RegisterEvent<ClientRegistrationUpdatedEvent>(OnClientRegistrationUpdated);
@@ -25,6 +31,8 @@ namespace Entile.Server.Domain
             RegisterEvent<ExtendedInformationItemRemovedEvent>(OnExtendedInformationItemRemoved);
             RegisterEvent<AllExtendedInformationItemsRemovedEvent>(OnAllExtendedInformationItemsRemoved);
             RegisterEvent<ClientUnregisteredEvent>(OnClientUnregistered);
+            RegisterEvent<SubscriptionRegisteredEvent>(OnSubscriptionRegistered);
+            RegisterEvent<SubscriptionUnregisteredEvent>(OnSubscriptionUnregistered);
         }
 
         public Client(Guid uniqueId, string notificationChannel)
@@ -41,7 +49,7 @@ namespace Entile.Server.Domain
         public void SetExtendedInformationItem(string key, string value)
         {
             if (!_isActive)
-                throw new ClientNotRegisteredException(UniqueId);
+                throw new ClientNotRegisteredException(Id);
 
             ApplyEvent(new ExtendedInformationItemSetEvent(key, value));
         }
@@ -49,10 +57,10 @@ namespace Entile.Server.Domain
         public void RemoveExtendedInformationItem(string key)
         {
             if (!_isActive)
-                throw new ClientNotRegisteredException(UniqueId);
+                throw new ClientNotRegisteredException(Id);
 
             if (!ExtendedInformation.ContainsKey(key))
-                throw new InvalidExtendedInformationItemException(UniqueId, key);
+                throw new InvalidExtendedInformationItemException(Id, key);
 
             ApplyEvent(new ExtendedInformationItemRemovedEvent(key));
         }
@@ -65,10 +73,24 @@ namespace Entile.Server.Domain
         public void Unregister()
         {
             if (!_isActive)
-                throw new ClientNotRegisteredException(UniqueId);
+                throw new ClientNotRegisteredException(Id);
 
             ApplyEvent(new ClientUnregisteredEvent());
         }
+
+        public void RegisterSubscription(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
+        {
+            ApplyEvent(new SubscriptionRegisteredEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
+        }
+
+        public void UnregisterSubscription(Guid subscriptionId)
+        {
+            if (!_subscriptions.Contains(subscriptionId))
+                throw new UnknownSubscriptionException(Id, subscriptionId);
+
+            ApplyEvent(new SubscriptionUnregisteredEvent(subscriptionId));
+        }
+
 
         public void SendNotification(NotificationBase notification, int attemptsLeft, INotificationSender notificationSender, IMessageScheduler commandScheduler)
         {
@@ -137,18 +159,18 @@ namespace Entile.Server.Domain
             {
                 attemptsLeft--;
                 if (toastNotification != null)
-                    commandScheduler.ScheduleMessage(new SendToastNotificationCommand(this.UniqueId, toastNotification.NotificationId, toastNotification.Title, toastNotification.Body, toastNotification.ParamUri, attemptsLeft), resendTime);
+                    commandScheduler.ScheduleMessage(new SendToastNotificationCommand(this.Id, toastNotification.NotificationId, toastNotification.Title, toastNotification.Body, toastNotification.ParamUri, attemptsLeft), resendTime);
                 else if (rawNotification != null)
-                    commandScheduler.ScheduleMessage(new SendRawNotificationCommand(this.UniqueId, rawNotification.NotificationId, rawNotification.RawContent, attemptsLeft), resendTime);
+                    commandScheduler.ScheduleMessage(new SendRawNotificationCommand(this.Id, rawNotification.NotificationId, rawNotification.RawContent, attemptsLeft), resendTime);
                 else if (tileNotification != null)
-                    commandScheduler.ScheduleMessage(new SendTileNotificationCommand(this.UniqueId, tileNotification.NotificationId, tileNotification.ParamUri, tileNotification.Title, tileNotification.Counter, tileNotification.BackgroundUri, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, attemptsLeft), resendTime);
+                    commandScheduler.ScheduleMessage(new SendTileNotificationCommand(this.Id, tileNotification.NotificationId, tileNotification.ParamUri, tileNotification.Title, tileNotification.Counter, tileNotification.BackgroundUri, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, attemptsLeft), resendTime);
             }
 
         }
 
         private void OnClientRegistered(ClientRegisteredEvent @event)
         {
-            _uniqueId = @event.UniqueId;
+            _uniqueId = @event.AggregateId;
             _isActive = true;
             _notificationChannel = @event.NotificationChannel;
         }
@@ -177,6 +199,16 @@ namespace Entile.Server.Domain
         private void OnClientUnregistered(ClientUnregisteredEvent @event)
         {
             _isActive = false;
+        }
+
+        private void OnSubscriptionUnregistered(SubscriptionUnregisteredEvent obj)
+        {
+            _subscriptions.Remove(obj.SubscriptionId);
+        }
+
+        private void OnSubscriptionRegistered(SubscriptionRegisteredEvent obj)
+        {
+            _subscriptions.Add(obj.SubscriptionId);
         }
     }
 }

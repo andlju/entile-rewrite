@@ -4,16 +4,16 @@ namespace Entile.Server.Commands
 {
     public class SendToastNotificationCommand : CommandBase
     {
-        public Guid UniqueId { get; private set; }
-        public Guid NotificationId { get; private set; }
-        public string Title { get; private set; }
-        public string Body { get; private set; }
-        public string ParamUri { get; private set; }
-        public int NumberOfAttempts { get; private set; }
+        public readonly Guid ClientId;
+        public readonly Guid NotificationId;
+        public readonly string Title;
+        public readonly string Body;
+        public readonly string ParamUri;
+        public readonly int NumberOfAttempts;
 
-        public SendToastNotificationCommand(Guid uniqueId, Guid notificationId, string title, string body, string paramUri, int numberOfAttempts)
+        public SendToastNotificationCommand(Guid clientId, Guid notificationId, string title, string body, string paramUri, int numberOfAttempts)
         {
-            UniqueId = uniqueId;
+            ClientId = clientId;
             NotificationId = notificationId;
             Title = title;
             Body = body;

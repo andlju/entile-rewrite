@@ -46,7 +46,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientRegisteredEvent @event)
         {
-            var idStr = @event.UniqueId.ToString();
+            var idStr = @event.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(idStr);
@@ -66,7 +66,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientUnregisteredEvent @event)
         {
-            var idStr = @event.UniqueId.ToString();
+            var idStr = @event.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(idStr);
@@ -79,7 +79,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientRegistrationUpdatedEvent @event)
         {
-            var idStr = @event.UniqueId.ToString();
+            var idStr = @event.AggregateId.ToString();
             using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(idStr);

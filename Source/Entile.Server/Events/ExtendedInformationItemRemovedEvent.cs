@@ -5,7 +5,7 @@ namespace Entile.Server.Events
     [Serializable]
     public class ExtendedInformationItemRemovedEvent : EventBase
     {
-        public string Key { get; private set; }
+        public readonly string Key;
 
         public ExtendedInformationItemRemovedEvent(string key)
         {

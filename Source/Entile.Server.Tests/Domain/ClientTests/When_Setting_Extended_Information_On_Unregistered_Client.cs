@@ -34,7 +34,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_UniqueId_In_The_Exception_Is_Correct()
         {
-            Assert.Equal(UniqueId, ((ClientNotRegisteredException)ExceptionThrown).UniqueId);
+            Assert.Equal(UniqueId, ((ClientNotRegisteredException)ExceptionThrown).ClientId);
         }
     }
 }

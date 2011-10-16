@@ -5,7 +5,7 @@ namespace Entile.Server.Events
     [Serializable]
     public class ClientRegistrationUpdatedEvent : EventBase
     {
-        public string NotificationChannel { get; private set; }
+        public readonly string NotificationChannel;
 
         public ClientRegistrationUpdatedEvent(string notificationChannel)
         {

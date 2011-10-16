@@ -21,10 +21,10 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(SendToastNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.ClientId);
 
             if (client == null)
-                throw new ClientNotRegisteredException(command.UniqueId);
+                throw new ClientNotRegisteredException(command.ClientId);
 
             client.SendNotification(new ToastNotification()
                                         {
@@ -39,10 +39,10 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(SendRawNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.ClientId);
 
             if (client == null)
-                throw new ClientNotRegisteredException(command.UniqueId);
+                throw new ClientNotRegisteredException(command.ClientId);
 
             client.SendNotification(new RawNotification() 
             {
@@ -55,10 +55,10 @@ namespace Entile.Server.CommandHandlers
 
         public void Handle(SendTileNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.UniqueId);
+            var client = _clientRepository.GetById(command.ClientId);
 
             if (client == null)
-                throw new ClientNotRegisteredException(command.UniqueId);
+                throw new ClientNotRegisteredException(command.ClientId);
 
             client.SendNotification(new TileNotification() 
             {
