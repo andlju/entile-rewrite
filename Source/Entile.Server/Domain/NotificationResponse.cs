@@ -10,9 +10,14 @@ namespace Entile.Server.Domain
         string AsXml();
     }
 
-    public class NotificationBase : INotificationMessage
+    public abstract class NotificationBase : INotificationMessage
     {
-        public Guid NotificationId { get; set; }
+        public Guid NotificationId { get; private set; }
+
+        protected NotificationBase(Guid notificationId)
+        {
+            NotificationId = notificationId;
+        }
 
         public string AsXml()
         {
@@ -33,18 +38,22 @@ namespace Entile.Server.Domain
             return xmlString.ToString();
         }
 
-        protected virtual void WriteContent(XmlWriter writer)
-        {
-
-        }
+        protected abstract void WriteContent(XmlWriter writer);
     }
 
     public class ToastNotification : NotificationBase
     {
-        public string Title { get; set; }
-        public string Body { get; set; }
+        public string Title { get; private set; }
+        public string Body { get; private set; }
 
-        public string ParamUri { get; set; }
+        public string ParamUri { get; private set; }
+
+        public ToastNotification(Guid notificationId, string title, string body, string paramUri) : base(notificationId)
+        {
+            Title = title;
+            Body = body;
+            ParamUri = paramUri;
+        }
 
         protected override void WriteContent(XmlWriter writer)
         {
@@ -68,20 +77,46 @@ namespace Entile.Server.Domain
 
     public class TileNotification : NotificationBase
     {
-        public string ParamUri { get; set; }
+        public string Title { get; private set; }
+        public int Counter { get; private set; }
+        public string BackgroundUri { get; private set; }
 
-        public string Title { get; set; }
-        public int Counter { get; set; }
-        public string BackgroundUri { get; set; }
+        public string BackTitle { get; private set; }
+        public string BackContent { get; private set; }
+        public string BackBackgroundUri { get; private set; }
 
-        public string BackTitle { get; set; }
-        public string BackContent { get; set; }
-        public string BackBackgroundUri { get; set; }
+        public string ParamUri { get; private set; }
+
+        public TileNotification(Guid notificationId, string title, int counter, string backgroundUri, string backTitle, string backContent, string backBackgroundUri, string paramUri) : base(notificationId)
+        {
+            Title = title;
+            Counter = counter;
+            BackgroundUri = backgroundUri;
+            BackTitle = backTitle;
+            BackContent = backContent;
+            BackBackgroundUri = backBackgroundUri;
+            ParamUri = paramUri;
+        }
+
+        protected override void WriteContent(XmlWriter writer)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class RawNotification : NotificationBase
     {
-        public string RawContent { get; set; }
+        public string RawContent { get; private set; }
+
+        public RawNotification(Guid notificationId, string rawContent) : base(notificationId)
+        {
+            RawContent = rawContent;
+        }
+
+        protected override void WriteContent(XmlWriter writer)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     public class NotificationResponse

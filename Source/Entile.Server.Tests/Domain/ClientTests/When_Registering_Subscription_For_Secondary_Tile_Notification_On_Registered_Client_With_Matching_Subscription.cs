@@ -61,7 +61,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_Uri_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal("/Page1.xaml?test=test", e.Uri));
+            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal("/Page1.xaml?test=test", e.ParamUri));
         }
 
         [Fact]

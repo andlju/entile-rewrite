@@ -4,11 +4,13 @@ namespace Entile.Server.Events
 {
     public class NotificationSucceededEvent : EventBase
     {
+        public readonly Guid SubscriptionId;
         public readonly Guid NotificationId;
         public readonly int AttemptsLeft;
 
-        public NotificationSucceededEvent(Guid notificationId, int attemptsLeft)
+        public NotificationSucceededEvent(Guid subscriptionId, Guid notificationId, int attemptsLeft)
         {
+            SubscriptionId = subscriptionId;
             NotificationId = notificationId;
             AttemptsLeft = attemptsLeft;
         }
@@ -18,13 +20,11 @@ namespace Entile.Server.Events
     {
         public readonly string Title;
         public readonly string Body;
-        public readonly string ParamUri;
 
-        public ToastNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string title, string body, string paramUri) : base(notificationId, attemptsLeft)
+        public ToastNotificationSucceededEvent(Guid subscriptionId, Guid notificationId, int attemptsLeft, string title, string body) : base(subscriptionId, notificationId, attemptsLeft)
         {
             Title = title;
             Body = body;
-            ParamUri = paramUri;
         }
     }
 
@@ -32,7 +32,7 @@ namespace Entile.Server.Events
     {
         public readonly string Content;
 
-        public RawNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string content) : base(notificationId, attemptsLeft)
+        public RawNotificationSucceededEvent(Guid subscriptionId, Guid notificationId, int attemptsLeft, string content) : base(subscriptionId, notificationId, attemptsLeft)
         {
             Content = content;
         }
@@ -48,9 +48,7 @@ namespace Entile.Server.Events
         public readonly string BackContent;
         public readonly string BackBackgroundUri;
 
-        public readonly string ParamUri;
-
-        public TileNotificationSucceededEvent(Guid notificationId, int attemptsLeft, string title, string backgroundUri, int count, string backTitle, string backContent, string backBackgroundUri, string paramUri) : base(notificationId, attemptsLeft)
+        public TileNotificationSucceededEvent(Guid subscriptionId, Guid notificationId, int attemptsLeft, string title, string backgroundUri, int count, string backTitle, string backContent, string backBackgroundUri) : base(subscriptionId, notificationId, attemptsLeft)
         {
             Title = title;
             BackgroundUri = backgroundUri;
@@ -58,7 +56,6 @@ namespace Entile.Server.Events
             BackTitle = backTitle;
             BackContent = backContent;
             BackBackgroundUri = backBackgroundUri;
-            ParamUri = paramUri;
         }
     }
 }

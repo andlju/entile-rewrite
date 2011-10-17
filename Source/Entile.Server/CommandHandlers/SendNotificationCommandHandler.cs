@@ -26,13 +26,13 @@ namespace Entile.Server.CommandHandlers
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
 
-            client.SendNotification(new ToastNotification()
-                                        {
-                                            Title = command.Title, 
-                                            Body = command.Body, 
-                                            NotificationId = command.NotificationId, 
-                                            ParamUri = command.ParamUri
-                                        }, command.NumberOfAttempts, _notificationSender, _commandScheduler);
+            client.SendToastNotification(
+                command.SubscriptionId, 
+                command.NotificationId, 
+                command.Title, 
+                command.Body, 
+                command.NumberOfAttempts, 
+                _notificationSender, _commandScheduler);
 
             _clientRepository.SaveChanges(client);
         }
@@ -44,11 +44,12 @@ namespace Entile.Server.CommandHandlers
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
 
-            client.SendNotification(new RawNotification() 
-            {
-                NotificationId = command.NotificationId,
-                RawContent = command.Content
-            }, command.NumberOfAttempts, _notificationSender, _commandScheduler);
+            client.SendRawNotification(
+                command.SubscriptionId, 
+                command.NotificationId,
+                command.Content,
+                command.NumberOfAttempts, 
+                _notificationSender, _commandScheduler);
 
             _clientRepository.SaveChanges(client);
         }
@@ -60,17 +61,17 @@ namespace Entile.Server.CommandHandlers
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
 
-            client.SendNotification(new TileNotification() 
-            {
-                NotificationId = command.NotificationId,
-                Title = command.Title,
-                Counter = command.Counter,
-                BackgroundUri = command.BackgroundUri,
-                BackTitle = command.BackTitle,
-                BackContent = command.BackContent,
-                BackBackgroundUri = command.BackBackgroundUri,
-                ParamUri = command.ParamUri
-            }, command.NumberOfAttempts, _notificationSender, _commandScheduler);
+            client.SendTileNotification(
+                command.SubscriptionId,
+                command.NotificationId,
+                command.Title,
+                command.Counter,
+                command.BackgroundUri,
+                command.BackTitle,
+                command.BackContent,
+                command.BackBackgroundUri,
+                command.NumberOfAttempts,
+                _notificationSender, _commandScheduler);
 
             _clientRepository.SaveChanges(client);
         }

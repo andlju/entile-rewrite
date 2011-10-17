@@ -9,14 +9,14 @@ namespace Entile.Server.Events
     {
         public readonly Guid SubscriptionId;
         public readonly NotificationKind Kind;
-        public readonly string Uri;
+        public readonly string ParamUri;
         public readonly IEnumerable<KeyValuePair<string, string>> ExtendedInformation;
 
-        public SubscriptionRegisteredEvent(Guid subscriptionId, NotificationKind kind, string uri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
+        public SubscriptionRegisteredEvent(Guid subscriptionId, NotificationKind kind, string paramUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
         {
             SubscriptionId = subscriptionId;
             Kind = kind;
-            Uri = uri;
+            ParamUri = paramUri;
             ExtendedInformation = extendedInformation;
         }
     }

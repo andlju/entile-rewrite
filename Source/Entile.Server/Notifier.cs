@@ -21,11 +21,11 @@ namespace Entile.Server
         public void SendNotificationToAllClients(string title, string body)
         {
             var context = new EntileViews();
-            foreach (var client in context.ClientViews)
+            /*foreach (var client in context.ClientViews)
             {
                 var clientId = Guid.Parse(client.UniqueId);
                 SendCommand(new SendToastNotificationCommand(clientId, Guid.NewGuid(), title, body, null, 3));
-            }
+            }*/
         }
 
         private void SendCommand(ICommand command)

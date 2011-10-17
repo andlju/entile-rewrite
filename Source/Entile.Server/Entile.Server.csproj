@@ -54,18 +54,12 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="CommandHandlers\RegisterSubscriptionCommandHandler.cs" />
-    <Compile Include="CommandHandlers\RemoveAllExtendedInformationItemsCommandHandler.cs" />
-    <Compile Include="CommandHandlers\RemoveExtendedInformationItemsCommandHandler.cs" />
     <Compile Include="CommandHandlers\SendNotificationCommandHandler.cs" />
-    <Compile Include="CommandHandlers\SetExtendedInformationItemCommandHandler.cs" />
     <Compile Include="CommandHandlers\UnregisterSubscriptionCommandHandler.cs" />
     <Compile Include="Commands\CommandBase.cs" />
     <Compile Include="Commands\RegisterSubscriptionCommand.cs" />
-    <Compile Include="Commands\RemoveAllExtendedInformationItemsCommand.cs" />
-    <Compile Include="Commands\RemoveExtendedInformationItemCommand.cs" />
     <Compile Include="Commands\SendRawTileNotificationCommand.cs" />
     <Compile Include="Commands\SendToastNotificationCommand.cs" />
-    <Compile Include="Commands\SetExtendedInformationItemCommand.cs" />
     <Compile Include="Commands\UnregisterForNotificationCommand.cs" />
     <Compile Include="Commands\UnregisterSubscriptionCommand.cs" />
     <Compile Include="Domain\INotificationSender.cs" />
@@ -91,14 +85,11 @@
     <Compile Include="Domain\ClientNotRegisteredException.cs" />
     <Compile Include="EntityFrameworkEventStore.cs" />
     <Compile Include="EventStoreRepository.cs" />
-    <Compile Include="Events\AllExtendedInformationItemsRemovedEvent.cs" />
     <Compile Include="Events\EventBase.cs" />
     <Compile Include="Events\ClientRegisteredEvent.cs" />
     <Compile Include="Events\ClientRegistrationUpdatedEvent.cs" />
     <Compile Include="Events\ClientUnregisteredEvent.cs" />
-    <Compile Include="Events\ExtendedInformationItemSetEvent.cs" />
     <Compile Include="Events\IEvent.cs" />
-    <Compile Include="Events\ExtendedInformationItemRemovedEvent.cs" />
     <Compile Include="IBus.cs" />
     <Compile Include="IEventSerializer.cs" />
     <Compile Include="IEventStore.cs" />

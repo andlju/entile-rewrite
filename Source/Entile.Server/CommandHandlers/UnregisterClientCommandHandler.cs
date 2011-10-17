@@ -1,4 +1,5 @@
-﻿using Entile.Server.Commands;
+﻿using System;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
@@ -19,6 +20,10 @@ namespace Entile.Server.CommandHandlers
             if (client != null)
             {
                 client.Unregister();
+            } 
+            else
+            {
+                throw new InvalidOperationException(string.Format("Unknown client {0}", command.ClientId));
             }
             _clientRepository.SaveChanges(client);
         }

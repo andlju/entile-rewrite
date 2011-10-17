@@ -8,10 +8,11 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Successfully_Sending_ToastNotification_To_Registered_Client : With<Client, SendToastNotificationCommand>
+    public class When_Successfully_Sending_ToastNotification_To_Subscribed_Client : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
         private readonly Guid _notificationId = Guid.NewGuid();
+        private readonly Guid _subscriptionId = Guid.NewGuid();
 
         protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository<Client> repository)
         {
@@ -23,12 +24,12 @@ namespace Entile.Server.Tests.Domain.ClientTests
             _notificationSender.ResponseToReturn = new NotificationResponse(200, "Received", "Connected", "Active");
 
             yield return new ClientRegisteredEvent(UniqueId, "http://test.com/mychannel");
+            yield return new SubscriptionRegisteredEvent(_subscriptionId, NotificationKind.Toast, "/Test.xaml?test=value", null);
         }
 
         protected override SendToastNotificationCommand When()
         {
-
-            return new SendToastNotificationCommand(UniqueId, _notificationId, "Title", "Body", "/Test.xaml?test=value", 3);
+            return new SendToastNotificationCommand(UniqueId, _subscriptionId, _notificationId, "Title", "Body", 3);
         }
 
         [Fact]
@@ -92,9 +93,9 @@ namespace Entile.Server.Tests.Domain.ClientTests
         }
 
         [Fact]
-        public void Then_Notification_Succeeded_ParamUri_Is_Correct()
+        public void Then_Notification_Succeeded_SubscriptionId_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("/Test.xaml?test=value", e.ParamUri));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal(_subscriptionId, e.SubscriptionId));
         }
 
         [Fact]

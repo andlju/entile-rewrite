@@ -27,20 +27,5 @@ namespace Entile.WcfTestHost
         {
             _registrator.Unregister(uniqueId);
         }
-
-        public void SetExtendedInformationItem(Guid uniqueId, string key, string value)
-        {
-            _registrator.SetExtendedInformation(uniqueId, key, value);
-        }
-
-        public void RemoveExtendedInformationItem(Guid uniqueId, string key)
-        {
-            _registrator.RemoveExtendedInformation(uniqueId, key);
-        }
-
-        public void RemoveAllExtendedInformationItems(Guid uniqueId)
-        {
-            _registrator.RemoveAllExtendedInformation(uniqueId);
-        }
     }
 }

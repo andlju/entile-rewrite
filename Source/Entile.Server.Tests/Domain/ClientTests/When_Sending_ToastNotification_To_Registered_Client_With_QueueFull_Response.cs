@@ -8,32 +8,13 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class MockMessageScheduler : IMessageScheduler
-    {
-        public List<Tuple<IMessage, DateTime>> ScheduledMessages = new List<Tuple<IMessage, DateTime>>();
-
-        public TMessage ScheduledMessage<TMessage>(int messageNumber)
-        {
-            return (TMessage)ScheduledMessages[messageNumber].Item1;
-        }
-
-        public void ScheduleMessage(IMessage message, DateTime sendTime)
-        {
-            ScheduledMessages.Add(new Tuple<IMessage, DateTime>(message, sendTime));
-        }
-
-        public IEnumerable<IMessage> GetMessagesToProcess()
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class When_Sending_ToastNotification_To_Registered_Client_With_QueueFull_Response : With<Client, SendToastNotificationCommand>
+    public class When_Sending_ToastNotification_To_Subscribed_Client_With_QueueFull_Response : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
         private readonly MockMessageScheduler _messageScheduler = new MockMessageScheduler();
 
         private Guid _notificationId = Guid.NewGuid();
+        private Guid _subscriptionId = Guid.NewGuid();
 
         protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository<Client> repository)
         {
@@ -45,11 +26,12 @@ namespace Entile.Server.Tests.Domain.ClientTests
             _notificationSender.ResponseToReturn = new NotificationResponse(200, "QueueFull", "Connected", "Active");
 
             yield return new ClientRegisteredEvent(UniqueId, "http://test.com/mychannel");
+            yield return new SubscriptionRegisteredEvent(_subscriptionId, NotificationKind.Toast, "/Test.xaml?test=value", null);
         }
 
         protected override SendToastNotificationCommand When()
         {
-            return new SendToastNotificationCommand(UniqueId, _notificationId, "Title", "Body", "/Test.xaml?test=value", 3);
+            return new SendToastNotificationCommand(UniqueId, _subscriptionId, _notificationId, "Title", "Body", 3);
         }
 
         [Fact]
@@ -95,9 +77,9 @@ namespace Entile.Server.Tests.Domain.ClientTests
         }
 
         [Fact]
-        public void Then_ScheduledCommand_Has_Correct_ParamUri()
+        public void Then_ScheduledCommand_Has_Correct_SubscriptionId()
         {
-            Assert.Equal("/Test.xaml?test=value", _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).ParamUri);
+            Assert.Equal(_subscriptionId, _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).SubscriptionId);
         }
 
         [Fact]

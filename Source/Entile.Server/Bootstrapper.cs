@@ -33,9 +33,6 @@ namespace Entile.Server
             jsonEventSerializer.RegisterKnownMessageType<ClientRegisteredEvent>();
             jsonEventSerializer.RegisterKnownMessageType<ClientRegistrationUpdatedEvent>();
             jsonEventSerializer.RegisterKnownMessageType<ClientUnregisteredEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<ExtendedInformationItemSetEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<ExtendedInformationItemRemovedEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<AllExtendedInformationItemsRemovedEvent>();
 
             jsonEventSerializer.RegisterKnownMessageType<ToastNotificationSucceededEvent>();
             jsonEventSerializer.RegisterKnownMessageType<RawNotificationSucceededEvent>();
@@ -72,9 +69,8 @@ namespace Entile.Server
             // Register Command Handlers
             _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
             _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new SetExtendedInformationItemCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new RemoveExtendedInformationItemsCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new RemoveAllExtendedInformationItemsCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RegisterSubscriptionCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new UnregisterSubscriptionCommandHandler(clientRepository));
 
             _commandRouter.RegisterHandlersIn(new SendNotificationCommandHandler(clientRepository, notificationSender, commandScheduler));
 
@@ -101,7 +97,7 @@ namespace Entile.Server
 
             // Register Event Handlers
             _viewCreatorsEventRouter.RegisterHandlersIn(new ClientViewHandler());
-            _viewCreatorsEventRouter.RegisterHandlersIn(new ExtendedInformationViewHandler());
+            _viewCreatorsEventRouter.RegisterHandlersIn(new SubscriptionViewHandler());
 
             var dispatcher = new EventStreamDispatcher(_viewCreatorsBus, entityFrameworkEventStore);
 

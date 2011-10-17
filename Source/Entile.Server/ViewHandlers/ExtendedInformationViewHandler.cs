@@ -3,71 +3,50 @@ using Entile.Server.Events;
 
 namespace Entile.Server.ViewHandlers
 {
-    public class ExtendedInformationViewHandler : 
-        IMessageHandler<ExtendedInformationItemSetEvent>,
-        IMessageHandler<ExtendedInformationItemRemovedEvent>,
-        IMessageHandler<AllExtendedInformationItemsRemovedEvent>,
-        IMessageHandler<ClientUnregisteredEvent>
+    public class SubscriptionViewHandler : 
+        IMessageHandler<SubscriptionRegisteredEvent>,
+        IMessageHandler<SubscriptionUnregisteredEvent>
     {
-        public void Handle(ExtendedInformationItemSetEvent command)
+        public void Handle(SubscriptionRegisteredEvent command)
         {
-            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
-                var item = context.ExtendedInformationViews.Find(command.AggregateId, command.Key);
-                if (item == null)
+                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == command.AggregateId).Single();
+
+                var sub = client.Subscriptions.Where(s => s.SubscriptionId == command.SubscriptionId).SingleOrDefault();
+                if (sub == null)
                 {
-                    item = new ExtendedInformationView() { ClientViewUniqueId = idStr, Key = command.Key };
-                    context.ExtendedInformationViews.Add(item);
+                    sub = new SubscriptionView();
+                    client.Subscriptions.Add(sub);
                 }
-                item.Value = command.Value;
+                else
+                {
+                    sub.ExtendedInformation.Clear();
+                }
+                sub.NotificationKind = (int) command.Kind;
+                sub.ParamUri = command.ParamUri;
+                
+                foreach(var extendedInfo in command.ExtendedInformation)
+                {
+                    sub.ExtendedInformation.Add(new ExtendedInformationView() { Key = extendedInfo.Key, Value = extendedInfo.Value});
+                }
+
                 context.SaveChanges();
             }
         }
 
-        public void Handle(ExtendedInformationItemRemovedEvent command)
+        public void Handle(SubscriptionUnregisteredEvent command)
         {
-            var idStr = command.AggregateId.ToString();
             using (var context = new EntileViews())
             {
-                var item = context.ExtendedInformationViews.Find(idStr, command.Key);
-                if (item != null)
-                {
-                    context.ExtendedInformationViews.Remove(item);
-                }
-                context.SaveChanges();
-            }
-        }
+                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == command.AggregateId).Single();
 
-        public void Handle(AllExtendedInformationItemsRemovedEvent command)
-        {
-            var idStr = command.AggregateId.ToString();
-            using (var context = new EntileViews())
-            {
-                var items = from i in context.ExtendedInformationViews
-                            where i.ClientViewUniqueId == idStr
-                            select i;
-                foreach (var item in items)
+                var sub = client.Subscriptions.Where(s => s.SubscriptionId == command.SubscriptionId).SingleOrDefault();
+                if (sub != null)
                 {
-                    context.ExtendedInformationViews.Remove(item);
+                    client.Subscriptions.Remove(sub);
+                    context.SaveChanges();
                 }
-                context.SaveChanges();
-            }
-        }
-
-        public void Handle(ClientUnregisteredEvent command)
-        {
-            var idStr = command.AggregateId.ToString();
-            using (var context = new EntileViews())
-            {
-                var items = from i in context.ExtendedInformationViews
-                            where i.ClientViewUniqueId == idStr
-                            select i;
-                foreach (var item in items)
-                {
-                    context.ExtendedInformationViews.Remove(item);
-                }
-                context.SaveChanges();
             }
         }
     }

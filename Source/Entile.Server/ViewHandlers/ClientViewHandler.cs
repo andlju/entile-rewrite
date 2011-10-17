@@ -1,5 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Data.Entity;
+using System.Linq;
 using Entile.Server.Events;
 
 namespace Entile.Server.ViewHandlers
@@ -7,24 +10,44 @@ namespace Entile.Server.ViewHandlers
     public class ClientView
     {
         [Key]
-        public string UniqueId { get; set; }
+        public Guid ClientId { get; set; }
 
         public string NotificationChannel { get; set; }
+
+        public Collection<SubscriptionView> Subscriptions { get; set; }
+    }
+
+    public class SubscriptionView
+    {
+        [Key]
+        [Column(Order = 0)]
+        public Guid ClientId { get; set; }
+
+        [Key]
+        [Column(Order = 1)]
+        public Guid SubscriptionId { get; set; }
+
+        public int NotificationKind { get; set; }
+        public string ParamUri { get; set; }
+
+        public Collection<ExtendedInformationView> ExtendedInformation { get; set; }
     }
 
     public class ExtendedInformationView
     {
         [Key]
         [Column(Order = 0)]
-        public string ClientViewUniqueId { get; set; }
+        public Guid ClientId { get; set; }
 
         [Key]
         [Column(Order = 1)]
+        public Guid SubscriptionId { get; set; } 
+
+        [Key]
+        [Column(Order = 2)]
         public string Key { get; set; }
 
         public string Value { get; set; }
-
-        public ClientView ClientView { get; set; }
     }
 
     public class EntileViews : DbContext
@@ -34,8 +57,6 @@ namespace Entile.Server.ViewHandlers
         }
         
         public DbSet<ClientView> ClientViews { get; set; }
-
-        public DbSet<ExtendedInformationView> ExtendedInformationViews { get; set; }
     }
 
     public class ClientViewHandler :
@@ -46,7 +67,7 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientRegisteredEvent @event)
         {
-            var idStr = @event.AggregateId.ToString();
+            var idStr = @event.AggregateId;
             using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(idStr);
@@ -54,7 +75,7 @@ namespace Entile.Server.ViewHandlers
                 {
                     clientView = new ClientView
                     {
-                        UniqueId = idStr,
+                        ClientId = idStr,
                     };
 
                     context.ClientViews.Add(clientView);
@@ -66,20 +87,20 @@ namespace Entile.Server.ViewHandlers
 
         public void Handle(ClientUnregisteredEvent @event)
         {
-            var idStr = @event.AggregateId.ToString();
             using (var context = new EntileViews())
             {
-                var clientView = context.ClientViews.Find(idStr);
-
-                context.ClientViews.Remove(clientView);
-                
-                context.SaveChanges();
+                var clientView = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == @event.AggregateId).FirstOrDefault();
+                if (clientView != null)
+                {
+                    context.ClientViews.Remove(clientView);
+                    context.SaveChanges();
+                }
             }
         }
 
         public void Handle(ClientRegistrationUpdatedEvent @event)
         {
-            var idStr = @event.AggregateId.ToString();
+            var idStr = @event.AggregateId;
             using (var context = new EntileViews())
             {
                 var clientView = context.ClientViews.Find(idStr);
@@ -87,7 +108,7 @@ namespace Entile.Server.ViewHandlers
                 {
                     clientView = new ClientView
                     {
-                        UniqueId = idStr,
+                        ClientId = idStr,
                     };
 
                     context.ClientViews.Add(clientView);
