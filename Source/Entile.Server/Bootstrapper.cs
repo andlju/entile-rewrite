@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Entile.Server.CommandHandlers;
@@ -6,6 +8,7 @@ using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
 using Entile.Server.ViewHandlers;
+using EventStore;
 
 namespace Entile.Server
 {

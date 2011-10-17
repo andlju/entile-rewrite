@@ -54,6 +54,6 @@ namespace Entile.Server.Domain
         }
 
         public abstract Guid Id { get; }
-        protected int SequenceNumber { get; set; }
+        public int SequenceNumber { get; protected set; }
     }
 }
