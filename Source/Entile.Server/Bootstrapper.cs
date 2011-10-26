@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using CommonDomain.Core;
+using CommonDomain.Persistence;
+using CommonDomain.Persistence.EventStore;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -30,55 +33,39 @@ namespace Entile.Server
 
         public void Initialize()
         {
-            var jsonEventSerializer = new JsonMessageSerializer();
+            
+            var repository = new EventStoreRepository(
+                Wireup.Init().UsingSqlPersistence("EntileEventStore").InitializeStorageEngine().
+                UsingJsonSerialization().Build(),
+                new AggregateFactory(), new ConflictDetector());
 
-            // Register known events to serialize
-            jsonEventSerializer.RegisterKnownMessageType<ClientRegisteredEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<ClientRegistrationUpdatedEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<ClientUnregisteredEvent>();
 
-            jsonEventSerializer.RegisterKnownMessageType<ToastNotificationSucceededEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<RawNotificationSucceededEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<TileNotificationSucceededEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<ToastNotificationFailedEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<RawNotificationFailedEvent>();
-            jsonEventSerializer.RegisterKnownMessageType<TileNotificationFailedEvent>();
-
-            var jsonCommandSerializer = new JsonMessageSerializer();
-            jsonCommandSerializer.RegisterKnownMessageType<SendToastNotificationCommand>();
-            jsonCommandSerializer.RegisterKnownMessageType<SendRawNotificationCommand>();
-            jsonCommandSerializer.RegisterKnownMessageType<SendTileNotificationCommand>();
-
-            var entityFrameworkEventStore = new EntityFrameworkEventStore(jsonEventSerializer);
-
-            InitializeClientCommands(entityFrameworkEventStore);
-            InitializeViewCreators(entityFrameworkEventStore);
+            InitializeClientCommands(repository);
+            InitializeViewCreators(repository);
 
             _registrator = new Registrator(_commandBus);
             _notifier = new Notifier(_commandBus);
 
         }
 
-        private void InitializeClientCommands(EntityFrameworkEventStore entityFrameworkEventStore)
+        private void InitializeClientCommands(IRepository repository)
         {
             _commandRouter = new MessageRouter();
             _commandBus = new InProcessBus(_commandRouter);
 
-            var clientRepository = new EventStoreRepository<Client>(entityFrameworkEventStore, _commandBus);
 
             var notificationSender = new DummyNotificationSender();
-            var commandScheduler = new MessageScheduler(entityFrameworkEventStore);
+            var commandScheduler = new MessageScheduler(null);
 
             // Register Command Handlers
-            _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new RegisterSubscriptionCommandHandler(clientRepository));
-            _commandRouter.RegisterHandlersIn(new UnregisterSubscriptionCommandHandler(clientRepository));
+            _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(repository));
+            _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(repository));
+            _commandRouter.RegisterHandlersIn(new RegisterSubscriptionCommandHandler(repository));
+            _commandRouter.RegisterHandlersIn(new UnregisterSubscriptionCommandHandler(repository));
 
-            _commandRouter.RegisterHandlersIn(new SendNotificationCommandHandler(clientRepository, notificationSender, commandScheduler));
+            _commandRouter.RegisterHandlersIn(new SendNotificationCommandHandler(repository, notificationSender, commandScheduler));
 
-
-            _commandSchedulerTask = new Task(() =>
+            /*_commandSchedulerTask = new Task(() =>
                                                  {
                                                      while (true)
                                                      {
@@ -90,10 +77,10 @@ namespace Entile.Server
                                                          Thread.Sleep(5000);
                                                      }
                                                  });
-            _commandSchedulerTask.Start();
+            _commandSchedulerTask.Start();*/
         }
 
-        private void InitializeViewCreators(EntityFrameworkEventStore entityFrameworkEventStore)
+        private void InitializeViewCreators(IRepository repository)
         {
             _viewCreatorsEventRouter = new MessageRouter();
             _viewCreatorsBus = new InProcessBus(_viewCreatorsEventRouter);
@@ -101,20 +88,6 @@ namespace Entile.Server
             // Register Event Handlers
             _viewCreatorsEventRouter.RegisterHandlersIn(new ClientViewHandler());
             _viewCreatorsEventRouter.RegisterHandlersIn(new SubscriptionViewHandler());
-
-            var dispatcher = new EventStreamDispatcher(_viewCreatorsBus, entityFrameworkEventStore);
-
-            _createViewsTask = new Task(() =>
-                                            {
-                                                var lastUpdate = entityFrameworkEventStore.GetLastUpdate("Views");
-                                                while (true)
-                                                {
-                                                    lastUpdate = dispatcher.Dispatch(lastUpdate);
-                                                    entityFrameworkEventStore.SetLastUpdate("Views", lastUpdate);
-                                                    Thread.Sleep(1000);
-                                                }
-                                            });
-            _createViewsTask.Start();
         }
 
         public IRegistrator Registrator
@@ -132,6 +105,15 @@ namespace Entile.Server
             {
                 EnsureInitialized();
                 return _notifier;
+            }
+        }
+
+        public IBus CommandBus
+        {
+            get
+            {
+                EnsureInitialized();
+                return _commandBus;
             }
         }
 

@@ -6,12 +6,10 @@ namespace Entile.Server.Events
     public abstract class EventBase : IEvent
     {
         public Guid AggregateId { get; set; }
-        public int SequenceNumber { get; set; }
-        public long Timestamp { get; set; }
 
         protected EventBase()
         {
-            Timestamp = DateTime.Now.Ticks;
+
         }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommonDomain.Persistence;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -16,7 +17,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         private Guid _notificationId = Guid.NewGuid();
         private Guid _subscriptionId = Guid.NewGuid();
 
-        protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<SendToastNotificationCommand> CreateHandler(IRepository repository)
         {
             return new SendNotificationCommandHandler(repository, _notificationSender, _messageScheduler);
         }

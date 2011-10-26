@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using CommonDomain.Persistence;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -12,14 +13,9 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
     public class When_Registering_New_Client : With<Client, RegisterClientCommand>
     {
-        protected override IMessageHandler<RegisterClientCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<RegisterClientCommand> CreateHandler(IRepository repository)
         {
             return new RegisterClientCommandHandler(repository);
-        }
-
-        protected override System.Collections.Generic.IEnumerable<IEvent> Given()
-        {
-            return null;
         }
 
         protected override RegisterClientCommand When()
@@ -29,7 +25,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
 
         [Fact]
         public void Then_ClientRegisteredEvent_Is_Sent()
-        { 
+        {
             AssertEvent.IsType<ClientRegisteredEvent>(0);
         }
 

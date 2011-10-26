@@ -1,4 +1,5 @@
 ﻿using System;
+using CommonDomain.Persistence;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 
@@ -6,18 +7,18 @@ namespace Entile.Server.CommandHandlers
 {
     public class UnregisterClientCommandHandler : IMessageHandler<UnregisterClientCommand>
     {
-        private readonly IRepository<Client> _clientRepository;
+        private readonly IRepository _repository;
 
-        public UnregisterClientCommandHandler(IRepository<Client> clientRepository)
+        public UnregisterClientCommandHandler(IRepository repository)
         {
-            _clientRepository = clientRepository;
+            _repository = repository;
         }
 
         public void Handle(UnregisterClientCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
-            if (client != null)
+            if (client.Id != Guid.Empty)
             {
                 client.Unregister();
             } 
@@ -25,7 +26,7 @@ namespace Entile.Server.CommandHandlers
             {
                 throw new InvalidOperationException(string.Format("Unknown client {0}", command.ClientId));
             }
-            _clientRepository.SaveChanges(client);
+            _repository.Save(client, Guid.NewGuid(), null);
         }
 
     }

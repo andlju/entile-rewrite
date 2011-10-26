@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonDomain">
+      <HintPath>..\packages\CommonDomain.1.2.1\lib\net40\CommonDomain.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -63,8 +66,6 @@
     <Compile Include="Domain\ClientTests\When_Updating_Registration_On_Unregistered_Client.cs" />
     <Compile Include="Domain\ClientTests\MockNotificationSender.cs" />
     <Compile Include="Domain\With.cs" />
-    <Compile Include="EventStreamConsumerTest.cs" />
-    <Compile Include="JsonEventSerializerTest.cs" />
     <Compile Include="MessageRouterTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

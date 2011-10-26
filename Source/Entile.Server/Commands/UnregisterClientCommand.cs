@@ -4,7 +4,12 @@ namespace Entile.Server.Commands
 {
     public class UnregisterClientCommand : CommandBase
     {
-        public readonly Guid ClientId;
+        public Guid ClientId;
+
+        public UnregisterClientCommand()
+        {
+            
+        }
 
         public UnregisterClientCommand(Guid clientId)
         {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommonDomain.Persistence;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -18,7 +19,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
             yield return new ClientRegisteredEvent(_clientId, "http://test.com");
         }
 
-        protected override IMessageHandler<RegisterSubscriptionCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<RegisterSubscriptionCommand> CreateHandler(IRepository repository)
         {
             return new RegisterSubscriptionCommandHandler(repository);
         }

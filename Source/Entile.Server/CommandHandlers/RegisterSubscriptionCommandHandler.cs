@@ -1,25 +1,28 @@
-﻿using Entile.Server.Commands;
+﻿using System;
+using CommonDomain.Persistence;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
     public class RegisterSubscriptionCommandHandler : IMessageHandler<RegisterSubscriptionCommand>
     {
-        private IRepository<Client> _clientRepository;
+        private IRepository _repository;
 
-        public RegisterSubscriptionCommandHandler(IRepository<Client> clientRepository)
+
+        public RegisterSubscriptionCommandHandler(IRepository repository)
         {
-            _clientRepository = clientRepository;
+            _repository = repository;
         }
 
         public void Handle(RegisterSubscriptionCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
             client.RegisterSubscription(command.SubscriptionId, command.Kind, command.Uri,
                                            command.ExtendedInformation);
-            
-            _clientRepository.SaveChanges(client);
+
+            _repository.Save(client, Guid.NewGuid(), null);
         }
     }
 }

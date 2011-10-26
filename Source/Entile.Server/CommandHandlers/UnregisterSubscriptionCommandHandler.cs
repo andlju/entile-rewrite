@@ -1,24 +1,26 @@
-﻿using Entile.Server.Commands;
+﻿using System;
+using CommonDomain.Persistence;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
     public class UnregisterSubscriptionCommandHandler : IMessageHandler<UnregisterSubscriptionCommand>
     {
-        private readonly IRepository<Client> _clientRepository;
+        private readonly IRepository _repository;
 
-        public UnregisterSubscriptionCommandHandler(IRepository<Client> clientRepository)
+        public UnregisterSubscriptionCommandHandler(IRepository repository)
         {
-            _clientRepository = clientRepository;
+            _repository = repository;
         }
 
         public void Handle(UnregisterSubscriptionCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
             client.UnregisterSubscription(command.SubscriptionId);
-
-            _clientRepository.SaveChanges(client);
+            
+            _repository.Save(client, Guid.NewGuid(), null);
         }
     }
 }

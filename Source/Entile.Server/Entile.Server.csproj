@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonDomain">
+      <HintPath>..\packages\CommonDomain.1.2.1\lib\net40\CommonDomain.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <HintPath>..\packages\EntityFramework.4.1.10715.0\lib\EntityFramework.dll</HintPath>
     </Reference>
@@ -64,13 +67,12 @@
     <Compile Include="Commands\RegisterSubscriptionCommand.cs" />
     <Compile Include="Commands\SendRawTileNotificationCommand.cs" />
     <Compile Include="Commands\SendToastNotificationCommand.cs" />
-    <Compile Include="Commands\UnregisterForNotificationCommand.cs" />
     <Compile Include="Commands\UnregisterSubscriptionCommand.cs" />
+    <Compile Include="Domain\AggregateFactory.cs" />
     <Compile Include="Domain\INotificationSender.cs" />
     <Compile Include="Domain\InvalidExtendedInformationItemException.cs" />
     <Compile Include="Domain\NotificationKind.cs" />
     <Compile Include="Domain\NotificationResponse.cs" />
-    <Compile Include="EventStreamDispatcher.cs" />
     <Compile Include="Events\NotificationFailedEvent.cs" />
     <Compile Include="Events\NotificationSucceededEvent.cs" />
     <Compile Include="Events\RegisteredForNotificationEvent.cs" />
@@ -84,23 +86,15 @@
     <Compile Include="Commands\RegisterClientCommand.cs" />
     <Compile Include="Commands\SendTileNotificationCommand.cs" />
     <Compile Include="Commands\UnregisterClientCommand.cs" />
-    <Compile Include="Domain\Aggregate.cs" />
     <Compile Include="Domain\Client.cs" />
     <Compile Include="Domain\ClientNotRegisteredException.cs" />
-    <Compile Include="EntityFrameworkEventStore.cs" />
-    <Compile Include="EventStoreRepository.cs" />
     <Compile Include="Events\EventBase.cs" />
     <Compile Include="Events\ClientRegisteredEvent.cs" />
     <Compile Include="Events\ClientRegistrationUpdatedEvent.cs" />
     <Compile Include="Events\ClientUnregisteredEvent.cs" />
     <Compile Include="Events\IEvent.cs" />
     <Compile Include="IBus.cs" />
-    <Compile Include="IEventSerializer.cs" />
-    <Compile Include="IEventStore.cs" />
-    <Compile Include="FileSystemEventStore.cs" />
     <Compile Include="IRegistrator.cs" />
-    <Compile Include="IRepository.cs" />
-    <Compile Include="JsonEventSerializer.cs" />
     <Compile Include="Notifier.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registrator.cs" />

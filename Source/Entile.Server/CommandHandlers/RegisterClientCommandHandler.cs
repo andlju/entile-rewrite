@@ -1,22 +1,24 @@
-﻿using Entile.Server.Commands;
+﻿using System;
+using CommonDomain.Persistence;
+using Entile.Server.Commands;
 using Entile.Server.Domain;
 
 namespace Entile.Server.CommandHandlers
 {
     public class RegisterClientCommandHandler : IMessageHandler<RegisterClientCommand>
     {
-        private readonly IRepository<Client> _clientRepository;
+        private readonly IRepository _repository;
 
-        public RegisterClientCommandHandler(IRepository<Client> clientRepository)
+        public RegisterClientCommandHandler(IRepository repository)
         {
-            _clientRepository = clientRepository;
+            _repository = repository;
         }
 
         public void Handle(RegisterClientCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
-            if (client != null)
+            if (client.Id != Guid.Empty)
             {
                 client.UpdateRegistration(command.NotificationChannel);
             } 
@@ -25,7 +27,7 @@ namespace Entile.Server.CommandHandlers
                 client = new Client(command.ClientId, command.NotificationChannel); 
             }
 
-            _clientRepository.SaveChanges(client);
+            _repository.Save(client, Guid.NewGuid(), null);
         }
     }
 }

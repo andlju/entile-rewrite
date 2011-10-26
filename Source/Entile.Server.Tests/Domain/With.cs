@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CommonDomain;
+using CommonDomain.Persistence;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
@@ -8,8 +10,50 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain
 {
+    public class MockRepository : IRepository
+    {
+        private IEvent[] _givenEvents;
+        private Func<IAggregate> _factory;
+
+        private IEvent[] _savedEvents;
+
+        public MockRepository(IEnumerable<IEvent> givenEvents, Func<IAggregate> factory)
+        {
+            _givenEvents = givenEvents.ToArray();
+            _factory = factory;
+        }
+
+        public IEvent[] SavedEvents
+        {
+            get { return _savedEvents; }
+        }
+
+        public TAggregate GetById<TAggregate>(Guid id, int version) where TAggregate : class, IAggregate
+        {
+            if (_givenEvents.Length == 0)
+                return (TAggregate)_factory();
+
+            var obj = _factory();
+            foreach (var e in _givenEvents)
+            {
+                obj.ApplyEvent(e);
+            }
+
+            return (TAggregate)obj;
+        }
+
+        public void Save(IAggregate aggregate, Guid commitId, Action<IDictionary<string, object>> updateHeaders)
+        {
+            var events = aggregate.GetUncommittedEvents();
+            if (events != null)
+                _savedEvents = events.Cast<IEvent>().ToArray();
+            else 
+                _savedEvents = new IEvent[0];
+        }
+    }
+
     public abstract class With<TAgg, TCmd>
-        where TAgg : Aggregate<TAgg>, new()
+        where TAgg : class, IAggregate, new()
         where TCmd : ICommand
     {
         private Exception _exceptionThrown;
@@ -18,21 +62,26 @@ namespace Entile.Server.Tests.Domain
 
         private IEvent[] _events;
 
+        protected MockRepository MockRepository;
+
         protected virtual IEnumerable<IEvent> Given()
         {
             yield break;
         }
 
-        protected abstract IMessageHandler<TCmd> CreateHandler(IRepository<TAgg> repository);
+        protected abstract IMessageHandler<TCmd> CreateHandler(IRepository repository);
  
         protected abstract TCmd When();
 
         protected With()
         {
+            var repository = new MockRepository(Given(), () => new TAgg());
             try
             {
-                var handler = CreateHandler(new InternalTestRepository(this));
+                var handler = CreateHandler(repository);
                 handler.Handle(When());
+                
+                _events = repository.SavedEvents;
             } 
             catch(Exception ex)
             {
@@ -58,32 +107,6 @@ namespace Entile.Server.Tests.Domain
             get { return new Assertions(this);}
         }
 
-        private class InternalTestRepository : IRepository<TAgg>
-        {
-            private readonly With<TAgg, TCmd> _with;
-
-            public InternalTestRepository(With<TAgg, TCmd> with)
-            {
-                _with = with;
-            }
-
-            public TAgg GetById(Guid uniqueId)
-            {
-                var givenEvents = _with.Given();
-                if (givenEvents == null)
-                    return null;
-
-                var agg = new TAgg();
-                agg.LoadEvents(givenEvents);
-
-                return agg;
-            }
-
-            public void SaveChanges(TAgg aggregate)
-            {
-                _with._events = aggregate.GetUncommittedEvents().ToArray();
-            }
-        }
 
         public class Assertions
         {

@@ -1,3 +1,5 @@
+using System;
+using CommonDomain.Persistence;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 
@@ -8,20 +10,20 @@ namespace Entile.Server.CommandHandlers
         IMessageHandler<SendRawNotificationCommand>,
         IMessageHandler<SendTileNotificationCommand>
     {
-        private readonly IRepository<Client> _clientRepository;
+        private readonly IRepository _repository;
         private readonly INotificationSender _notificationSender;
         private readonly IMessageScheduler _commandScheduler;
 
-        public SendNotificationCommandHandler(IRepository<Client> clientRepository, INotificationSender notificationSender, IMessageScheduler commandScheduler)
+        public SendNotificationCommandHandler(IRepository repository, INotificationSender notificationSender, IMessageScheduler commandScheduler)
         {
-            _clientRepository = clientRepository;
+            _repository = repository;
             _notificationSender = notificationSender;
             _commandScheduler = commandScheduler;
         }
 
         public void Handle(SendToastNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
@@ -34,12 +36,12 @@ namespace Entile.Server.CommandHandlers
                 command.NumberOfAttempts, 
                 _notificationSender, _commandScheduler);
 
-            _clientRepository.SaveChanges(client);
+            _repository.Save(client, Guid.NewGuid(), null);
         }
 
         public void Handle(SendRawNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
@@ -50,13 +52,13 @@ namespace Entile.Server.CommandHandlers
                 command.Content,
                 command.NumberOfAttempts, 
                 _notificationSender, _commandScheduler);
-
-            _clientRepository.SaveChanges(client);
+            
+            _repository.Save(client, Guid.NewGuid(), null);
         }
 
         public void Handle(SendTileNotificationCommand command)
         {
-            var client = _clientRepository.GetById(command.ClientId);
+            var client = _repository.GetById<Client>(command.ClientId, int.MaxValue);
 
             if (client == null)
                 throw new ClientNotRegisteredException(command.ClientId);
@@ -73,7 +75,7 @@ namespace Entile.Server.CommandHandlers
                 command.NumberOfAttempts,
                 _notificationSender, _commandScheduler);
 
-            _clientRepository.SaveChanges(client);
+            _repository.Save(client, Guid.NewGuid(), null);
         }
     }
 }

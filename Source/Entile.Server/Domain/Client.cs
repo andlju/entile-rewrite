@@ -3,10 +3,6 @@ using System.Collections.Generic;
 using Entile.Server.Commands;
 using Entile.Server.Events;
 
-namespace Entile.Server.Events
-{
-}
-
 namespace Entile.Server.Domain
 {
     class Subscription
@@ -23,38 +19,27 @@ namespace Entile.Server.Domain
         }
     }
 
-    public class Client : Aggregate<Client>
+    public class Client : CommonDomain.Core.AggregateBase<IEvent>
     {
-        private Guid _uniqueId;
         private bool _isActive;
         private string _notificationChannel;
 
-        public override Guid Id { get { return _uniqueId; } }
-
-        private IDictionary<string, string> _extendedInformation;
-        private IDictionary<Guid, Subscription> _subscriptions;
+        private readonly IDictionary<Guid, Subscription> _subscriptions;
 
         public Client()
         {
-            _extendedInformation = new Dictionary<string, string>();
             _subscriptions = new Dictionary<Guid, Subscription>();
-
-            RegisterEvent<ClientRegisteredEvent>(OnClientRegistered);
-            RegisterEvent<ClientRegistrationUpdatedEvent>(OnClientRegistrationUpdated);
-            RegisterEvent<ClientUnregisteredEvent>(OnClientUnregistered);
-            RegisterEvent<SubscriptionRegisteredEvent>(OnSubscriptionRegistered);
-            RegisterEvent<SubscriptionUnregisteredEvent>(OnSubscriptionUnregistered);
         }
 
         public Client(Guid uniqueId, string notificationChannel)
             : this()
         {
-            ApplyEvent(new ClientRegisteredEvent(uniqueId, notificationChannel));
+            PublishEvent(new ClientRegisteredEvent(uniqueId, notificationChannel));
         }
 
         public void UpdateRegistration(string notificationChannel)
         {
-            ApplyEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
+            PublishEvent(new ClientRegistrationUpdatedEvent(notificationChannel));
         }
 
         public void Unregister()
@@ -62,12 +47,12 @@ namespace Entile.Server.Domain
             if (!_isActive)
                 throw new ClientNotRegisteredException(Id);
 
-            ApplyEvent(new ClientUnregisteredEvent());
+            PublishEvent(new ClientUnregisteredEvent());
         }
 
         public void RegisterSubscription(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
         {
-            ApplyEvent(new SubscriptionRegisteredEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
+            PublishEvent(new SubscriptionRegisteredEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
         }
 
         public void UnregisterSubscription(Guid subscriptionId)
@@ -75,7 +60,7 @@ namespace Entile.Server.Domain
             if (!_subscriptions.ContainsKey(subscriptionId))
                 throw new UnknownSubscriptionException(Id, subscriptionId);
 
-            ApplyEvent(new SubscriptionUnregisteredEvent(subscriptionId));
+            PublishEvent(new SubscriptionUnregisteredEvent(subscriptionId));
         }
 
         public void SendToastNotification(Guid subscriptionId, Guid notificationId, string title, string body, int attemptsLeft, INotificationSender notificationSender, IMessageScheduler messageScheduler)
@@ -134,22 +119,22 @@ namespace Entile.Server.Domain
                 if (response.NotificationStatus == "Received")
                 {
                     if (toastNotification != null)
-                        ApplyEvent(new ToastNotificationSucceededEvent(subscriptionId, toastNotification.NotificationId, attemptsLeft, toastNotification.Title, toastNotification.Body));
+                        PublishEvent(new ToastNotificationSucceededEvent(subscriptionId, toastNotification.NotificationId, attemptsLeft, toastNotification.Title, toastNotification.Body));
                     else if (rawNotification != null)
-                        ApplyEvent(new RawNotificationSucceededEvent(subscriptionId, rawNotification.NotificationId, attemptsLeft, rawNotification.RawContent));
+                        PublishEvent(new RawNotificationSucceededEvent(subscriptionId, rawNotification.NotificationId, attemptsLeft, rawNotification.RawContent));
                     else if (tileNotification != null)
-                        ApplyEvent(new TileNotificationSucceededEvent(subscriptionId, tileNotification.NotificationId, attemptsLeft, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri));
+                        PublishEvent(new TileNotificationSucceededEvent(subscriptionId, tileNotification.NotificationId, attemptsLeft, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri));
                     return;
                 }
             }
 
             // Something went wrong somehow. First, let's publish an event saing so.
             if (toastNotification != null)
-                ApplyEvent(new ToastNotificationFailedEvent(subscriptionId, toastNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, toastNotification.Title, toastNotification.Body));
+                PublishEvent(new ToastNotificationFailedEvent(subscriptionId, toastNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, toastNotification.Title, toastNotification.Body));
             else if (rawNotification != null)
-                ApplyEvent(new RawNotificationFailedEvent(subscriptionId, rawNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, rawNotification.RawContent));
+                PublishEvent(new RawNotificationFailedEvent(subscriptionId, rawNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, rawNotification.RawContent));
             else if (tileNotification != null)
-                ApplyEvent(new TileNotificationFailedEvent(subscriptionId, tileNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri));
+                PublishEvent(new TileNotificationFailedEvent(subscriptionId, tileNotification.NotificationId, attemptsLeft, DateTime.Now, response.HttpStatusCode, response.NotificationStatus, response.DeviceConnectionStatus, response.SubscriptionStatus, tileNotification.Title, tileNotification.BackgroundUri, tileNotification.Counter, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri));
 
             // Next let's figure out what to do next
             var resendTime = DateTime.Now;
@@ -194,35 +179,67 @@ namespace Entile.Server.Domain
                 else if (tileNotification != null)
                     messageScheduler.ScheduleMessage(new SendTileNotificationCommand(this.Id, subscriptionId, tileNotification.NotificationId, tileNotification.Title, tileNotification.Counter, tileNotification.BackgroundUri, tileNotification.BackTitle, tileNotification.BackContent, tileNotification.BackBackgroundUri, attemptsLeft), resendTime);
             }
-
         }
 
-        private void OnClientRegistered(ClientRegisteredEvent @event)
+        protected void PublishEvent(IEvent @event)
         {
-            _uniqueId = @event.AggregateId;
+            if (@event.AggregateId == Guid.Empty)
+                @event.AggregateId = Id;
+
+            RaiseEvent(@event);
+        }
+
+        protected void Apply(ClientRegisteredEvent @event)
+        {
+            Id = @event.AggregateId;
             _isActive = true;
             _notificationChannel = @event.NotificationChannel;
         }
 
-        private void OnClientRegistrationUpdated(ClientRegistrationUpdatedEvent @event)
+        protected void Apply(ClientRegistrationUpdatedEvent @event)
         {
             _isActive = true;
             _notificationChannel = @event.NotificationChannel;
         }
 
-        private void OnClientUnregistered(ClientUnregisteredEvent @event)
+        protected void Apply(ClientUnregisteredEvent @event)
         {
             _isActive = false;
         }
 
-        private void OnSubscriptionUnregistered(SubscriptionUnregisteredEvent @event)
+        protected void Apply(SubscriptionUnregisteredEvent @event)
         {
             _subscriptions.Remove(@event.SubscriptionId);
         }
 
-        private void OnSubscriptionRegistered(SubscriptionRegisteredEvent @event)
+        protected void Apply(SubscriptionRegisteredEvent @event)
         {
             _subscriptions[@event.SubscriptionId] = new Subscription(@event.SubscriptionId, @event.Kind, @event.ParamUri);
+        }
+
+        protected void Apply(TileNotificationSucceededEvent @event)
+        {
+
+        }
+        protected void Apply(ToastNotificationSucceededEvent @event)
+        {
+
+        }
+        protected void Apply(RawNotificationSucceededEvent @event)
+        {
+
+        }
+        protected void Apply(TileNotificationFailedEvent @event)
+        {
+
+        }
+        protected void Apply(ToastNotificationFailedEvent @event)
+        {
+
+        }
+        protected void Apply(RawNotificationFailedEvent @event)
+        {
+
         }
     }
 }

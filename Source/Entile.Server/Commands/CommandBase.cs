@@ -2,13 +2,11 @@ using System;
 
 namespace Entile.Server.Commands
 {
-    public class CommandBase : ICommand
+    public abstract class CommandBase : ICommand
     {
-        public long Timestamp { get; private set; }
-
-        public CommandBase()
+        
+        protected CommandBase()
         {
-            Timestamp = DateTime.Now.Ticks;
         }
     }
 }

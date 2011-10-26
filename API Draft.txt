@@ -1,0 +1,48 @@
+// GET /entile
+
+{
+  link : [
+    { 
+      rel : 'register',
+      type : 'client',
+      href : 'http://entile.com/entile/register-client',
+    },
+    {
+      rel : 'unregister',
+      type : 'client',
+      href : 'http://entile.com/entile/unregister-client'
+    }
+  ]
+}
+
+
+// GET /entile/register-client
+// content-type : entile-form
+{ 
+  method : 'POST',
+  clientId : 'Guid',
+  notificationChannel : 'string'
+}
+
+// POST /entile/register-client
+// Request
+{
+  clientId : 'AD44C58C-60F5-4E43-BA61-EC9B36911CF5',
+  notificationChannel : 'http://test.com/channel/lkjsdfoij'
+}
+// Response (successful)
+{
+  status : 'accepted',
+  clientId : 'AD44C58C-60F5-4E43-BA61-EC9B36911CF5'
+}
+// Response (failed)
+{
+  status : 'failed',
+  error : {
+    type : 'argument',
+    message : 'Invalid client id',    
+  }
+}
+
+
+// GET

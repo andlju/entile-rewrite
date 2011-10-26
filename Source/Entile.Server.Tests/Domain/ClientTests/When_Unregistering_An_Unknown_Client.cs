@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommonDomain.Persistence;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -10,14 +11,9 @@ namespace Entile.Server.Tests.Domain.ClientTests
 {
     public class When_Unregistering_An_Unknown_Client : With<Client, UnregisterClientCommand>
     {
-        protected override IMessageHandler<UnregisterClientCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<UnregisterClientCommand> CreateHandler(IRepository repository)
         {
             return new UnregisterClientCommandHandler(repository);
-        }
-
-        protected override IEnumerable<IEvent> Given()
-        {
-            return null;
         }
 
         protected override UnregisterClientCommand When()

@@ -6,11 +6,16 @@ namespace Entile.Server.Commands
 {
     public class RegisterSubscriptionCommand : CommandBase
     {
-        public readonly Guid ClientId;
-        public readonly Guid SubscriptionId;
-        public readonly NotificationKind Kind;
-        public readonly string Uri;
-        public readonly IEnumerable<KeyValuePair<string, string>> ExtendedInformation;
+        public Guid ClientId;
+        public Guid SubscriptionId;
+        public NotificationKind Kind;
+        public string Uri;
+        public IEnumerable<KeyValuePair<string, string>> ExtendedInformation;
+
+        public RegisterSubscriptionCommand()
+        {
+
+        }
 
         public RegisterSubscriptionCommand(Guid clientId, Guid subscriptionId, NotificationKind kind, string uri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
         {

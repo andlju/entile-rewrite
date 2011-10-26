@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CommonDomain.Persistence;
 using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -25,7 +26,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
                                                     });
         }
 
-        protected override IMessageHandler<UnregisterSubscriptionCommand> CreateHandler(IRepository<Client> repository)
+        protected override IMessageHandler<UnregisterSubscriptionCommand> CreateHandler(IRepository repository)
         {
             return new UnregisterSubscriptionCommandHandler(repository);
         }

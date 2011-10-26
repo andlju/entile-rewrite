@@ -5,6 +5,5 @@ namespace Entile.Server.Events
     public interface IEvent : IMessage
     {
         Guid AggregateId { get; set; }
-        int SequenceNumber { get; set; }
     }
 }
