@@ -2,17 +2,17 @@ using System;
 
 namespace Entile.Server.Commands
 {
-    public class UnregisterSubscriptionCommand : CommandBase
+    public class UnsubscribeCommand : CommandBase
     {
         public Guid ClientId;
         public Guid SubscriptionId;
 
-        public UnregisterSubscriptionCommand()
+        public UnsubscribeCommand()
         {
             
         }
 
-        public UnregisterSubscriptionCommand(Guid clientId, Guid subscriptionId)
+        public UnsubscribeCommand(Guid clientId, Guid subscriptionId)
         {
             ClientId = clientId;
             SubscriptionId = subscriptionId;

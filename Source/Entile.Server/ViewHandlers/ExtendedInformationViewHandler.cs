@@ -4,10 +4,10 @@ using Entile.Server.Events;
 namespace Entile.Server.ViewHandlers
 {
     public class SubscriptionViewHandler : 
-        IMessageHandler<SubscriptionRegisteredEvent>,
-        IMessageHandler<SubscriptionUnregisteredEvent>
+        IMessageHandler<SubscribedEvent>,
+        IMessageHandler<UnsbuscribedEvent>
     {
-        public void Handle(SubscriptionRegisteredEvent command)
+        public void Handle(SubscribedEvent command)
         {
             using (var context = new EntileViews())
             {
@@ -35,7 +35,7 @@ namespace Entile.Server.ViewHandlers
             }
         }
 
-        public void Handle(SubscriptionUnregisteredEvent command)
+        public void Handle(UnsbuscribedEvent command)
         {
             using (var context = new EntileViews())
             {

@@ -19,8 +19,8 @@ namespace Entile.NancyHost
         {
             RegisterCommand<RegisterClientCommand>(commandBus);
             RegisterCommand<UnregisterClientCommand>(commandBus);
-            RegisterCommand<RegisterSubscriptionCommand>(commandBus);
-            RegisterCommand<UnregisterSubscriptionCommand>(commandBus);
+            RegisterCommand<SubscribeCommand>(commandBus);
+            RegisterCommand<UnsubscribeCommand>(commandBus);
 
             RegisterCommand<SendTileNotificationCommand>(commandBus);
             RegisterCommand<SendToastNotificationCommand>(commandBus);

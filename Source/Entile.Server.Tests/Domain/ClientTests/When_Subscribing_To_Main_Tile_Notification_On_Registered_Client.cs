@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Registering_Subscription_For_Main_Tile_Notification_On_Registered_Client : With<Client, RegisterSubscriptionCommand>
+    public class When_Subscribing_To_Main_Tile_Notification_On_Registered_Client : With<Client, SubscribeCommand>
     {
         private Guid _uniqueId = Guid.NewGuid();
         private Guid _notificationId = Guid.NewGuid();
@@ -19,14 +19,14 @@ namespace Entile.Server.Tests.Domain.ClientTests
             yield return new ClientRegisteredEvent(_uniqueId, "http://test.com");
         }
 
-        protected override IMessageHandler<RegisterSubscriptionCommand> CreateHandler(IRepository repository)
+        protected override IMessageHandler<SubscribeCommand> CreateHandler(IRepository repository)
         {
-            return new RegisterSubscriptionCommandHandler(repository);
+            return new SubscribeCommandHandler(repository);
         }
 
-        protected override RegisterSubscriptionCommand When()
+        protected override SubscribeCommand When()
         {
-            return new RegisterSubscriptionCommand(_uniqueId, _notificationId,
+            return new SubscribeCommand(_uniqueId, _notificationId,
                 NotificationKind.Tile, string.Empty, 
                 new Dictionary<string, string>()
                     {
@@ -38,7 +38,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_RegisteredForNotificationEvent_Is_Published()
         {
-            AssertEvent.IsType<SubscriptionRegisteredEvent>(0);
+            AssertEvent.IsType<SubscribedEvent>(0);
         }
 
         [Fact]
@@ -50,19 +50,19 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_NotificationKind_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal(NotificationKind.Tile, e.Kind));
+            AssertEvent.Contents<SubscribedEvent>(0, e => Assert.Equal(NotificationKind.Tile, e.Kind));
         }
 
         [Fact]
         public void Then_Uri_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal(string.Empty, e.ParamUri));
+            AssertEvent.Contents<SubscribedEvent>(0, e => Assert.Equal(string.Empty, e.ParamUri));
         }
 
         [Fact]
         public void Then_ExtendedInformation_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e =>
+            AssertEvent.Contents<SubscribedEvent>(0, e =>
 
                                                                     Assert.Contains(
                                                                         new KeyValuePair<string,string>("TestKey", "TestValue"),

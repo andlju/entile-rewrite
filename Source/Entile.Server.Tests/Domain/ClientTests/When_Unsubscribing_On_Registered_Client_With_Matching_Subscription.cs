@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Unregistering_Subscription_On_Registered_Client_With_Matching_Subscription : With<Client, UnregisterSubscriptionCommand>
+    public class When_Unsubscribing_On_Registered_Client_With_Matching_Subscription : With<Client, UnsubscribeCommand>
     {
         private Guid _clientId = Guid.NewGuid();
         private Guid _subscriptionId = Guid.NewGuid();
@@ -18,7 +18,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         {
             yield return new ClientRegisteredEvent(_clientId, "http://test.com");
             yield return
-                new SubscriptionRegisteredEvent(_subscriptionId, NotificationKind.Tile, "/Test.xaml",
+                new SubscribedEvent(_subscriptionId, NotificationKind.Tile, "/Test.xaml",
                                                 new Dictionary<string, string>()
                                                     {
                                                         {"TestKey", "TestValue"},
@@ -26,20 +26,20 @@ namespace Entile.Server.Tests.Domain.ClientTests
                                                     });
         }
 
-        protected override IMessageHandler<UnregisterSubscriptionCommand> CreateHandler(IRepository repository)
+        protected override IMessageHandler<UnsubscribeCommand> CreateHandler(IRepository repository)
         {
-            return new UnregisterSubscriptionCommandHandler(repository);
+            return new UnsubscribeCommandHandler(repository);
         }
 
-        protected override UnregisterSubscriptionCommand When()
+        protected override UnsubscribeCommand When()
         {
-            return new UnregisterSubscriptionCommand(_clientId, _subscriptionId);
+            return new UnsubscribeCommand(_clientId, _subscriptionId);
         }
 
         [Fact]
         public void Then_SubscriptionUnregisteredEvent_Is_Published()
         {
-            AssertEvent.IsType<SubscriptionUnregisteredEvent>(0);
+            AssertEvent.IsType<UnsbuscribedEvent>(0);
         }
 
         [Fact]
@@ -51,7 +51,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_SubscriptionId_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionUnregisteredEvent>(0, e => Assert.Equal(e.SubscriptionId, _subscriptionId));
+            AssertEvent.Contents<UnsbuscribedEvent>(0, e => Assert.Equal(e.SubscriptionId, _subscriptionId));
         }
     }
 }

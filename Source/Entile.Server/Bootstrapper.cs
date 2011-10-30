@@ -12,6 +12,7 @@ using Entile.Server.Domain;
 using Entile.Server.Events;
 using Entile.Server.ViewHandlers;
 using EventStore;
+using EventStore.Dispatcher;
 
 namespace Entile.Server
 {
@@ -33,15 +34,24 @@ namespace Entile.Server
 
         public void Initialize()
         {
-            
+
             var repository = new EventStoreRepository(
-                Wireup.Init().UsingSqlPersistence("EntileEventStore").InitializeStorageEngine().
-                UsingJsonSerialization().Build(),
+                Wireup.Init().
+                    UsingSqlPersistence("EntileEventStore").InitializeStorageEngine().
+                    UsingJsonSerialization().UsingAsynchronousDispatcher(
+                        new DelegateMessagePublisher(c =>
+                                                         {
+                                                             foreach (var e in c.Events)
+                                                             {
+                                                                 _viewCreatorsBus.Publish(e.Body as IMessage);
+                                                             }
+                                                         })).
+                    Build(),
                 new AggregateFactory(), new ConflictDetector());
 
 
             InitializeClientCommands(repository);
-            InitializeViewCreators(repository);
+            InitializeViewCreators();
 
             _registrator = new Registrator(_commandBus);
             _notifier = new Notifier(_commandBus);
@@ -60,8 +70,8 @@ namespace Entile.Server
             // Register Command Handlers
             _commandRouter.RegisterHandlersIn(new RegisterClientCommandHandler(repository));
             _commandRouter.RegisterHandlersIn(new UnregisterClientCommandHandler(repository));
-            _commandRouter.RegisterHandlersIn(new RegisterSubscriptionCommandHandler(repository));
-            _commandRouter.RegisterHandlersIn(new UnregisterSubscriptionCommandHandler(repository));
+            _commandRouter.RegisterHandlersIn(new SubscribeCommandHandler(repository));
+            _commandRouter.RegisterHandlersIn(new UnsubscribeCommandHandler(repository));
 
             _commandRouter.RegisterHandlersIn(new SendNotificationCommandHandler(repository, notificationSender, commandScheduler));
 
@@ -80,7 +90,7 @@ namespace Entile.Server
             _commandSchedulerTask.Start();*/
         }
 
-        private void InitializeViewCreators(IRepository repository)
+        private void InitializeViewCreators()
         {
             _viewCreatorsEventRouter = new MessageRouter();
             _viewCreatorsBus = new InProcessBus(_viewCreatorsEventRouter);

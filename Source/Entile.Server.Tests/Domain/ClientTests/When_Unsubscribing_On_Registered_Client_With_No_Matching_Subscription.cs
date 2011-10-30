@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Unregistering_Subscription_On_Registered_Client_With_No_Matching_Subscription : With<Client, UnregisterSubscriptionCommand>
+    public class When_Unsubscribing_On_Registered_Client_With_No_Matching_Subscription : With<Client, UnsubscribeCommand>
     {
         private Guid _clientId = Guid.NewGuid();
         private Guid _subscriptionId = Guid.NewGuid();
@@ -18,7 +18,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         {
             yield return new ClientRegisteredEvent(_clientId, "http://test.com");
             yield return
-                new SubscriptionRegisteredEvent(Guid.NewGuid(), NotificationKind.Tile, "/Test.xaml",
+                new SubscribedEvent(Guid.NewGuid(), NotificationKind.Tile, "/Test.xaml",
                                                 new Dictionary<string, string>()
                                                     {
                                                         {"TestKey", "TestValue"},
@@ -26,14 +26,14 @@ namespace Entile.Server.Tests.Domain.ClientTests
                                                     });
         }
 
-        protected override IMessageHandler<UnregisterSubscriptionCommand> CreateHandler(IRepository repository)
+        protected override IMessageHandler<UnsubscribeCommand> CreateHandler(IRepository repository)
         {
-            return new UnregisterSubscriptionCommandHandler(repository);
+            return new UnsubscribeCommandHandler(repository);
         }
 
-        protected override UnregisterSubscriptionCommand When()
+        protected override UnsubscribeCommand When()
         {
-            return new UnregisterSubscriptionCommand(_clientId, _subscriptionId);
+            return new UnsubscribeCommand(_clientId, _subscriptionId);
         }
 
         [Fact]

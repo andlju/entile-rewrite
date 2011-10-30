@@ -1,19 +1,49 @@
 // GET /entile
 
 {
-  link : [
+  links : [
+    {
+      rel : 'client',
+      method : 'GET',
+      href : 'http://entile.com/entile/client/{clientId}'
+    },
     { 
-      rel : 'register',
-      type : 'client',
-      href : 'http://entile.com/entile/register-client',
+      rel : 'register-client',
+      method : 'POST',
+      href : 'http://entile.com/entile/client/{clientId}',
     },
     {
-      rel : 'unregister',
-      type : 'client',
-      href : 'http://entile.com/entile/unregister-client'
+      rel : 'unregister-client',
+      method : 'DELETE',
+      href : 'http://entile.com/entile/client/{clientId}'
     }
   ]
 }
+
+// GET /entile/client/AD44C58C-60F5-4E43-BA61-EC9B36911CF5
+// 200 OK
+{
+  subscriptions : [
+    {
+      kind : 'Toast',
+      subscriptionId : '',
+      links : [
+        {
+          rel : 'unsubscribe',
+          href : ''
+        }
+      ]
+    }
+  ],
+  links : [
+     {
+      rel : 'unregister',
+      href : 'http://entile.com/entile/client/{clientId}'
+     }
+  ]
+}
+
+// 404
 
 
 // GET /entile/register-client
@@ -31,11 +61,18 @@
   notificationChannel : 'http://test.com/channel/lkjsdfoij'
 }
 // Response (successful)
+// Httpstatus accepted
 {
-  status : 'accepted',
-  clientId : 'AD44C58C-60F5-4E43-BA61-EC9B36911CF5'
+  links : [
+    {
+      rel : 'subscribe',
+      href : 'http://entile.com/entile/client/AD44C58C-60F5-4E43-BA61-EC9B36911CF5/subscribe',
+    }
+  ]
+  
 }
 // Response (failed)
+// 500
 {
   status : 'failed',
   error : {
@@ -45,4 +82,7 @@
 }
 
 
-// GET
+// POST /entile/client/AD44C58C-60F5-4E43-BA61-EC9B36911CF5/subscribe
+{
+  subscriptionId : 'ACD5A71E-8B46-478E-ACCC-BC318F0F2517'
+}

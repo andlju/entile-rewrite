@@ -4,7 +4,7 @@ using Entile.Server.Domain;
 
 namespace Entile.Server.Commands
 {
-    public class RegisterSubscriptionCommand : CommandBase
+    public class SubscribeCommand : CommandBase
     {
         public Guid ClientId;
         public Guid SubscriptionId;
@@ -12,12 +12,12 @@ namespace Entile.Server.Commands
         public string Uri;
         public IEnumerable<KeyValuePair<string, string>> ExtendedInformation;
 
-        public RegisterSubscriptionCommand()
+        public SubscribeCommand()
         {
 
         }
 
-        public RegisterSubscriptionCommand(Guid clientId, Guid subscriptionId, NotificationKind kind, string uri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
+        public SubscribeCommand(Guid clientId, Guid subscriptionId, NotificationKind kind, string uri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
         {
             ClientId = clientId;
             SubscriptionId = subscriptionId;

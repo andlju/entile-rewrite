@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
-    public class When_Registering_Subscription_For_Secondary_Tile_Notification_On_Registered_Client_With_Matching_Subscription : With<Client, RegisterSubscriptionCommand>
+    public class When_Subscribing_To_Secondary_Tile_Notification_On_Registered_Client_With_Matching_Subscription : With<Client, SubscribeCommand>
     {
         private Guid _clientId = Guid.NewGuid();
         private Guid _subscriptionId = Guid.NewGuid();
@@ -17,7 +17,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         protected override IEnumerable<IEvent> Given()
         {
             yield return new ClientRegisteredEvent(_clientId, "http://test.com");
-            yield return new SubscriptionRegisteredEvent(_subscriptionId, NotificationKind.Tile, "/Page1.xaml?test=old",
+            yield return new SubscribedEvent(_subscriptionId, NotificationKind.Tile, "/Page1.xaml?test=old",
                                                          new Dictionary<string, string>()
                                                              {
                                                                  {"TestKey", "OldTestValue"},
@@ -25,14 +25,14 @@ namespace Entile.Server.Tests.Domain.ClientTests
                                                              });
         }
 
-        protected override IMessageHandler<RegisterSubscriptionCommand> CreateHandler(IRepository repository)
+        protected override IMessageHandler<SubscribeCommand> CreateHandler(IRepository repository)
         {
-            return new RegisterSubscriptionCommandHandler(repository);
+            return new SubscribeCommandHandler(repository);
         }
 
-        protected override RegisterSubscriptionCommand When()
+        protected override SubscribeCommand When()
         {
-            return new RegisterSubscriptionCommand(_clientId, _subscriptionId,
+            return new SubscribeCommand(_clientId, _subscriptionId,
                                                    NotificationKind.Tile, "/Page1.xaml?test=test",
                                                    new Dictionary<string, string>()
                                                        {
@@ -44,7 +44,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_RegisteredForNotificationEvent_Is_Published()
         {
-            AssertEvent.IsType<SubscriptionRegisteredEvent>(0);
+            AssertEvent.IsType<SubscribedEvent>(0);
         }
 
         [Fact]
@@ -56,19 +56,19 @@ namespace Entile.Server.Tests.Domain.ClientTests
         [Fact]
         public void Then_NotificationKind_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal(NotificationKind.Tile, e.Kind));
+            AssertEvent.Contents<SubscribedEvent>(0, e => Assert.Equal(NotificationKind.Tile, e.Kind));
         }
 
         [Fact]
         public void Then_Uri_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e => Assert.Equal("/Page1.xaml?test=test", e.ParamUri));
+            AssertEvent.Contents<SubscribedEvent>(0, e => Assert.Equal("/Page1.xaml?test=test", e.ParamUri));
         }
 
         [Fact]
         public void Then_ExtendedInformation_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<SubscriptionRegisteredEvent>(0, e =>
+            AssertEvent.Contents<SubscribedEvent>(0, e =>
 
                                                                  Assert.Contains(
                                                                      new KeyValuePair<string, string>("TestKey", "TestValue"),

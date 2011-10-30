@@ -25,7 +25,7 @@ namespace Entile.Server.Tests.Domain.ClientTests
             _notificationSender.ResponseToReturn = new NotificationResponse(200, "Received", "Connected", "Active");
 
             yield return new ClientRegisteredEvent(UniqueId, "http://test.com/mychannel");
-            yield return new SubscriptionRegisteredEvent(_subscriptionId, NotificationKind.Toast, "/Test.xaml?test=value", null);
+            yield return new SubscribedEvent(_subscriptionId, NotificationKind.Toast, "/Test.xaml?test=value", null);
         }
 
         protected override SendToastNotificationCommand When()

@@ -50,17 +50,17 @@ namespace Entile.Server.Domain
             PublishEvent(new ClientUnregisteredEvent());
         }
 
-        public void RegisterSubscription(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
+        public void Subscribe(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
         {
-            PublishEvent(new SubscriptionRegisteredEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
+            PublishEvent(new SubscribedEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
         }
 
-        public void UnregisterSubscription(Guid subscriptionId)
+        public void Unsubscribe(Guid subscriptionId)
         {
             if (!_subscriptions.ContainsKey(subscriptionId))
                 throw new UnknownSubscriptionException(Id, subscriptionId);
 
-            PublishEvent(new SubscriptionUnregisteredEvent(subscriptionId));
+            PublishEvent(new UnsbuscribedEvent(subscriptionId));
         }
 
         public void SendToastNotification(Guid subscriptionId, Guid notificationId, string title, string body, int attemptsLeft, INotificationSender notificationSender, IMessageScheduler messageScheduler)
@@ -207,12 +207,12 @@ namespace Entile.Server.Domain
             _isActive = false;
         }
 
-        protected void Apply(SubscriptionUnregisteredEvent @event)
+        protected void Apply(UnsbuscribedEvent @event)
         {
             _subscriptions.Remove(@event.SubscriptionId);
         }
 
-        protected void Apply(SubscriptionRegisteredEvent @event)
+        protected void Apply(SubscribedEvent @event)
         {
             _subscriptions[@event.SubscriptionId] = new Subscription(@event.SubscriptionId, @event.Kind, @event.ParamUri);
         }
