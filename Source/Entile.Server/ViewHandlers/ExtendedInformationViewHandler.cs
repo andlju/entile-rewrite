@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Linq;
 using Entile.Server.Events;
 
@@ -7,41 +8,49 @@ namespace Entile.Server.ViewHandlers
         IMessageHandler<SubscribedEvent>,
         IMessageHandler<UnsbuscribedEvent>
     {
-        public void Handle(SubscribedEvent command)
+        public void Handle(SubscribedEvent evt)
         {
             using (var context = new EntileViews())
             {
-                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == command.AggregateId).Single();
+                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == evt.AggregateId).Single();
 
-                var sub = client.Subscriptions.Where(s => s.SubscriptionId == command.SubscriptionId).SingleOrDefault();
+                var sub = client.Subscriptions.Where(s => s.SubscriptionId == evt.SubscriptionId).SingleOrDefault();
                 if (sub == null)
                 {
-                    sub = new SubscriptionView();
+                    sub = new SubscriptionView
+                              {
+                                  SubscriptionId = evt.SubscriptionId,
+                                  ExtendedInformation = new Collection<ExtendedInformationView>()
+                              };
                     client.Subscriptions.Add(sub);
                 }
                 else
                 {
                     sub.ExtendedInformation.Clear();
                 }
-                sub.NotificationKind = (int) command.Kind;
-                sub.ParamUri = command.ParamUri;
-                
-                foreach(var extendedInfo in command.ExtendedInformation)
+                sub.NotificationKind = (int) evt.Kind;
+                sub.ParamUri = evt.ParamUri;
+
+                if (evt.ExtendedInformation != null)
                 {
-                    sub.ExtendedInformation.Add(new ExtendedInformationView() { Key = extendedInfo.Key, Value = extendedInfo.Value});
+                    foreach (var extendedInfo in evt.ExtendedInformation)
+                    {
+                        sub.ExtendedInformation.Add(new ExtendedInformationView()
+                                                        {Key = extendedInfo.Key, Value = extendedInfo.Value});
+                    }
                 }
 
                 context.SaveChanges();
             }
         }
 
-        public void Handle(UnsbuscribedEvent command)
+        public void Handle(UnsbuscribedEvent evt)
         {
             using (var context = new EntileViews())
             {
-                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == command.AggregateId).Single();
+                var client = context.ClientViews.Include("Subscriptions.ExtendedInformation").Where(c => c.ClientId == evt.AggregateId).Single();
 
-                var sub = client.Subscriptions.Where(s => s.SubscriptionId == command.SubscriptionId).SingleOrDefault();
+                var sub = client.Subscriptions.Where(s => s.SubscriptionId == evt.SubscriptionId).SingleOrDefault();
                 if (sub != null)
                 {
                     client.Subscriptions.Remove(sub);

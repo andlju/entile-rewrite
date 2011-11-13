@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 
 namespace Entile.Server
 {
-    public interface IBus
-    {
-        void Publish(IMessage message);
-    }
-
     public static class MessageRouterExtensions
     {
-        public static void RegisterHandler<TMessage>(this IMessageRouter router, Action<TMessage> handler)
+        public static void RegisterHandler<TMessage>(this IRouter<Action<IMessage>> router, Action<TMessage> handler)
             where TMessage : IMessage
         {
             Action<IMessage> action = msg => handler((TMessage)msg);
@@ -21,14 +15,14 @@ namespace Entile.Server
             router.RegisterHandler(messageType, action);
         }
 
-        public static void RegisterHandlersIn(this IMessageRouter router, object obj)
+        public static void RegisterHandlersIn(this IRouter<Action<IMessage>> router, object obj)
         {
             var type = obj.GetType();
 
             var handlers = from i in type.GetInterfaces()
                            where
-                           i.IsGenericType &&
-                           i.GetGenericTypeDefinition() == typeof(IMessageHandler<>)
+                               i.IsGenericType &&
+                               i.GetGenericTypeDefinition() == typeof(IMessageHandler<>)
                            select i;
 
             foreach (var handler in handlers)
@@ -39,13 +33,5 @@ namespace Entile.Server
                 router.RegisterHandler(messageType, msg => handleMethod.Invoke(obj, new[] { msg }));
             }
         }
-
-    }
-
-    public interface IMessageRouter
-    {
-        void RegisterHandler(Type messageType, Action<IMessage> action);
-
-        IEnumerable<Action<IMessage>> GetHandlersFor(Type type);
     }
 }

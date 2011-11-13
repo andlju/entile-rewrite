@@ -10,6 +10,7 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
+using Entile.Server.QueryHandlers;
 using Entile.Server.ViewHandlers;
 using EventStore;
 using EventStore.Dispatcher;
@@ -21,19 +22,19 @@ namespace Entile.Server
         private readonly object _lock = new object();
         private bool _isInitialized = false;
 
-        private IBus _commandBus;
-        private IMessageRouter _commandRouter;
+        private IMessageDispatcher _commandDispatcher;
+        private IRouter<Action<IMessage>> _commandRouter;
 
-        private IBus _viewCreatorsBus;
-        private IMessageRouter _viewCreatorsEventRouter;
+        private IMessageDispatcher _viewCreatorsDispatcher;
+        private IRouter<Action<IMessage>> _viewCreatorsEventRouter;
 
-        private IRegistrator _registrator;
-        private INotifier _notifier;
-        private Task _commandSchedulerTask;
-        private Task _createViewsTask;
+        private IQueryDispatcher _queryDispatcher;
+        private IRouter<Func<IMessage, object>> _queryRouter;
 
         public void Initialize()
         {
+            InitializeViewCreators();
+            InitializeQueryHandlers();
 
             var repository = new EventStoreRepository(
                 Wireup.Init().
@@ -43,7 +44,7 @@ namespace Entile.Server
                                                          {
                                                              foreach (var e in c.Events)
                                                              {
-                                                                 _viewCreatorsBus.Publish(e.Body as IMessage);
+                                                                 _viewCreatorsDispatcher.Dispatch(e.Body as IMessage);
                                                              }
                                                          })).
                     Build(),
@@ -51,17 +52,12 @@ namespace Entile.Server
 
 
             InitializeClientCommands(repository);
-            InitializeViewCreators();
-
-            _registrator = new Registrator(_commandBus);
-            _notifier = new Notifier(_commandBus);
-
         }
 
         private void InitializeClientCommands(IRepository repository)
         {
-            _commandRouter = new MessageRouter();
-            _commandBus = new InProcessBus(_commandRouter);
+            _commandRouter = new MessageRouter<Action<IMessage>>();
+            _commandDispatcher = new InProcessMessageDispatcher(_commandRouter);
 
 
             var notificationSender = new DummyNotificationSender();
@@ -75,55 +71,41 @@ namespace Entile.Server
 
             _commandRouter.RegisterHandlersIn(new SendNotificationCommandHandler(repository, notificationSender, commandScheduler));
 
-            /*_commandSchedulerTask = new Task(() =>
-                                                 {
-                                                     while (true)
-                                                     {
-                                                         var messages = commandScheduler.GetMessagesToProcess();
-                                                         foreach (var message in messages)
-                                                         {
-                                                             _commandBus.Publish(message);
-                                                         }
-                                                         Thread.Sleep(5000);
-                                                     }
-                                                 });
-            _commandSchedulerTask.Start();*/
         }
 
         private void InitializeViewCreators()
         {
-            _viewCreatorsEventRouter = new MessageRouter();
-            _viewCreatorsBus = new InProcessBus(_viewCreatorsEventRouter);
+            _viewCreatorsEventRouter = new MessageRouter<Action<IMessage>>();
+            _viewCreatorsDispatcher = new InProcessMessageDispatcher(_viewCreatorsEventRouter);
 
             // Register Event Handlers
             _viewCreatorsEventRouter.RegisterHandlersIn(new ClientViewHandler());
             _viewCreatorsEventRouter.RegisterHandlersIn(new SubscriptionViewHandler());
         }
 
-        public IRegistrator Registrator
+        private void InitializeQueryHandlers()
+        {
+            _queryRouter = new MessageRouter<Func<IMessage, object>>();
+            _queryDispatcher = new QueryDispatcher(_queryRouter);
+
+            _queryRouter.RegisterHandlersIn(new GetClientQueryHandler());
+        }
+
+        public IMessageDispatcher CommandDispatcher
         {
             get
             {
                 EnsureInitialized();
-                return _registrator;
+                return _commandDispatcher;
             }
         }
 
-        public INotifier Notifier
+        public IQueryDispatcher QueryDispatcher
         {
             get
             {
                 EnsureInitialized();
-                return _notifier;
-            }
-        }
-
-        public IBus CommandBus
-        {
-            get
-            {
-                EnsureInitialized();
-                return _commandBus;
+                return _queryDispatcher;
             }
         }
 

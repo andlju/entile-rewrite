@@ -38,7 +38,7 @@ namespace Entile.Server.Tests
         [Fact] 
         public void RegisteringHandlersIn_Registers_All_Handlers()
         {
-            var target = new MessageRouter();
+            var target = new MessageRouter<Action<IMessage>>();
             var handler = new MessageHandlerExample();
 
             target.RegisterHandlersIn(handler);

@@ -1,0 +1,70 @@
+---
+GET /
+
+200 OK
+{
+  links : [
+    { uri : "/client/{clientId}/register", rel: "register"},
+    { uri : "/client/{clientId}", rel: "client"},
+  ]
+}
+
+
+---
+GET /client/127802B3-4496-4BC2-947A-C59C47659FD0
+
+200 OK
+{
+  notificationUri : "http://test.com",
+  subscriptions : [
+    { 
+      kind : "Tile", 
+      paramUri : "/Test.xaml",
+      extendedInformation : {
+        "TestKey" : "TestValue"
+      }
+  ]
+  
+  links : [
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/register", rel: "unregister"},
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/unregister", rel: "register"},
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/subscribe", rel: "subscribe"}
+  ]
+}
+
+GET /client/register
+{
+  form : {
+    method : "PUT",
+    notificationUri : null,
+  }
+}
+
+
+---
+GET /client/127802B3-4496-4BC2-947A-C59C47659FD0/register
+{
+  form : {
+    method : "PUT",
+    notificationUri : null,
+  }
+}
+
+
+---
+PUT /client/127802B3-4496-4BC2-947A-C59C47659FD0/register
+{
+  notificationUri : "http://test.com"
+}
+
+Xyz Created
+Self?: /client/127802B3-4496-4BC2-947A-C59C47659FD0
+{
+  links : [
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0", rel: "client"},
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/register", rel: "unregister"},
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/unregister", rel: "register"},
+    { uri : "/client/127802B3-4496-4BC2-947A-C59C47659FD0/subscribe", rel: "subscribe"}
+  ]
+}
+

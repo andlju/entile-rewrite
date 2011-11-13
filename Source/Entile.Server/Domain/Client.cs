@@ -50,7 +50,7 @@ namespace Entile.Server.Domain
             PublishEvent(new ClientUnregisteredEvent());
         }
 
-        public void Subscribe(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, IEnumerable<KeyValuePair<string, string>> extendedInformation)
+        public void Subscribe(Guid subscriptionId, NotificationKind notificationKind, string notificationUri, Dictionary<string, string> extendedInformation)
         {
             PublishEvent(new SubscribedEvent(subscriptionId, notificationKind, notificationUri, extendedInformation));
         }
