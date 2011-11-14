@@ -5,10 +5,12 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
+    [TestClass]
     public class When_Sending_ToastNotification_To_Subscribed_Client_With_QueueFull_Response : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
@@ -35,58 +37,58 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new SendToastNotificationCommand(UniqueId, _subscriptionId, _notificationId, "Title", "Body", 3);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Failed_Event_Is_Sent()
         {
             AssertEvent.IsType<ToastNotificationFailedEvent>(0);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Failed_Notification_Title_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationFailedEvent>(0, e => Assert.Equal("Title", e.Title));
+            AssertEvent.Contents<ToastNotificationFailedEvent>(0, e => Assert.AreEqual("Title", e.Title));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Failed_Notification_Body_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationFailedEvent>(0, e => Assert.Equal("Body", e.Body));
+            AssertEvent.Contents<ToastNotificationFailedEvent>(0, e => Assert.AreEqual("Body", e.Body));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_One_Command_Is_Scheduled()
         {
-            Assert.Equal(1, _messageScheduler.ScheduledMessages.Count);
+            Assert.AreEqual(1, _messageScheduler.ScheduledMessages.Count);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_SendToastNotificationCommand_Is_Scheduled()
         {
-            Assert.IsType<SendToastNotificationCommand>(_messageScheduler.ScheduledMessages[0].Item1);
+            Assert.IsInstanceOfType(_messageScheduler.ScheduledMessages[0].Item1, typeof(SendToastNotificationCommand));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ScheduledCommand_Has_Correct_Title()
         {
-            Assert.Equal("Title", _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).Title);
+            Assert.AreEqual("Title", _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).Title);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ScheduledCommand_Has_Correct_Body()
         {
-            Assert.Equal("Body", _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).Body);
+            Assert.AreEqual("Body", _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).Body);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ScheduledCommand_Has_Correct_SubscriptionId()
         {
-            Assert.Equal(_subscriptionId, _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).SubscriptionId);
+            Assert.AreEqual(_subscriptionId, _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).SubscriptionId);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ScheduledCommand_Has_Correct_NotificationId()
         {
-            Assert.Equal(_notificationId, _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).NotificationId);
+            Assert.AreEqual(_notificationId, _messageScheduler.ScheduledMessage<SendToastNotificationCommand>(0).NotificationId);
         }
     }
 }

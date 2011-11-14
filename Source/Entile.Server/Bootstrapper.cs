@@ -39,8 +39,8 @@ namespace Entile.Server
             var repository = new EventStoreRepository(
                 Wireup.Init().
                     UsingSqlPersistence("EntileEventStore").InitializeStorageEngine().
-                    UsingJsonSerialization().UsingAsynchronousDispatcher(
-                        new DelegateMessagePublisher(c =>
+                    UsingJsonSerialization().UsingAsynchronousDispatchScheduler(
+                        new DelegateMessageDispatcher(c =>
                                                          {
                                                              foreach (var e in c.Events)
                                                              {

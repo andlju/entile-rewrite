@@ -5,10 +5,11 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
+    [TestClass]
     public class When_Unsubscribing_On_Registered_Client_With_Matching_Subscription : With<Client, UnsubscribeCommand>
     {
         private Guid _clientId = Guid.NewGuid();
@@ -36,22 +37,22 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new UnsubscribeCommand(_clientId, _subscriptionId);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_SubscriptionUnregisteredEvent_Is_Published()
         {
             AssertEvent.IsType<UnsbuscribedEvent>(0);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_No_Other_Event_Is_Published()
         {
-            Assert.Equal(1, Events.Length);
+            Assert.AreEqual(1, Events.Length);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_SubscriptionId_In_Event_Is_Correct()
         {
-            AssertEvent.Contents<UnsbuscribedEvent>(0, e => Assert.Equal(e.SubscriptionId, _subscriptionId));
+            AssertEvent.Contents<UnsbuscribedEvent>(0, e => Assert.AreEqual(e.SubscriptionId, _subscriptionId));
         }
     }
 }

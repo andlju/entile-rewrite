@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Entile.Server.Tests
 {
@@ -33,9 +33,10 @@ namespace Entile.Server.Tests
     }
 
     
+    [TestClass]
     public class MessageRouterTest
     {
-        [Fact] 
+        [TestMethod] 
         public void RegisteringHandlersIn_Registers_All_Handlers()
         {
             var target = new MessageRouter<Action<IMessage>>();
@@ -52,8 +53,8 @@ namespace Entile.Server.Tests
             firstHandler.Invoke(firstTestMessage);
             secondHandler.Invoke(secondTestMessage);
             
-            Assert.Equal(handler.FirstTestMesage, firstTestMessage);
-            Assert.Equal(handler.SecondTestMessage, secondTestMessage);
+            Assert.AreEqual(handler.FirstTestMesage, firstTestMessage);
+            Assert.AreEqual(handler.SecondTestMessage, secondTestMessage);
         }
     }
 }

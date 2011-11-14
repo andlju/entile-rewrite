@@ -5,10 +5,11 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
+    [TestClass]
     public class When_Unregistering_An_Unknown_Client : With<Client, UnregisterClientCommand>
     {
         protected override IMessageHandler<UnregisterClientCommand> CreateHandler(IRepository repository)
@@ -21,22 +22,22 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new UnregisterClientCommand(UniqueId);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_No_Event_Is_Sent()
         {
-            Assert.Null(Events);
+            Assert.IsNull(Events);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ClientNotRegisteredException_Should_Be_Thrown()
         {
-            Assert.IsType<InvalidOperationException>(ExceptionThrown);
+            Assert.IsInstanceOfType(ExceptionThrown, typeof(InvalidOperationException));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_UniqueId_In_The_Exception_Is_Correct()
         {
-            Assert.True(((InvalidOperationException)ExceptionThrown).Message.Contains(UniqueId.ToString()));
+            Assert.IsTrue(((InvalidOperationException)ExceptionThrown).Message.Contains(UniqueId.ToString()));
         }
     }
 }

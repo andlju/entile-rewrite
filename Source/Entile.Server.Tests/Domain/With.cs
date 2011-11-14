@@ -6,7 +6,8 @@ using CommonDomain.Persistence;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 
 namespace Entile.Server.Tests.Domain
 {
@@ -26,6 +27,20 @@ namespace Entile.Server.Tests.Domain
         public IEvent[] SavedEvents
         {
             get { return _savedEvents; }
+        }
+
+        public TAggregate GetById<TAggregate>(Guid id) where TAggregate : class, IAggregate
+        {
+            if (_givenEvents.Length == 0)
+                return (TAggregate)_factory();
+
+            var obj = _factory();
+            foreach (var e in _givenEvents)
+            {
+                obj.ApplyEvent(e);
+            }
+
+            return (TAggregate)obj;
         }
 
         public TAggregate GetById<TAggregate>(Guid id, int version) where TAggregate : class, IAggregate
@@ -52,6 +67,7 @@ namespace Entile.Server.Tests.Domain
         }
     }
 
+    [TestClass]
     public abstract class With<TAgg, TCmd>
         where TAgg : class, IAggregate, new()
         where TCmd : ICommand
@@ -73,17 +89,18 @@ namespace Entile.Server.Tests.Domain
  
         protected abstract TCmd When();
 
-        protected With()
+        [TestInitialize]
+        public void Initialize()
         {
             var repository = new MockRepository(Given(), () => new TAgg());
             try
             {
                 var handler = CreateHandler(repository);
                 handler.Handle(When());
-                
+
                 _events = repository.SavedEvents;
-            } 
-            catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 _exceptionThrown = ex;
             }
@@ -119,8 +136,8 @@ namespace Entile.Server.Tests.Domain
 
             public void IsType<TEvent>(int eventNumber)
             {
-                Assert.NotNull(_parent.Events[eventNumber]);
-                Assert.IsType<TEvent>(_parent.Events[eventNumber]);
+                Assert.IsNotNull(_parent.Events[eventNumber]);
+                Assert.IsInstanceOfType(_parent.Events[eventNumber], typeof(TEvent));
             }
 
             public void Contents<TEvent>(int eventNumber, Action<TEvent> checkEvent)

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Entile.Server.Commands;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 
 namespace Entile.Server.Tests
 {
@@ -29,10 +30,11 @@ namespace Entile.Server.Tests
         public string Test { get; set; }
     }
 
+    [TestClass]
     public class CommandSchedulerTest
     {
         
-        [Fact]
+        [TestMethod]
         public void When_Scheduling_A_Command_It_Is_Pushed_To_The_Store()
         {
             var schedulerStore = new MockSchedulerStore();
@@ -41,8 +43,8 @@ namespace Entile.Server.Tests
 
             commandScheduler.ScheduleMessage(new TestCommand() { Test = "TestText"}, new DateTime(2012, 06, 24, 13, 37, 42));
 
-            Assert.Equal(1, schedulerStore.PushedMessages.Count);
-            Assert.Equal(new DateTime(2012, 06, 24, 13, 37, 42), schedulerStore.PushedMessages[0].Item2);
+            Assert.AreEqual(1, schedulerStore.PushedMessages.Count);
+            Assert.AreEqual(new DateTime(2012, 06, 24, 13, 37, 42), schedulerStore.PushedMessages[0].Item2);
         }
     }
 }

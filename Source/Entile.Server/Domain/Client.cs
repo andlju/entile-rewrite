@@ -19,7 +19,7 @@ namespace Entile.Server.Domain
         }
     }
 
-    public class Client : CommonDomain.Core.AggregateBase<IEvent>
+    public class Client : CommonDomain.Core.AggregateBase
     {
         private bool _isActive;
         private string _notificationChannel;

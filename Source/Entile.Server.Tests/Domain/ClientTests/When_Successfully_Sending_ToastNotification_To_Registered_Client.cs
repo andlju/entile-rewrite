@@ -5,10 +5,12 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
+    [TestClass]
     public class When_Successfully_Sending_ToastNotification_To_Subscribed_Client : With<Client, SendToastNotificationCommand>
     {
         private readonly MockNotificationSender _notificationSender = new MockNotificationSender();
@@ -33,76 +35,76 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new SendToastNotificationCommand(UniqueId, _subscriptionId, _notificationId, "Title", "Body", 3);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_No_Exception_Is_Thrown()
         {
-            Assert.Null(ExceptionThrown);
+            Assert.IsNull(ExceptionThrown);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Is_Sent_Once()
         {
-            Assert.Equal(1, _notificationSender.NumberOfCalls);
+            Assert.AreEqual(1, _notificationSender.NumberOfCalls);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Is_Sent_To_Registered_Channel()
         {
-            Assert.Equal("http://test.com/mychannel", _notificationSender.NotificationChannel);
+            Assert.AreEqual("http://test.com/mychannel", _notificationSender.NotificationChannel);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Sent_Notification_Title_Is_Correct()
         {
-            Assert.Equal("Title", ((ToastNotification)_notificationSender.NotificationMessage).Title);
+            Assert.AreEqual("Title", ((ToastNotification)_notificationSender.NotificationMessage).Title);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Sent_Notification_Body_Is_Correct()
         {
-            Assert.Equal("Body", ((ToastNotification)_notificationSender.NotificationMessage).Body);
+            Assert.AreEqual("Body", ((ToastNotification)_notificationSender.NotificationMessage).Body);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Sent_Notification_ParamUri_Is_Correct()
         {
-            Assert.Equal("/Test.xaml?test=value", ((ToastNotification)_notificationSender.NotificationMessage).ParamUri);
+            Assert.AreEqual("/Test.xaml?test=value", ((ToastNotification)_notificationSender.NotificationMessage).ParamUri);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Succeeded_Event_Is_Pushed()
         {
             AssertEvent.IsType<ToastNotificationSucceededEvent>(0);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Only_One_Event_Is_Pushed()
         {
-            Assert.Equal(1, Events.Length);
+            Assert.AreEqual(1, Events.Length);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Succeeded_Title_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("Title", e.Title));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.AreEqual("Title", e.Title));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Succeeded_Body_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal("Body", e.Body));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.AreEqual("Body", e.Body));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Succeeded_SubscriptionId_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal(_subscriptionId, e.SubscriptionId));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.AreEqual(_subscriptionId, e.SubscriptionId));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_Notification_Succeeded_NotificationId_Is_Correct()
         {
-            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.Equal(_notificationId, e.NotificationId));
+            AssertEvent.Contents<ToastNotificationSucceededEvent>(0, e => Assert.AreEqual(_notificationId, e.NotificationId));
         }
 
     }

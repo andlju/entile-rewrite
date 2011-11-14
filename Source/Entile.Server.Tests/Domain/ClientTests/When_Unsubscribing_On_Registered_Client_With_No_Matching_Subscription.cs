@@ -5,10 +5,11 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
+    [TestClass]
     public class When_Unsubscribing_On_Registered_Client_With_No_Matching_Subscription : With<Client, UnsubscribeCommand>
     {
         private Guid _clientId = Guid.NewGuid();
@@ -36,28 +37,28 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new UnsubscribeCommand(_clientId, _subscriptionId);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_No_Event_Is_Published()
         {
-            Assert.Null(Events);
+            Assert.IsNull(Events);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_UnknowSubscriptionException_Is_Thrown()
         {
-            Assert.IsType<UnknownSubscriptionException>(ExceptionThrown);
+            Assert.IsInstanceOfType(ExceptionThrown, typeof(UnknownSubscriptionException));
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ClientId_In_Exception_Is_Correct()
         {
-            Assert.Equal(_clientId, ((UnknownSubscriptionException)ExceptionThrown).ClientId);
+            Assert.AreEqual(_clientId, ((UnknownSubscriptionException)ExceptionThrown).ClientId);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_SubscriptionId_In_Exception_Is_Correct()
         {
-            Assert.Equal(_subscriptionId, ((UnknownSubscriptionException)ExceptionThrown).SubscriptionId);
+            Assert.AreEqual(_subscriptionId, ((UnknownSubscriptionException)ExceptionThrown).SubscriptionId);
         }
     }
 }

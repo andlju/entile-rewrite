@@ -5,12 +5,12 @@ using Entile.Server.CommandHandlers;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
 using Entile.Server.Events;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Entile.Server.Tests.Domain.ClientTests
 {
     // ReSharper disable InconsistentNaming
-
+    [TestClass]
     public class When_Registering_New_Client : With<Client, RegisterClientCommand>
     {
         protected override IMessageHandler<RegisterClientCommand> CreateHandler(IRepository repository)
@@ -23,25 +23,25 @@ namespace Entile.Server.Tests.Domain.ClientTests
             return new RegisterClientCommand(UniqueId, "http://my.channel.com");
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_ClientRegisteredEvent_Is_Sent()
         {
             AssertEvent.IsType<ClientRegisteredEvent>(0);
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_The_UniqueId_On_The_Event_Is_Correct()
         {
             AssertEvent.Contents<ClientRegisteredEvent>(0,
-                ev => Assert.Equal(UniqueId, ev.AggregateId)
+                ev => Assert.AreEqual(UniqueId, ev.AggregateId)
                 );
         }
 
-        [Fact]
+        [TestMethod]
         public void Then_The_NotificationChannel_On_The_Event_Is_Correct()
         {
             AssertEvent.Contents<ClientRegisteredEvent>(0, 
-                ev => Assert.Equal("http://my.channel.com", ev.NotificationChannel)
+                ev => Assert.AreEqual("http://my.channel.com", ev.NotificationChannel)
                 );
         }
     }
