@@ -21,6 +21,6 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\Source\Entile.Server\bin\Release\Entile.Server.dll" target="lib"/>
+    <file src=".\Source\Entile.Server\bin\Release\Entile.Server.dll" target="lib"/>
   </files>
 </package>

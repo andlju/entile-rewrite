@@ -10,6 +10,6 @@
     <projectUrl>http://coding-insomnia.com/entile</projectUrl>
   </metadata>
   <files>
-    <file src="..\Source\Entile.Client\bin\Release\Entile.Client.dll" target="lib"/>
+    <file src=".\Source\Entile.Client\bin\Release\Entile.Client.dll" target="lib"/>
   </files>
 </package>
