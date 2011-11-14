@@ -9,7 +9,11 @@
     <licenseUrl>https://github.com/andlju/entile/raw/master/LICENSE.txt</licenseUrl>
     <projectUrl>http://coding-insomnia.com/entile</projectUrl>
     <dependencies>
-      <dependency id="WebActivator" version="1.0.0.0" />
+      <!-- <dependency id="WebActivator" version="1.0.0.0" /> -->
+      <dependency id="EventStore" version="3.0.11305.44" />
+      <dependency id="EventStore.Serialization.Json" version="3.0.11305.44" />
+      <dependency id="CommonDomain" version="1.4.0" />
+      <dependency id="EntityFramework" version="4.2.0.0"/>
     </dependencies>
     <frameworkAssemblies>
       <frameworkAssembly assemblyName="System.ServiceModel" />
@@ -17,6 +21,6 @@
     </frameworkAssemblies>
   </metadata>
   <files>
-    <file src="..\BuildArtifacts\Entile.Server.dll" target="lib"/>
+    <file src="..\Source\Entile.Server\bin\Release\Entile.Server.dll" target="lib"/>
   </files>
 </package>
