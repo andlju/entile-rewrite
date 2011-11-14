@@ -18,6 +18,9 @@ namespace Entile.NancyHost
             RegisterModelType(container, typeof(RootApiModel));
             RegisterModelType(container, typeof(ClientApiModel));
             RegisterModelType(container, typeof(SubscriptionApiModel));
+
+            Get["/"] = _ => View["Views/ApiBrowser.html"];
+
         }
 
         private void RegisterModelType(TinyIoCContainer container, Type modelType)
@@ -89,11 +92,17 @@ namespace Entile.NancyHost
                     var convertMethod =
                         ConvertMethod.MakeGenericMethod(
                             field.FieldType);
-
-                    var converted = convertMethod.Invoke(
-                        null, new[] { Context.Parameters[param] }
-                        );
-                    field.SetValue(command, converted);
+                    try
+                    {
+                        var converted = convertMethod.Invoke(
+                            null, new[] { Context.Parameters[param] }
+                            );
+                        field.SetValue(command, converted);
+                    }
+                    catch (TargetInvocationException ex)
+                    {
+                        
+                    }
                 }
             }
             return command;
