@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using Entile.Server;
@@ -8,18 +9,24 @@ namespace Entile.NancyHost.Api
 {
     public static class LinkExtensions
     {
-        public static IEnumerable<object> AsLinks(this Type type)
+        public static IEnumerable<object> ToLinks(this Type type)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            return methods.AsLinks();
+            return methods.ToLinks();
         }
 
-        public static IEnumerable<object> AsLinks(this IEnumerable<MethodInfo> methodInfos)
+        public static IEnumerable<object> ToLinks(this IEnumerable<MethodInfo> methodInfos)
         {
-            return methodInfos.Select(method => AsLink(method));
+            return methodInfos.Select(method => ToLink(method)).ToArray();
         }
 
-        private static object AsLink(this MethodInfo method)
+        public static IEnumerable<object> ToRootLink(this Type type)
+        {
+            var method = type.GetMethod("Self");
+            return new[] { method.ToLink() };
+        } 
+
+        private static object ToLink(this MethodInfo method)
         {
             return new
                        {

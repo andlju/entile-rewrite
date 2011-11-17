@@ -6,17 +6,17 @@ namespace Entile.Server
 {
     public static class QueryRouterExtensions
     {
-        public static void RegisterHandler<TMessage>(this IRouter<Func<IMessage, object>> router, Func<IMessage, object> handler)
+        public static void RegisterHandler<TMessage>(this IRouter<Func<IMessage, dynamic>> router, Func<IMessage, dynamic> handler)
             where TMessage : IMessage
         {
-            Func<IMessage, object> action = msg => handler((TMessage)msg);
+            Func<IMessage, dynamic> action = msg => handler((TMessage)msg);
 
             Type messageType = typeof(TMessage);
 
             router.RegisterHandler(messageType, action);
         }
 
-        public static void RegisterHandlersIn(this IRouter<Func<IMessage, object>> router, object obj)
+        public static void RegisterHandlersIn(this IRouter<Func<IMessage, dynamic>> router, object obj)
         {
             var type = obj.GetType();
 

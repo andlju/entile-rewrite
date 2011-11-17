@@ -82,6 +82,7 @@
     <Compile Include="Api\LinkExtensions.cs" />
     <Compile Include="Api\RootApiModel.cs" />
     <Compile Include="ApiBootstrapper.cs" />
+    <Compile Include="ClientModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

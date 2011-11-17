@@ -17,7 +17,7 @@ namespace Entile.NancyHost.Api
                            Links = GetMethodInfos(
                                () => new ClientApiModel(null, null).Self(null),
                                () => new ClientApiModel(null, null).Register(null)
-                               ).AsLinks()
+                               ).ToLinks()
                        };
         }
     }

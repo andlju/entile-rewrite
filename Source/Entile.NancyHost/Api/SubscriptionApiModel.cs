@@ -14,13 +14,18 @@ namespace Entile.NancyHost.Api
         {
         }
 
+        public object Self()
+        {
+            return null;
+        }
+
         public object Unsubscribe(UnsubscribeCommand command)
         {
             CommandDispatcher.Dispatch(command);
 
             return new
                        {
-                           Links = typeof (ClientApiModel).AsLinks()
+                           Links = typeof (ClientApiModel).ToLinks()
                        };
         }
 

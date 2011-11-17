@@ -14,10 +14,16 @@ namespace Entile.NancyHost.Api
 
         public object Self(GetClientQuery query)
         {
+            dynamic client = QueryDispatcher.Invoke(query);
+            foreach(dynamic sub in client.Subscriptions)
+            {
+                var subscriptionId = sub.SubscriptionId;
+                sub.Links = typeof (SubscriptionApiModel).ToRootLink();
+            }
             return new
                        {
-                           Client = QueryDispatcher.Invoke(query),
-                           Links = typeof (ClientApiModel).AsLinks()
+                           Client = client,
+                           Links = typeof (ClientApiModel).ToLinks()
                        };
         }
 
@@ -27,7 +33,7 @@ namespace Entile.NancyHost.Api
 
             return new
                        {
-                           Links = typeof (ClientApiModel).AsLinks()
+                           Links = typeof (ClientApiModel).ToLinks()
                        };
         }
 
@@ -37,7 +43,7 @@ namespace Entile.NancyHost.Api
 
             return new
                        {
-                           Links = typeof (RootApiModel).AsLinks()
+                           Links = typeof (RootApiModel).ToLinks()
                        };
         }
 
@@ -47,7 +53,7 @@ namespace Entile.NancyHost.Api
 
             return new
                        {
-                           Links = typeof (SubscriptionApiModel).AsLinks()
+                           Links = typeof (SubscriptionApiModel).ToLinks()
                        };
         }
     }

@@ -18,7 +18,7 @@ namespace Entile.NancyHost
             RegisterModelType(container, typeof(RootApiModel));
             RegisterModelType(container, typeof(ClientApiModel));
             RegisterModelType(container, typeof(SubscriptionApiModel));
-
+            
             Get["/"] = _ => View["Views/ApiBrowser.html"];
 
         }
@@ -36,7 +36,7 @@ namespace Entile.NancyHost
                 Func<object, Response> invokeAction = _ =>
                                                           {
                                                               var model = container.Resolve(modelType);
-                                                              object result;
+                                                              dynamic result;
                                                               if (messageType != null)
                                                               {
                                                                   var message = GetMessage(messageType);
@@ -47,7 +47,7 @@ namespace Entile.NancyHost
                                                                   result = currentMethod.Invoke(model, null);
                                                               }
 
-                                                              return Response.AsJson(result);
+                                                              return Response.AsJson((object)result);
                                                           };
 
                 var httpMethod = currentMethod.GetHttpMethod();
