@@ -5,16 +5,16 @@ using Entile.Server.ViewHandlers;
 
 namespace Entile.Server.QueryHandlers
 {
-    public class GetClientQueryHandler : IQueryHandler<GetClientQuery>
+    public class ClientQueries
     {
-        public dynamic Handle(GetClientQuery query)
+        public dynamic GetClient(GetClientQuery query)
         {
             using (var views = new EntileViews())
             {
                 var client = (from c in views.ClientViews.Include("Subscriptions.ExtendedInformation")
                               where c.ClientId == query.ClientId
                               select c).ToArray().Select(BuildClient);
-                
+
                 return client.SingleOrDefault();
             }
         }
@@ -24,7 +24,7 @@ namespace Entile.Server.QueryHandlers
             dynamic cl = new ExpandoObject();
             cl.ClientId = c.ClientId;
             cl.NotificationChannel = c.NotificationChannel;
-            cl.Subscriptions = c.Subscriptions.Select(BuildSubscription).ToArray();
+            cl.Subscriptions = Enumerable.ToArray<object>(c.Subscriptions.Select<SubscriptionView, object>(BuildSubscription));
             return cl;
         }
 

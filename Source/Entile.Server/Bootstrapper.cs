@@ -28,13 +28,9 @@ namespace Entile.Server
         private IMessageDispatcher _viewCreatorsDispatcher;
         private IRouter<Action<IMessage>> _viewCreatorsEventRouter;
 
-        private IQueryDispatcher _queryDispatcher;
-        private IRouter<Func<IMessage, object>> _queryRouter;
-
         public void Initialize()
         {
             InitializeViewCreators();
-            InitializeQueryHandlers();
 
             var repository = new EventStoreRepository(
                 Wireup.Init().
@@ -83,29 +79,12 @@ namespace Entile.Server
             _viewCreatorsEventRouter.RegisterHandlersIn(new SubscriptionViewHandler());
         }
 
-        private void InitializeQueryHandlers()
-        {
-            _queryRouter = new MessageRouter<Func<IMessage, object>>();
-            _queryDispatcher = new QueryDispatcher(_queryRouter);
-
-            _queryRouter.RegisterHandlersIn(new GetClientQueryHandler());
-        }
-
         public IMessageDispatcher CommandDispatcher
         {
             get
             {
                 EnsureInitialized();
                 return _commandDispatcher;
-            }
-        }
-
-        public IQueryDispatcher QueryDispatcher
-        {
-            get
-            {
-                EnsureInitialized();
-                return _queryDispatcher;
             }
         }
 

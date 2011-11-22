@@ -5,8 +5,8 @@ namespace Entile.NancyHost.Api
     [Api("/api")]
     public class RootApiModel : ApiModelBase
     {
-        public RootApiModel(IMessageDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
-            : base(commandDispatcher, queryDispatcher)
+        public RootApiModel(IMessageDispatcher commandDispatcher)
+            : base(commandDispatcher)
         {
         }
 
@@ -14,10 +14,7 @@ namespace Entile.NancyHost.Api
         {
             return new
                        {
-                           Links = GetMethodInfos(
-                               () => new ClientApiModel(null, null).Self(null),
-                               () => new ClientApiModel(null, null).Register(null)
-                               ).ToLinks()
+                           Links = ToEntrypointLinks(typeof(ClientApiModel)) 
                        };
         }
     }

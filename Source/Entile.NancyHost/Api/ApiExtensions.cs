@@ -7,33 +7,8 @@ using Entile.Server;
 
 namespace Entile.NancyHost.Api
 {
-    public static class LinkExtensions
+    public static class ApiExtensions
     {
-        public static IEnumerable<object> ToLinks(this Type type)
-        {
-            var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            return methods.ToLinks();
-        }
-
-        public static IEnumerable<object> ToLinks(this IEnumerable<MethodInfo> methodInfos)
-        {
-            return methodInfos.Select(method => ToLink(method)).ToArray();
-        }
-
-        public static IEnumerable<object> ToRootLink(this Type type)
-        {
-            var method = type.GetMethod("Self");
-            return new[] { method.ToLink() };
-        } 
-
-        private static object ToLink(this MethodInfo method)
-        {
-            return new
-                       {
-                           Uri = method.GetUri(),
-                           Rel = method.GetRel()
-                       };
-        }
 
         public static string GetResourceName(this Type type)
         {
@@ -96,18 +71,6 @@ namespace Entile.NancyHost.Api
                 httpMethod = apiMethodAttrib.HttpMethod ?? httpMethod;
             }
             return httpMethod;
-        }
-
-        public static object AsForm(this MethodInfo method)
-        {
-            var httpMethod = method.GetHttpMethod();
-            var messageProperties = GetMessageType(method).GetFields();
-
-            return new
-                       {
-                           Action = httpMethod,
-                           Form = messageProperties.ToDictionary(pi => pi.Name, _ => (object)null)
-                       };
         }
 
         public static Type GetMessageType(this MethodInfo method)

@@ -35,21 +35,23 @@ namespace Entile.NancyHost
 
                 Func<object, Response> invokeAction = _ =>
                                                           {
-                                                              var model = container.Resolve(modelType);
-                                                              dynamic result;
+                                                              var model = container.Resolve(modelType) as ApiModelBase;
+                                                              object result;
                                                               if (messageType != null)
                                                               {
                                                                   var message = GetMessage(messageType);
-                                                                  result = currentMethod.Invoke(model, new[] { message });
-                                                              } 
+                                                                  result = currentMethod.Invoke(model, new[] {message});
+                                                              }
                                                               else
                                                               {
                                                                   result = currentMethod.Invoke(model, null);
                                                               }
+                                                              return
+                                                                  Response.AsJson(result).StatusCode =
+                                                                  (Nancy.HttpStatusCode) model.HttpStatusCode;
 
-                                                              return Response.AsJson((object)result);
                                                           };
-
+                
                 var httpMethod = currentMethod.GetHttpMethod();
                 var uri = currentMethod.GetUri();
 
@@ -59,7 +61,7 @@ namespace Entile.NancyHost
                 } 
                 else
                 {
-                    Get[uri] = _ => Response.AsJson(currentMethod.AsForm());
+                    Get[uri] = _ => Response.AsJson(ToForm(currentMethod));
 
                     if (httpMethod == "POST")
                     {
@@ -106,6 +108,18 @@ namespace Entile.NancyHost
                 }
             }
             return command;
+        }
+
+        private object ToForm(MethodInfo method)
+        {
+            var httpMethod = method.GetHttpMethod();
+            var messageProperties = method.GetMessageType().GetFields();
+
+            return new
+            {
+                Action = httpMethod,
+                Form = messageProperties.ToDictionary(pi => pi.Name, _ => (object)null)
+            };
         }
 
         static T Convert<T>(dynamic d)

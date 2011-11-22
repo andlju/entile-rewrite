@@ -77,9 +77,10 @@
     <Compile Include="ApiModule.cs" />
     <Compile Include="Api\ApiAttribute.cs" />
     <Compile Include="Api\ApiModelBase.cs" />
+    <Compile Include="Api\HttpStatusCode.cs" />
     <Compile Include="Api\SubscriptionApiModel.cs" />
     <Compile Include="Api\ClientApiModel.cs" />
-    <Compile Include="Api\LinkExtensions.cs" />
+    <Compile Include="Api\ApiExtensions.cs" />
     <Compile Include="Api\RootApiModel.cs" />
     <Compile Include="ApiBootstrapper.cs" />
     <Compile Include="ClientModule.cs" />

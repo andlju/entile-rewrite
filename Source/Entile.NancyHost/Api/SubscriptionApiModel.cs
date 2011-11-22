@@ -9,8 +9,8 @@ namespace Entile.NancyHost.Api
     [Api("/api/client/{clientId}/subscription/{subscriptionId}")]
     public class SubscriptionApiModel : ApiModelBase
     {
-        public SubscriptionApiModel(IMessageDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
-            : base(commandDispatcher, queryDispatcher)
+        public SubscriptionApiModel(IMessageDispatcher commandDispatcher)
+            : base(commandDispatcher)
         {
         }
 
@@ -21,11 +21,11 @@ namespace Entile.NancyHost.Api
 
         public object Unsubscribe(UnsubscribeCommand command)
         {
-            CommandDispatcher.Dispatch(command);
+            DispatchCommand(command);
 
             return new
                        {
-                           Links = typeof (ClientApiModel).ToLinks()
+                           Links = ToLinks(typeof(ClientApiModel))
                        };
         }
 

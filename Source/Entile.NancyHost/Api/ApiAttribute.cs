@@ -19,6 +19,7 @@ namespace Entile.NancyHost.Api
     [AttributeUsage(AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
     internal sealed class ApiMethodAttribute : Attribute
     {
+        public bool Entrypoint { get; set; }
 
         public string RelativeUri { get; set; }
 

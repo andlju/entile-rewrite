@@ -1,59 +1,65 @@
 using Entile.Server;
 using Entile.Server.Commands;
+using Entile.Server.Domain;
 using Entile.Server.Queries;
+using Entile.Server.QueryHandlers;
 
 namespace Entile.NancyHost.Api
 {
     [Api("/api/client/{clientId}")]
     public class ClientApiModel : ApiModelBase
     {
-        public ClientApiModel(IMessageDispatcher commandDispatcher, IQueryDispatcher queryDispatcher)
-            : base(commandDispatcher, queryDispatcher)
+        private readonly ClientQueries _clientQueries;
+
+        public ClientApiModel(IMessageDispatcher commandDispatcher)
+            : base(commandDispatcher)
         {
+            _clientQueries = new ClientQueries();
         }
 
         public object Self(GetClientQuery query)
         {
-            dynamic client = QueryDispatcher.Invoke(query);
+            dynamic client = _clientQueries.GetClient(query);
             foreach(dynamic sub in client.Subscriptions)
             {
                 var subscriptionId = sub.SubscriptionId;
-                sub.Links = typeof (SubscriptionApiModel).ToRootLink();
+                sub.Links = ToEntrypointLinks(typeof(SubscriptionApiModel));
             }
             return new
                        {
                            Client = client,
-                           Links = typeof (ClientApiModel).ToLinks()
+                           Links = ToLinks(typeof(ClientApiModel))
                        };
         }
 
+        [ApiMethod(Entrypoint = true, HttpMethod = "PUT")]
         public object Register(RegisterClientCommand command)
         {
-            CommandDispatcher.Dispatch(command);
+            DispatchCommand(command);
 
             return new
                        {
-                           Links = typeof (ClientApiModel).ToLinks()
+                           Links = ToLinks(typeof(ClientApiModel))
                        };
         }
 
         public object Unregister(UnregisterClientCommand command)
         {
-            CommandDispatcher.Dispatch(command);
-
+            DispatchCommand(command);
             return new
-                       {
-                           Links = typeof (RootApiModel).ToLinks()
-                       };
+            {
+                Links = ToLinks(typeof(RootApiModel))
+            };
+                
         }
 
         public object Subscribe(SubscribeCommand command)
         {
-            CommandDispatcher.Dispatch(command);
+            DispatchCommand(command);
 
             return new
                        {
-                           Links = typeof (SubscriptionApiModel).ToLinks()
+                           Links = ToLinks(typeof(SubscriptionApiModel))
                        };
         }
     }
