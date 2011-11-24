@@ -8,32 +8,37 @@
 <body>
 <script type="text/javascript">
 
-    function Link(uri, rel) {
-        this.linkUri = ko.observable(uri);
-        this.rel = ko.observable(rel);
-
-        var self = this;
-
-        this.select = function () {
-            viewModel.currentUri(self.linkUri());
-            viewModel.refresh();
-        };
-    }
-
     function ApiViewModel() {
         this.links = ko.observableArray([]);
 
+        this.currentHtml = ko.observable();
         this.currentUri = ko.observable("/api");
         var self = this;
 
         this.refresh = function () {
             $.getJSON(self.currentUri(), {}, function (data, status) {
 
-                var linkList = $.map(data.Links, function (item, no) {
-                    return new Link(item.Uri, item.Rel);
-                });
-                self.links(linkList);
+                var html = self.buildHtml(data);
+                self.currentHtml(html);
             });
+        };
+
+        this.buildHtml = function (obj) {
+            if (obj.Uri && obj.Rel) {
+                return "<a href=\"#\" onclick=\"viewModel.currentUri('" + obj.Uri + "'); viewModel.refresh(); return false;\">" + obj.Rel + "</a>";
+            }
+            
+            if ($.isArray(obj) || $.isPlainObject(obj)) {
+                var html = "<ul>";
+                var subObjs = $.map(obj, function (data, idx) { return "<b>" + idx + "</b> " + self.buildHtml(data); });
+
+                $.each(subObjs, function (idx) { html += "<li>" + subObjs[idx] + "</li>"; });
+                html += "</ul>";
+
+                return html;
+            }
+
+            return obj.toString();
         };
     }
 
@@ -47,15 +52,8 @@
     
 </script>
     <h1>Api navigator</h1>
+    
+    <div id="contents" data-bind="html: currentHtml"></div>
 
-    <ul>
-        <div data-bind="template: {name: 'linkListItemTemplate', foreach: links}"></div>
-    </ul>
-
-    <script id="linkListItemTemplate" type="text/html">
-        <li>
-            <a href="#" data-bind="text: rel, click: select"></a>
-        </li>
-    </script>
 </body>
 </html>

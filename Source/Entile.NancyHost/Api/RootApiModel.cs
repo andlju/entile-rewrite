@@ -12,9 +12,12 @@ namespace Entile.NancyHost.Api
 
         public object Self()
         {
+            var links = ToEntrypointLinks(typeof (ClientApiModel), null);
+            links.AddRange(ToEntrypointLinks(typeof(ClientsAdminApiModel), null));
+
             return new
                        {
-                           Links = ToEntrypointLinks(typeof(ClientApiModel), null) 
+                           Links = links
                        };
         }
     }

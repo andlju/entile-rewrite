@@ -17,9 +17,12 @@ namespace Entile.NancyHost
         public ApiModule(TinyIoCContainer container)
         {
             RegisterModelType(container, typeof(RootApiModel));
+
             RegisterModelType(container, typeof(ClientApiModel));
             RegisterModelType(container, typeof(SubscriptionApiModel));
-            
+
+            RegisterModelType(container, typeof(ClientsAdminApiModel));
+
             Get["/"] = _ => View["Views/ApiBrowser.html"];
 
         }
