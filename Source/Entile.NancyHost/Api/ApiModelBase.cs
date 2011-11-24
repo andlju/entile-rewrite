@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Text.RegularExpressions;
+using Entile.NancyHost.Api.ViewModel;
 using Entile.Server;
 using Entile.Server.Commands;
 
@@ -13,28 +15,18 @@ namespace Entile.NancyHost.Api
     {
         private readonly IMessageDispatcher _commandDispatcher;
 
-        public Dictionary<string, object> Context { get; private set; }
-
         public HttpStatusCode HttpStatusCode { get; protected set; }
 
         protected ApiModelBase(IMessageDispatcher commandDispatcher)
         {
             HttpStatusCode = HttpStatusCode.OK;
-            Context = new Dictionary<string, object>();
 
             _commandDispatcher = commandDispatcher;
         }
 
         protected void DispatchCommand(IMessage command)
         {
-            try
-            {
-                _commandDispatcher.Dispatch(command);
-            } 
-            catch(Exception ex)
-            {
-                HandleException(ex);
-            }
+            _commandDispatcher.Dispatch(command);
         }
 
         protected virtual void HandleException(Exception ex)
@@ -42,31 +34,50 @@ namespace Entile.NancyHost.Api
             HttpStatusCode = HttpStatusCode.InternalServerError;
         }
 
-        protected IEnumerable<object> ToLinks(Type type)
+        protected List<LinkViewModel> ToLinks(Type type, object context)
         {
             var methods = type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly);
-            return ToLinks(methods);
+            return ToLinks(methods, context);
         }
 
-        protected IEnumerable<object> ToLinks(IEnumerable<MethodInfo> methodInfos)
+        protected List<LinkViewModel> ToLinks(IEnumerable<MethodInfo> methodInfos, object context)
         {
-            return methodInfos.Select(method => ToLink(method)).ToArray();
+            return methodInfos.Select(method => ToLink(method, context)).ToList();
         }
 
-        protected IEnumerable<object> ToEntrypointLinks(Type type)
+        protected List<LinkViewModel> ToEntrypointLinks(Type type, object context)
         {
             var method = type.GetMethod("Self");
-            return new[] { ToLink(method) };
+            return new List<LinkViewModel> { ToLink(method, context) };
         }
 
-        private object ToLink( MethodInfo method)
+        private LinkViewModel ToLink(MethodInfo method, object context)
         {
-            return new
+            var rawUri = method.GetUri();
+            Regex parameters = new Regex(@"\{(?<param>\w+)\}");
+
+            var uri = parameters.Replace(rawUri, m => GetParameter(m, context));
+
+            return new LinkViewModel
             {
-                Uri = method.GetUri(),
+                Uri = uri,
                 Rel = method.GetRel()
             };
         }
 
+        private string GetParameter(Match m, object context)
+        {
+            if (context == null)
+                return m.Value;
+
+            var paramName = m.Groups["param"].Value;
+            var contextType = context.GetType();
+
+            var field = contextType.GetField(paramName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase);
+            if (field != null)
+                return field.GetValue(context).ToString();
+
+            return m.Value;
+        }
     }
 }

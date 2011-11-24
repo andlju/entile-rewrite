@@ -14,7 +14,7 @@ namespace Entile.NancyHost.Api
         {
             return new
                        {
-                           Links = ToEntrypointLinks(typeof(ClientApiModel)) 
+                           Links = ToEntrypointLinks(typeof(ClientApiModel), null) 
                        };
         }
     }

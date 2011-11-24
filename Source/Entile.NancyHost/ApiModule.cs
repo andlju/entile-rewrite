@@ -7,6 +7,7 @@ using Entile.Server;
 using Nancy;
 using Nancy.ModelBinding;
 using TinyIoC;
+using HttpStatusCode = Nancy.HttpStatusCode;
 
 namespace Entile.NancyHost
 {
@@ -32,32 +33,13 @@ namespace Entile.NancyHost
                 var currentMethod = method;
 
                 var messageType = method.GetMessageType();
-
-                Func<object, Response> invokeAction = _ =>
-                                                          {
-                                                              var model = container.Resolve(modelType) as ApiModelBase;
-                                                              object result;
-                                                              if (messageType != null)
-                                                              {
-                                                                  var message = GetMessage(messageType);
-                                                                  result = currentMethod.Invoke(model, new[] {message});
-                                                              }
-                                                              else
-                                                              {
-                                                                  result = currentMethod.Invoke(model, null);
-                                                              }
-                                                              return
-                                                                  Response.AsJson(result).StatusCode =
-                                                                  (Nancy.HttpStatusCode) model.HttpStatusCode;
-
-                                                          };
                 
                 var httpMethod = currentMethod.GetHttpMethod();
                 var uri = currentMethod.GetUri();
 
                 if (httpMethod == "GET")
                 {
-                    Get[modelType.GetBaseUri()] = invokeAction;
+                    Get[uri] = _ => InvokeModelAction(container, modelType, currentMethod, messageType);
                 } 
                 else
                 {
@@ -65,17 +47,46 @@ namespace Entile.NancyHost
 
                     if (httpMethod == "POST")
                     {
-                        Post[uri] = invokeAction;
+                        Post[uri] = _ => InvokeModelAction(container, modelType, currentMethod, messageType);
                     }
                     else if (httpMethod == "PUT")
                     {
-                        Put[uri] = invokeAction;
+                        Put[uri] = _ => InvokeModelAction(container, modelType, currentMethod, messageType);
                     }
                     else if (httpMethod == "DELETE")
                     {
-                        Delete[uri] = invokeAction;
+                        Delete[uri] = _ => InvokeModelAction(container, modelType, currentMethod, messageType);
                     }
                 }
+            }
+        }
+
+        private Response InvokeModelAction(TinyIoCContainer container, Type modelType, MethodInfo currentMethod, Type messageType)
+        {
+            try
+            {
+                var model = (ApiModelBase)container.Resolve(modelType);
+                object result;
+                if (messageType != null)
+                {
+                    var message = GetMessage(messageType);
+                    result = currentMethod.Invoke(model, new[] {message});
+                }
+                else
+                {
+                    result = currentMethod.Invoke(model, null);
+                }
+                
+                var response = Response.AsJson(result);
+                response.StatusCode = (HttpStatusCode)model.HttpStatusCode;
+
+                return response;
+            }
+            catch (Exception ex)
+            {
+                var response = Response.AsJson(new {ex.Message});
+                response.StatusCode = HttpStatusCode.InternalServerError;
+                return response;
             }
         }
 
@@ -85,23 +96,17 @@ namespace Entile.NancyHost
             var command = binder.Bind(Context, commandType) as IMessage;
             foreach (var param in Context.Parameters)
             {
-                FieldInfo field = commandType.GetField(param,
-                                                       BindingFlags.Public | 
-                                                       BindingFlags.Instance | 
-                                                       BindingFlags.IgnoreCase);
+                FieldInfo field = commandType.GetField(param, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
                 if (field != null)
                 {
-                    var convertMethod =
-                        ConvertMethod.MakeGenericMethod(
-                            field.FieldType);
+                    var convertMethod = ConvertMethod.MakeGenericMethod(field.FieldType);
                     try
                     {
-                        var converted = convertMethod.Invoke(
-                            null, new[] { Context.Parameters[param] }
-                            );
+                        var converted = convertMethod.Invoke(null, new[] { Context.Parameters[param] });
+
                         field.SetValue(command, converted);
                     }
-                    catch (TargetInvocationException ex)
+                    catch (TargetInvocationException)
                     {
                         
                     }
@@ -127,7 +132,7 @@ namespace Entile.NancyHost
             return (T) d;
         }
 
-        private static MethodInfo ConvertMethod = typeof (ApiModule).GetMethod("Convert", BindingFlags.Static | BindingFlags.NonPublic);
+        private static MethodInfo ConvertMethod = typeof(ApiModule).GetMethod("Convert", BindingFlags.Static | BindingFlags.NonPublic);
     }
 
 }

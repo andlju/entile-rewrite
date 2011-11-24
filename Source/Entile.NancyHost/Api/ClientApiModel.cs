@@ -1,3 +1,4 @@
+using Entile.NancyHost.Api.ViewModel;
 using Entile.Server;
 using Entile.Server.Commands;
 using Entile.Server.Domain;
@@ -19,17 +20,23 @@ namespace Entile.NancyHost.Api
 
         public object Self(GetClientQuery query)
         {
-            dynamic client = _clientQueries.GetClient(query);
-            foreach(dynamic sub in client.Subscriptions)
+            var client = ClientViewModel.FromView(_clientQueries.GetClient(query));
+            if (client == null)
             {
-                var subscriptionId = sub.SubscriptionId;
-                sub.Links = ToEntrypointLinks(typeof(SubscriptionApiModel));
+                HttpStatusCode = HttpStatusCode.NotFound;
+                return new
+                           {
+                               Links = ToLinks(typeof(RootApiModel), null)
+                           };
             }
-            return new
-                       {
-                           Client = client,
-                           Links = ToLinks(typeof(ClientApiModel))
-                       };
+
+            foreach (var sub in client.Subscriptions)
+            {
+                sub.Links = ToEntrypointLinks(typeof(SubscriptionApiModel), sub);
+            }
+            client.Links = ToLinks(typeof (ClientApiModel), client);
+            
+            return client;
         }
 
         [ApiMethod(Entrypoint = true, HttpMethod = "PUT")]
@@ -39,18 +46,30 @@ namespace Entile.NancyHost.Api
 
             return new
                        {
-                           Links = ToLinks(typeof(ClientApiModel))
+                           Links = ToLinks(typeof(ClientApiModel), command)
                        };
         }
 
+        [ApiMethod(HttpMethod = "DELETE")]
         public object Unregister(UnregisterClientCommand command)
         {
-            DispatchCommand(command);
+            try
+            {
+                DispatchCommand(command);
+            }
+            catch (ClientNotRegisteredException ex)
+            {
+                HttpStatusCode = HttpStatusCode.NotFound;
+                return new
+                {
+                    ex.Message,
+                    Links = ToLinks(typeof(RootApiModel), null)
+                };
+            }
             return new
             {
-                Links = ToLinks(typeof(RootApiModel))
+                Links = ToLinks(typeof(RootApiModel), null)
             };
-                
         }
 
         public object Subscribe(SubscribeCommand command)
@@ -59,7 +78,7 @@ namespace Entile.NancyHost.Api
 
             return new
                        {
-                           Links = ToLinks(typeof(SubscriptionApiModel))
+                           Links = ToLinks(typeof(SubscriptionApiModel), command)
                        };
         }
     }

@@ -77,12 +77,15 @@
     <Compile Include="ApiModule.cs" />
     <Compile Include="Api\ApiAttribute.cs" />
     <Compile Include="Api\ApiModelBase.cs" />
+    <Compile Include="Api\ClientApiModel.cs" />
     <Compile Include="Api\HttpStatusCode.cs" />
     <Compile Include="Api\SubscriptionApiModel.cs" />
-    <Compile Include="Api\ClientApiModel.cs" />
     <Compile Include="Api\ApiExtensions.cs" />
     <Compile Include="Api\RootApiModel.cs" />
     <Compile Include="ApiBootstrapper.cs" />
+    <Compile Include="Api\ViewModel\ClientViewModel.cs" />
+    <Compile Include="Api\ViewModel\SubscriptionViewModel.cs" />
+    <Compile Include="Api\ViewModel\ViewModelBase.cs" />
     <Compile Include="ClientModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
