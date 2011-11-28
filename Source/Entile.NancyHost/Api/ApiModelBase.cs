@@ -47,8 +47,24 @@ namespace Entile.NancyHost.Api
 
         protected List<LinkViewModel> ToEntrypointLinks(Type type, object context)
         {
+            var links = new List<LinkViewModel>();
             var method = type.GetMethod("Self");
-            return new List<LinkViewModel> { ToLink(method, context) };
+            if (method != null)
+                links.Add(ToLink(method, context));
+
+            foreach(var m in type.GetMethods())
+            {
+                var attrs = m.GetCustomAttributes(typeof (ApiMethodAttribute), true).FirstOrDefault() as ApiMethodAttribute;
+                if (attrs != null)
+                {
+                    if (attrs.Entrypoint)
+                    {
+                        links.Add(ToLink(m, context));
+                    }
+                }
+            }
+
+            return links;
         }
 
         private LinkViewModel ToLink(MethodInfo method, object context)

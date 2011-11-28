@@ -39,7 +39,7 @@ namespace Entile.NancyHost.Api
             return client;
         }
 
-        [ApiMethod(Entrypoint = true, HttpMethod = "PUT")]
+        [ApiMethod(HttpMethod = "PUT")]
         public object Register(RegisterClientCommand command)
         {
             DispatchCommand(command);
