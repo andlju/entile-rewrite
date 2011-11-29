@@ -13,6 +13,9 @@ namespace Entile.NancyHost.Api
 
     public abstract class ApiModelBase
     {
+        // TODO Make this configurable/auto discoverable
+        public static string RootUri = "http://localhost:4250";
+
         private readonly IMessageDispatcher _commandDispatcher;
 
         public HttpStatusCode HttpStatusCode { get; protected set; }
@@ -76,7 +79,7 @@ namespace Entile.NancyHost.Api
 
             return new LinkViewModel
             {
-                Uri = uri,
+                Uri = RootUri + uri,
                 Rel = method.GetRel()
             };
         }

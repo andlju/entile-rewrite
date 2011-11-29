@@ -19,6 +19,14 @@ namespace Entile.TestApp
         public MainPage()
         {
             InitializeComponent();
+            Loaded += new RoutedEventHandler(MainPage_Loaded);
         }
+
+        void MainPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.StartTestRunner();
+        }
+
+
     }
 }
