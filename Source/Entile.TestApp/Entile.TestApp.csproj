@@ -62,8 +62,9 @@
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight">
       <HintPath>..\packages\silverlight.unittest.wp7.3.0.40609.1000\lib\sl4-wp71\Microsoft.VisualStudio.QualityTools.UnitTesting.Silverlight.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.4.0.4\lib\sl3-wp\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.4.5.3\lib\sl4-windowsphone71\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows" />
     <Reference Include="system" />
@@ -73,6 +74,11 @@
     <Reference Include="mscorlib.extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actions\ApiCommandBase.cs" />
+    <Compile Include="Actions\ClientQuery.cs" />
+    <Compile Include="Actions\RegisterClientCommand.cs" />
+    <Compile Include="Actions\RootApiQuery.cs" />
+    <Compile Include="Actions\UnsubscribeCommand.cs" />
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
@@ -80,16 +86,25 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainWindowExtensions.cs" />
+    <Compile Include="Models\ClientModel.cs" />
+    <Compile Include="Models\LinkModel.cs" />
+    <Compile Include="Models\RootApiModel.cs" />
+    <Compile Include="Models\SubscriptionModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tests\EntileTests.cs" />
-    <Compile Include="ViewModels\ActionableObject.cs" />
-    <Compile Include="ViewModels\ApiCommandBase.cs" />
+    <Compile Include="Tests\EntileIntegrationTests.cs" />
+    <Compile Include="Tests\EntileViewModelTests.cs" />
+    <Compile Include="Tests\MockWebClient.cs" />
+    <Compile Include="Tests\QueryTests.cs" />
+    <Compile Include="Utilities\DefaultWebClientFactory.cs" />
+    <Compile Include="Utilities\SimpleWebClient.cs" />
+    <Compile Include="ViewModels\ClientUpdatedEventArgs.cs" />
+    <Compile Include="ViewModels\ViewModelBase.cs" />
     <Compile Include="ViewModels\EntileViewModel.cs" />
+    <Compile Include="ViewModels\ISimpleWebClient.cs" />
     <Compile Include="ViewModels\IViewContext.cs" />
-    <Compile Include="ViewModels\RegisterClientCommand.cs" />
-    <Compile Include="ViewModels\RootApiCommand.cs" />
+    <Compile Include="ViewModels\IWebClientFactory.cs" />
     <Compile Include="ViewModels\SubscriptionViewModel.cs" />
-    <Compile Include="ViewModels\UnsubscribeCommand.cs" />
+    <Compile Include="ViewModels\WebResponseEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">
@@ -116,6 +131,7 @@
     <Content Include="SplashScreenImage.jpg" />
     <Content Include="Test_Readme.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -1,38 +1,53 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows.Input;
+using Entile.TestApp.Actions;
+using Entile.TestApp.Models;
 
 namespace Entile.TestApp.ViewModels
 {
-    public class EntileViewModel : ActionableObject
+
+    public class EntileViewModel : ViewModelBase
     {
         private readonly EntileViewContext _viewContext = new EntileViewContext();
 
         public EntileViewModel()
         {
-            _clientId = Guid.NewGuid();
-            ViewContext.SetValue("ClientId", _clientId);
-            _rootApiCommand = new RootApiCommand(this, "http://localhost:4250/api");
+            _clientId = Guid.Parse("fd40122f-9b15-44ed-af69-6c70eb9cb24a"); // TODO Get Id from state
+            _viewContext.SetValue("ClientId", _clientId);
+
+            RegisterAction("Root", l =>
+                                       {
+                                           var action = new RootApiQuery(_viewContext, l.Uri);
+                                           RootApiQuery = action;
+                                       });
+
+            RegisterAction("Register", l =>
+                                           {
+                                               var action = new RegisterClientCommand(_viewContext, l.Uri);
+                                               RegisterClientCommand = action;
+                                           });
+
+            RegisterAction("Client", l =>
+                                         {
+                                             var action = new ClientQuery(_viewContext, l.Uri);
+                                             ClientQuery = action;
+                                         });
+
+            RegisterAction("Subscribe", l =>
+                                            {
+                                                var action = new SubscribeCommand(_viewContext, l.Uri);
+                                                SubscribeCommand = action;
+                                            });
+
+            UpdateLinks(new[] { new LinkModel() { Rel = "Root", Uri = "http://localhost:4250/api/" }, });
         }
 
-        protected override ICommand BuildCommand(string rel, string uri)
+        void LinksReturned(object sender, LinkResponseEventArgs e)
         {
-            switch (rel)
-            {
-                case "Register":
-                    return RegisterClientCommand = new RegisterClientCommand(this, uri);
-            }
-            return null;
-        }
-
-        protected override void RemoveCommand(string rel)
-        {
-            switch (rel)
-            {
-                case "Register":
-                    RegisterClientCommand = null;
-                    break;
-            }
+            UpdateLinks(e.Links);
         }
 
         private bool _activated;
@@ -55,6 +70,21 @@ namespace Entile.TestApp.ViewModels
             get { return _clientId; }
         }
 
+        private ClientQuery _clientQuery;
+        public ClientQuery ClientQuery
+        {
+            get { return _clientQuery; }
+            set
+            {
+                if (_clientQuery != value)
+                {
+                    _clientQuery = value;
+                    _clientQuery.LinksReturned += LinksReturned;
+                    RaisePropertyChanged("ClientQuery");
+                }
+            }
+        }
+
         private RegisterClientCommand _registerClientCommand;
         public RegisterClientCommand RegisterClientCommand
         {
@@ -69,16 +99,31 @@ namespace Entile.TestApp.ViewModels
             }
         }
 
-        private RootApiCommand _rootApiCommand;
-        public RootApiCommand RootApiCommand
+        private RootApiQuery _rootApiQuery;
+        public RootApiQuery RootApiQuery
         {
-            get { return _rootApiCommand; }
+            get { return _rootApiQuery; }
             set
             {
-                if (_rootApiCommand!= value)
+                if (_rootApiQuery!= value)
                 {
-                    _rootApiCommand = value;
-                    RaisePropertyChanged("RootApiCommand");
+                    _rootApiQuery = value;
+                    _rootApiQuery.LinksReturned += LinksReturned;
+                    RaisePropertyChanged("RootApiQuery");
+                }
+            }
+        }
+
+        private SubscribeCommand _subscribeCommand;
+        public SubscribeCommand SubscribeCommand
+        {
+            get { return _subscribeCommand; }
+            set
+            {
+                if (_subscribeCommand != value)
+                {
+                    _subscribeCommand = value;
+                    RaisePropertyChanged("SubscribeCommand");
                 }
             }
         }
@@ -89,20 +134,20 @@ namespace Entile.TestApp.ViewModels
             get { return _subscriptions; }
             set
             {
-                if (value == null) 
+                if (value == null)
                     throw new ArgumentNullException("value");
-                
+
                 _subscriptions.Clear();
                 foreach (var sub in value)
                 {
                     _subscriptions.Add(sub);
                 }
-                
+
                 // RaisePropertyChanged("Subscriptions"); 
             }
         }
 
-        public EntileViewContext ViewContext
+        public IViewContext ViewContext
         {
             get { return _viewContext; }
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Input;
+using Entile.TestApp.Actions;
 
 namespace Entile.TestApp.ViewModels
 {
@@ -10,7 +11,7 @@ namespace Entile.TestApp.ViewModels
         Raw
     }
 
-    public class SubscriptionViewModel : ActionableObject
+    public class SubscriptionViewModel : ViewModelBase
     {
         private readonly EntileViewContext _viewContext;
 
@@ -19,29 +20,15 @@ namespace Entile.TestApp.ViewModels
             _viewContext = new EntileViewContext(clientViewContext);
             
             _subscriptionId = subscriptionId;
-            ViewContext.SetValue("SubscriptionId", _subscriptionId);
+            _viewContext.SetValue("SubscriptionId", _subscriptionId);
+
+            RegisterAction("Unsubscribe", l =>
+                                              {
+                                                  var action = new UnsubscribeCommand(_viewContext, l.Uri);
+                                                  UnsubscribeCommand = action;
+                                              });
             _kind = kind;
             _paramUri = paramUri;
-        }
-
-        protected override ICommand BuildCommand(string rel, string uri)
-        {
-            switch(rel)
-            {
-                case "Unsubscribe":
-                    return UnsubscribeCommand = new UnsubscribeCommand(this, uri);
-            }
-            return null;
-        }
-
-        protected override void RemoveCommand(string rel)
-        {
-            switch (rel)
-            {
-                case "Unsubscribe":
-                    UnsubscribeCommand = null;
-                    break;
-            }
         }
 
         private Guid _subscriptionId;

@@ -1,5 +1,6 @@
 ﻿using Entile.Server;
 using Nancy;
+using Nancy.Bootstrapper;
 using Nancy.Conventions;
 using TinyIoC;
 
@@ -15,9 +16,19 @@ namespace Entile.NancyHost
         protected override void ConfigureConventions(NancyConventions nancyConventions)
         {
             base.ConfigureConventions(nancyConventions);
+            
             nancyConventions.StaticContentsConventions.Add(
                 StaticContentConventionBuilder.AddDirectory("Scripts")
                 );
+        }
+
+        protected override NancyInternalConfiguration InternalConfiguration
+        {
+            get
+            {
+                // Don't want any special handling for errors
+                return NancyInternalConfiguration.WithOverrides(cfg => cfg.ErrorHandlers.Clear());
+            }
         }
     }
 }

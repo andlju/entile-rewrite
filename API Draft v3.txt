@@ -1,0 +1,144 @@
+// API Draft v3
+
+// GET /clients
+// 200 OK
+{
+	"commands" : [
+		{ 
+			"name " : "register",				"method" : "POST", 		"uri" : "/clients", 
+			"fields" : [
+				{ "name" : "notificationUri", 	"optional" : false,		"description" : "Notification Uri" }
+			]
+		}
+	]
+}
+
+// POST /clients
+{
+	"notificationUri" : "http://test.com/oijasdfo8798olkasdf"
+}
+// 202 Created
+// Location: /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}
+
+// GET /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}
+// 200 OK
+{
+	"notificationUri" : "http://test.com/oijasdfo8798olkasdf",
+
+	"links" : [
+		{ "rel" : "self",		 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}" },
+		{ "rel" : "subscriptions",		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions" },
+	],
+
+	"commands" : [
+		{ 
+			"name " : "register",				"method" : "POST", 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}", 
+			"fields" : [
+				{ "name" : "notificationUri", 	"optional" : false,		"description" : "Notification Uri" }
+			]
+		},
+		{ 
+			"name " : "unregister",				"method" : "DELETE", 	"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}", 
+		},
+	]
+
+}
+
+// GET /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions
+// 200 OK
+{
+	"subscriptions" : [
+		{ 
+			"kind" : "Tile",
+			"paramUri" : "/Test.xaml",
+			"extendedInfo" : {
+				"testKey" : "testValue"
+			},
+
+			"links" : [
+				{ "rel" : "self",		 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}" },
+				{ "rel" : "client", 			"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}" }
+			],
+
+			"commands" : [
+				{	
+					"name" : "unsubscribe", 			"method" : "DELETE", 	"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}"} 
+				},
+				{
+					"name " : "update",					"method" : "PATCH",		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}", 
+					"fields" : [
+						{ "name" : "paramUri", 			"optional" : true,		"description" : "Parameter Uri" },
+						{ "name" : "extendedInfo",		"optional" : true,		"description" : "Extended Information" }
+					]
+				}
+			]
+		}
+	],
+
+	"links" : [
+		{ "rel" : "self",			"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions" },
+		{ "rel" : "client", 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}" }
+	],
+
+	"commands" : [
+		{
+			"name " : "subscribe",				"method" : "POST", 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions", 
+			"fields" : [
+				{ "name" : "kind", 				"optional" : false,		"description" : "Notification Kind" },
+				{ "name" : "paramUri", 			"optional" : true,		"description" : "Parameter Uri" },
+				{ "name" : "extendedInfo",		"optional" : true,		"description" : "Extended Information" },
+			]
+		}
+	]
+}
+
+
+// GET /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}
+// 200 OK
+{
+	"kind" : "Tile",
+	"paramUri" : "/Test.xaml",
+	"extendedInfo" : {
+		"testKey" : "testValue"
+	},
+
+	"notifications" : [
+		{
+			"timestamp" : "2012-07-12T10:23:12.123",
+			"title" : "Testar igen",
+			"counter" : 1,
+			"backgroundUri" : "http://test.com/back.jpg",
+			"backTitle" : "Testar 2",
+			"backContent" : "Content for back",
+			"backBackgroundUri" : "http://test.com/backback.jpg",
+		},
+		{
+			"timestamp" : "2012-06-24T10:23:12.123",
+			"title" : "Testar",
+			"counter" : 0,
+			"backgroundUri" : "http://test.com/back.jpg",
+			"backTitle" : "Testar 2",
+			"backContent" : "Content for back",
+			"backBackgroundUri" : "http://test.com/backback.jpg",
+		}
+	],
+
+	"links" : [
+		{ "rel" : "self",		 		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}" },
+		{ "rel" : "client", 			"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}" }
+	],
+
+	"commands" : [
+		{	
+			"name" : "unsubscribe", 			"method" : "DELETE", 	"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}"} 
+		},
+		{
+			"name " : "update",					"method" : "PATCH",		"uri" : "/clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions/{F32A4D2F-CE14-42FE-803C-F44288974023}", 
+			"fields" : [
+				{ "name" : "paramUri", 			"optional" : true,		"description" : "Parameter Uri" },
+				{ "name" : "extendedInfo",		"optional" : true,		"description" : "Extended Information" }
+			]
+		}
+	]
+
+}
