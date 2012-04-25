@@ -1,11 +1,14 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entile.Server.Commands
 {
     public class UnsubscribeCommand : CommandBase
     {
-        public Guid ClientId;
-        public Guid SubscriptionId;
+        [Key]
+        public Guid ClientId { get; set; }
+        [Key]
+        public Guid SubscriptionId { get; set; }
 
         public UnsubscribeCommand()
         {

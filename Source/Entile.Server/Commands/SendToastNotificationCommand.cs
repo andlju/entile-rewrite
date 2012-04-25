@@ -1,15 +1,27 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entile.Server.Commands
 {
     public class SendToastNotificationCommand : CommandBase
     {
-        public Guid ClientId;
-        public Guid SubscriptionId;
-        public Guid NotificationId;
-        public string Title;
-        public string Body;
-        public int NumberOfAttempts;
+        [Key]
+        public Guid ClientId { get; set; }
+        [Key]
+        public Guid SubscriptionId { get; set; }
+        [Key]
+        public Guid NotificationId { get; set; }
+
+        [Required]
+        [Display(Description = "Title of the Toast")]
+        public string Title { get; set; }
+
+        [Display(Description = "Body of the Toast")]
+        public string Body { get; set; }
+
+        [Required]
+        [Display(Description = "Number of attempts")]
+        public int NumberOfAttempts { get; set; }
 
         public SendToastNotificationCommand()
         {

@@ -25,6 +25,18 @@ namespace Entile.WebApiHost
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapHttpRoute(
+                name: "ClientsApi",
+                routeTemplate: "api/clients/{clientId}",
+                defaults: new { clientId = RouteParameter.Optional, controller = "clients" }
+            );
+
+            routes.MapHttpRoute(
+                name: "ClientSubscriptionsApi",
+                routeTemplate: "api/clients/{clientId}/subscriptions",
+                defaults: new { clientId = RouteParameter.Optional, controller = "clientsubscriptions" }
+            );
+
+            routes.MapHttpRoute(
                 name: "DefaultApi",
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }

@@ -4,19 +4,19 @@ namespace Entile.Server.Commands
 {
     public class SendTileNotificationCommand : CommandBase
     {
-        public Guid ClientId;
-        public Guid SubscriptionId;
-        public Guid NotificationId;
+        public Guid ClientId { get; set; }
+        public Guid SubscriptionId { get; set; }
+        public Guid NotificationId { get; set; }
 
-        public string Title;
-        public int Counter;
-        public string BackgroundUri;
+        public string Title { get; set; }
+        public int Counter { get; set; }
+        public string BackgroundUri { get; set; }
 
-        public string BackTitle;
-        public string BackContent;
-        public string BackBackgroundUri;
+        public string BackTitle { get; set; }
+        public string BackContent { get; set; }
+        public string BackBackgroundUri { get; set; }
 
-        public int NumberOfAttempts;
+        public int NumberOfAttempts { get; set; }
 
         public SendTileNotificationCommand()
         {

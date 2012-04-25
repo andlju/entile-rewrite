@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Entile.Server.Commands
 {
     public class UnregisterClientCommand : CommandBase
     {
-        public Guid ClientId;
+        [Key]
+        public Guid ClientId { get; set; }
 
         public UnregisterClientCommand()
         {

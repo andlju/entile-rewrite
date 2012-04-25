@@ -117,8 +117,13 @@
     <Reference Include="System.Configuration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ClientsHyperMediaProvider.cs" />
+    <Compile Include="Controllers\ClientSubscriptionsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ClientsController.cs" />
+    <Compile Include="Controllers\HyperMediaApplier.cs" />
+    <Compile Include="Controllers\HyperMediaProviderBase.cs" />
+    <Compile Include="Controllers\HyperMediaResponse.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

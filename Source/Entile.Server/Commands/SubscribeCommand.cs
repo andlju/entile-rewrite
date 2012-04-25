@@ -1,16 +1,29 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using Entile.Server.Domain;
 
 namespace Entile.Server.Commands
 {
     public class SubscribeCommand : CommandBase
     {
-        public Guid ClientId;
-        public Guid SubscriptionId;
-        public NotificationKind Kind;
-        public string Uri;
-        public Dictionary<string, string> ExtendedInformation;
+        [Key]
+        public Guid ClientId { get; set; }
+        
+        [Key]
+        public Guid SubscriptionId { get; set; }
+        
+        [Required]
+        [Display(Description = "Notification kind")]
+        public NotificationKind Kind { get; set; }
+
+        [Required]
+        [Display(Description = "Parameter uri")]
+        public string Uri { get; set; }
+
+        [Display(Description = "Extended information")]
+        public Dictionary<string, string> ExtendedInformation { get; set; }
 
         public SubscribeCommand()
         {

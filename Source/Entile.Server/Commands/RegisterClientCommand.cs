@@ -5,8 +5,8 @@ namespace Entile.Server.Commands
 {
     public class RegisterClientCommand : CommandBase
     {
-        public Guid ClientId;
-        public string NotificationChannel;
+        public Guid ClientId { get; set; }
+        public string NotificationChannel { get; set; }
         
         public RegisterClientCommand()
         {
