@@ -17,6 +17,21 @@ namespace Entile.WebApiHost.Controllers
         public string NotificationUri { get; set; }
     }
 
+    public class RootResponse : HyperMediaResponse
+    {
+        
+    }
+
+    public class RootController : ApiController
+    {
+        public RootResponse Get()
+        {
+            var root = new RootResponse();
+            RootHyperMediaProvider.Instance.AddHyperMedia(Request, root);
+            return root;
+        }
+    }
+
     public class ClientResponse : HyperMediaResponse
     {
         public Guid ClientId { get; set; }

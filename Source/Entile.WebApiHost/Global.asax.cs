@@ -25,6 +25,12 @@ namespace Entile.WebApiHost
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapHttpRoute(
+                name: "RootApi",
+                routeTemplate: "api",
+                defaults: new { controller = "root" }
+            );
+
+            routes.MapHttpRoute(
                 name: "ClientsApi",
                 routeTemplate: "api/clients/{clientId}",
                 defaults: new { clientId = RouteParameter.Optional, controller = "clients" }
@@ -57,6 +63,27 @@ namespace Entile.WebApiHost
             RegisterRoutes(RouteTable.Routes);
 
             BundleTable.Bundles.RegisterTemplateBundles();
+            BundleTable.Bundles.EnableBootstrapBundle();
         }
+
+    }
+
+    public static class BundleExtensions
+    {
+        public static void EnableBootstrapBundle(this BundleCollection bundles)
+        {
+            var bootstrapCss = new Bundle("~/Content/bootstrap/css", new CssMinify());
+            bootstrapCss.AddFile("~/Content/bootstrap.css");
+            bootstrapCss.AddFile("~/Content/bootstrap-responsive.css");
+            bootstrapCss.AddFile("~/Content/application.css");
+
+            bundles.Add(bootstrapCss);
+
+            var bootstrapJs = new Bundle("~/bootstrap/js", new JsMinify());
+            bootstrapJs.AddFile("~/Scripts/bootstrap.js");
+            bootstrapJs.AddFile("~/Scripts/knockout.js");
+            bundles.Add(bootstrapJs);
+        }
+
     }
 }

@@ -17,7 +17,7 @@
 {
 	"notificationUri" : "http://test.com/oijasdfo8798olkasdf"
 }
-// 202 Created
+// 201 Created
 // Location: /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}
 
 // GET /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}
@@ -43,6 +43,13 @@
 	]
 
 }
+
+// POST /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}
+{
+	"notificationUri" : "http://test.com/oijasdfo8798olkasdf"
+}
+// 202 Accepted
+
 
 // GET /clients/{127802B3-4496-4BC2-947A-C59C47659FD0}/subscriptions
 // 200 OK

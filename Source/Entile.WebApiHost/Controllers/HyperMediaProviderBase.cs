@@ -14,34 +14,77 @@ namespace Entile.WebApiHost.Controllers
     {
         private static Regex _paramRegex = new Regex(@"\{(?<param>\w+)\}", RegexOptions.Compiled);
 
-        public void AddHyperMedia(HttpRequestMessage request, T response)
+        protected class CommandBuilder
         {
-            var links = Links(request, response);
-            var commands = Commands(request, response);
-
-            if (links != null)
-                response.Links = new List<LinkDefinition>(links);
-
-            if (commands != null)
-                response.Commands = new List<CommandDefinition>(commands);
+            public string UriTemplate;
+            public string Name;
+            public string Description;
+            public string Method;
+            public Type CommandType;
         }
 
-        protected virtual IEnumerable<LinkDefinition> Links(HttpRequestMessage request, T response)
+        protected class LinkBuilder
+        {
+            public string UriTemplate;
+            public string Rel;
+        }
+
+        public void AddHyperMedia(HttpRequestMessage request, T response)
+        {
+            var links = Links();
+            var commands = Commands();
+
+            if (links != null)
+                response.Links = links.Select(l => BuildLink(request, response, l.UriTemplate, l.Rel)).ToList();
+
+            if (commands != null)
+                response.Commands = commands.Select(c => BuildCommand(request, response, c.UriTemplate, c.Name, c.Description, c.CommandType, c.Method)).ToList();
+        }
+
+        protected virtual IEnumerable<LinkBuilder> Links()
         {
             return null;
         }
 
-        protected virtual IEnumerable<CommandDefinition> Commands(HttpRequestMessage request, T response)
+        protected virtual IEnumerable<CommandBuilder> Commands()
         {
             return null;
         }
         
-        protected Uri BuildUri(HttpRequestMessage request, string relativeUri)
+        protected static LinkBuilder Link(string uriTemplate, string rel)
+        {
+            return new LinkBuilder() { Rel = rel, UriTemplate = uriTemplate};
+        }
+
+        protected static CommandBuilder Command(string uriTemplate, string name, string description, string method = null)
+        {
+            return new CommandBuilder()
+            {
+                UriTemplate = uriTemplate,
+                Name = name,
+                Description = description,
+                Method = method ?? "POST"
+            };
+        }
+
+        protected static CommandBuilder Command<TCmd>(string uriTemplate, string name, string description, string method = null) where TCmd : ICommand
+        {
+            return new CommandBuilder()
+            {
+                UriTemplate = uriTemplate,
+                Name = name,
+                Description = description,
+                Method = method ?? "POST",
+                CommandType = typeof(TCmd)
+            };
+        }
+
+        private static Uri BuildUri(HttpRequestMessage request, string relativeUri)
         {
             return new Uri(request.RequestUri, relativeUri);
         }
 
-        protected CommandDefinition BuildCommand(HttpRequestMessage request, T response, string uriTemplate, string name, string description, string method = null)
+        private static CommandDefinition BuildCommand(HttpRequestMessage request, T response, string uriTemplate, string name, string description, Type cmdType, string method)
         {
             var relativeUri = FillTemplate(uriTemplate, response);
             var uri = BuildUri(request, relativeUri);
@@ -49,27 +92,24 @@ namespace Entile.WebApiHost.Controllers
                           {
                               Name = name,
                               Description = description,
-                              Method = method ?? "POST",
+                              Method = method,
                               Uri = uri
                           };
+            if (cmdType != null)
+            {
+                var props = cmdType.GetProperties();
+
+                def.Fields = props.Where(p => !GetKey(p)).Select(p => new FieldDefinition()
+                                                                          {
+                                                                              Name = p.Name,
+                                                                              Description = GetDescription(p),
+                                                                              Optional = !GetRequired(p)
+                                                                          }).ToArray();
+            }
             return def;
         }
 
-        protected CommandDefinition BuildCommand<TCmd>(HttpRequestMessage request, T response, string uriTemplate, string name, string description, string method = null) where TCmd : ICommand
-        {
-            var def = BuildCommand(request, response, uriTemplate, name, description, method);
-
-            var props = typeof(TCmd).GetProperties();
-            def.Fields = props.Where(p => !GetKey(p)).Select(p => new FieldDefinition()
-                                               {
-                                                   Name = p.Name, 
-                                                   Description = GetDescription(p), 
-                                                   Optional = !GetRequired(p)
-                                               }).ToArray();
-            return def;
-        }
-
-        private string GetDescription(PropertyInfo propertyInfo)
+        private static string GetDescription(PropertyInfo propertyInfo)
         {
             var displayAttr = propertyInfo.GetCustomAttributes(typeof(DisplayAttribute), true).FirstOrDefault() as DisplayAttribute;
             if (displayAttr == null)
@@ -77,7 +117,7 @@ namespace Entile.WebApiHost.Controllers
             return displayAttr.Description ?? propertyInfo.Name;
         }
 
-        private bool GetRequired(PropertyInfo propertyInfo)
+        private static bool GetRequired(PropertyInfo propertyInfo)
         {
             var requiredAttr = propertyInfo.GetCustomAttributes(typeof(RequiredAttribute), true).FirstOrDefault() as RequiredAttribute;
             if (requiredAttr == null)
@@ -85,7 +125,7 @@ namespace Entile.WebApiHost.Controllers
             return true;
         }
 
-        private bool GetKey(PropertyInfo propertyInfo)
+        private static bool GetKey(PropertyInfo propertyInfo)
         {
             var requiredAttr = propertyInfo.GetCustomAttributes(typeof(KeyAttribute), true).FirstOrDefault() as KeyAttribute;
             if (requiredAttr == null)
@@ -93,20 +133,20 @@ namespace Entile.WebApiHost.Controllers
             return true;
         }
 
-        protected LinkDefinition BuildLink(HttpRequestMessage request, T response, string uriTemplate, string rel)
+        protected static LinkDefinition BuildLink(HttpRequestMessage request, T response, string uriTemplate, string rel)
         {
             var relativeUri = FillTemplate(uriTemplate, response);
 
             return new LinkDefinition() { Rel = rel, Uri = BuildUri(request, relativeUri) };
         }
 
-        private string FillTemplate(string uriTemplate, object context)
+        private static string FillTemplate(string uriTemplate, object context)
         {
             var uri = _paramRegex.Replace(uriTemplate, m => GetParameter(m, context));
             return uri;
         }
 
-        private string GetParameter(Match m, object context)
+        private static string GetParameter(Match m, object context)
         {
             if (context == null)
                 return m.Value;
