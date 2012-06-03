@@ -1,25 +1,36 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using Entile.WebApiHost.Models;
 
 namespace Entile.WebApiHost.Controllers
 {
     public class HyperMediaApplier
     {
-        private Dictionary<Type, object> _providers = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, object> _providers = new Dictionary<Type, object>();
 
         public void RegisterProvider<T>(HyperMediaProviderBase<T> provider) where T : HyperMediaResponse
         {
             _providers[typeof (T)] = provider;
         }
 
-        public void Apply(HttpRequestMessage request, HyperMediaResponse response)
+        public Uri GetLink<TResponse>(string linkName, HttpRequestMessage request, TResponse response) where TResponse : HyperMediaResponse
         {
             object obj;
-            if (!_providers.TryGetValue(response.GetType(), out obj))
+            if (!_providers.TryGetValue(typeof(TResponse), out obj))
+                return null;
+            var provider = (HyperMediaProviderBase<TResponse>)obj;
+            
+            return provider.GetLink(linkName, request, response).Uri;
+        }
+
+        public void Apply<TResponse>(HttpRequestMessage request, TResponse response) where TResponse : HyperMediaResponse
+        {
+            object obj;
+            if (!_providers.TryGetValue(typeof(TResponse), out obj))
                 return;
-            var method = obj.GetType().GetMethod("AddHyperMedia", new Type[] {typeof(HttpRequestMessage), response.GetType()});
-            method.Invoke(obj, new object[] { request, response });
+            var provider = (HyperMediaProviderBase<TResponse>) obj;
+            provider.AddHyperMedia(request, response);
         }
     }
 }

@@ -89,24 +89,24 @@
                         var idx = 0;
                         for (var e in val) {
                             content.push({
-                                name: ko.observable(f + '[' + idx + ']'),
-                                value: ko.observable(),
-                                nested: ko.observableArray(getDataContent(val[e]))
+                                name: f + '[' + idx + ']',
+                                value: null,
+                                nested: getDataContent(val[e])
                             });
                             idx++;
                         }
                     } else if ($.isPlainObject(val)) {
                         nested = getDataContent(val);
                         content.push({
-                            name: ko.observable(f),
-                            value: ko.observable(val),
-                            nested: ko.observableArray(nested)
+                            name: f,
+                            value: null,
+                            nested: nested
                         });
                     } else {
                         content.push({
-                            name: ko.observable(f),
-                            value: ko.observable(val),
-                            nested: ko.observableArray(nested)
+                            name: f,
+                            value: val,
+                            nested: nested
                         });
                     }
                 }
@@ -133,7 +133,12 @@
             self.buildJson = function () {
                 var obj = new Object();
                 for (var field in fields) {
-                    obj[fields[field].name()] = fields[field].value();
+                    var val = fields[field].value();
+                    try {
+                        val = $.parseJSON(val);
+                    } catch(ex) {}
+                    
+                    obj[fields[field].name()] = val;
                 }
                 return obj;
             };

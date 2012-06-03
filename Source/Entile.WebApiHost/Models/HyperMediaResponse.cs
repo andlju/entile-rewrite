@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Entile.WebApiHost.Controllers
+namespace Entile.WebApiHost.Models
 {
     public class LinkDefinition
     {

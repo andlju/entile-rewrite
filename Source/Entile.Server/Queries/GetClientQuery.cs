@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
+using Entile.Server.ViewHandlers;
 
 namespace Entile.Server.Queries
 {
     public class GetClientQuery : IMessage
     {
         public Guid ClientId;
-    }
-
-    public class GetSubscriptionQuery : IMessage
-    {
-        public Guid ClientId;
-        public Guid SubscriptionId;
     }
 }

@@ -117,10 +117,16 @@
     <Compile Include="Controllers\ClientsController.cs" />
     <Compile Include="Controllers\HyperMediaApplier.cs" />
     <Compile Include="Controllers\HyperMediaProviderBase.cs" />
-    <Compile Include="Controllers\HyperMediaResponse.cs" />
+    <Compile Include="Controllers\RootController.cs" />
+    <Compile Include="Controllers\RootHyperMediaProvider.cs" />
+    <Compile Include="Controllers\SubscriptionHyperMediaProvider.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ClientResponse.cs" />
+    <Compile Include="Models\HyperMediaResponse.cs" />
+    <Compile Include="Models\RootResponse.cs" />
+    <Compile Include="Models\SubscriptionResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -234,7 +240,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />

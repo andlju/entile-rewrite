@@ -10,50 +10,19 @@ using Entile.Server;
 using Entile.Server.Commands;
 using Entile.Server.Queries;
 using Entile.Server.QueryHandlers;
+using Entile.WebApiHost.Models;
 
 namespace Entile.WebApiHost.Controllers
 {
-    public class ClientResource
-    {
-        public string NotificationUri { get; set; }
-    }
 
-    public class RootResponse : HyperMediaResponse
+    public class NotificationController : ApiController
     {
-        
-    }
-
-    public class RootController : ApiController
-    {
-        public RootResponse Get()
+        public List<SubscriptionResponse> Get()
         {
-            var root = new RootResponse();
-            RootHyperMediaProvider.Instance.AddHyperMedia(Request, root);
-            return root;
+            var queries = new SubscriptionQueries();
+            var subs = queries.ListSubscriptions(new ListSubscriptionsQuery());
+            return null;
         }
-    }
-
-    public class ClientResponse : HyperMediaResponse
-    {
-        public Guid ClientId { get; set; }
-        public string NotificationUri { get; set; }
-
-        public SubscriptionResponse[] Subscriptions { get; set; }
-    }
-
-    public class SubscriptionResource
-    {
-        public string NotificationKind { get; set; }
-        public string ParamUri { get; set; }
-        public Dictionary<string, string> ExtendedInfo { get; set; }
-    }
-
-    public class SubscriptionResponse : HyperMediaResponse
-    {
-        public Guid ClientId { get; set; }
-        public Guid SubscriptionId { get; set; }
-        public string NotificationKind { get; set; }
-        public string ParamUri { get; set; }
     }
 
     public class ClientsController : ApiController
@@ -85,7 +54,7 @@ namespace Entile.WebApiHost.Controllers
                                                                                         {
                                                                                             ClientId = client.ClientId,
                                                                                             SubscriptionId = s.SubscriptionId,
-                                                                                            NotificationKind = ((Server.Domain.NotificationKind)s.NotificationKind).ToString(CultureInfo.InvariantCulture),
+                                                                                            NotificationKind = ((Server.Domain.NotificationKind)s.NotificationKind).ToString(),
                                                                                             ParamUri = s.ParamUri
                                                                                         }).ToArray()
                                };
@@ -103,10 +72,11 @@ namespace Entile.WebApiHost.Controllers
             command.ClientId = id;
 
             _dispatcher.Dispatch(command);
-            var clientUri = new Uri(Request.RequestUri, "/api/clients/" + id);
+            
+            var locationUri = _applier.GetLink("self", Request, new ClientResponse() {ClientId = command.ClientId});
 
             var response = new HttpResponseMessage(HttpStatusCode.Created);
-            response.Headers.Location = clientUri;
+            response.Headers.Location = locationUri;
             
             return response;
         }
@@ -116,10 +86,10 @@ namespace Entile.WebApiHost.Controllers
         {
             command.ClientId = clientId;
             _dispatcher.Dispatch(command);
-            var clientUri = new Uri(Request.RequestUri, "/api/clients/" + clientId);
+            var locationUri = _applier.GetLink("self", Request, new ClientResponse() { ClientId = command.ClientId });
 
             var response = new HttpResponseMessage(HttpStatusCode.Accepted);
-            response.Headers.Location = clientUri;
+            response.Headers.Location = locationUri;
 
             return response;
         }
@@ -132,8 +102,8 @@ namespace Entile.WebApiHost.Controllers
             
             var response = new HttpResponseMessage(HttpStatusCode.Accepted);
 
-            var rootUri = new Uri(Request.RequestUri, "/api");
-            response.Headers.Location = rootUri;
+            var locationUri = _applier.GetLink("root", Request, new ClientResponse() {ClientId = clientId});
+            response.Headers.Location = locationUri;
 
             return response;
         }

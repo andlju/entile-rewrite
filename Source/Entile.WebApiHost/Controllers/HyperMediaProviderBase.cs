@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using Entile.Server.Commands;
+using Entile.WebApiHost.Models;
 
 namespace Entile.WebApiHost.Controllers
 {
@@ -39,6 +40,15 @@ namespace Entile.WebApiHost.Controllers
 
             if (commands != null)
                 response.Commands = commands.Select(c => BuildCommand(request, response, c.UriTemplate, c.Name, c.Description, c.CommandType, c.Method)).ToList();
+        }
+
+        public LinkDefinition GetLink(string name, HttpRequestMessage request, T response)
+        {
+            var link = Links(response).FirstOrDefault(l => l.Rel == name);
+            if (link == null)
+                return null;
+
+            return BuildLink(request, response, link.UriTemplate, link.Rel); ;
         }
 
         protected virtual IEnumerable<LinkBuilder> Links(T response)

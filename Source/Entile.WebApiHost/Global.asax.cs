@@ -38,8 +38,8 @@ namespace Entile.WebApiHost
 
             routes.MapHttpRoute(
                 name: "ClientSubscriptionsApi",
-                routeTemplate: "api/clients/{clientId}/subscriptions",
-                defaults: new { clientId = RouteParameter.Optional, controller = "clientsubscriptions" }
+                routeTemplate: "api/clients/{clientId}/subscriptions/{subscriptionId}",
+                defaults: new { subscriptionId = RouteParameter.Optional, controller = "clientsubscriptions" }
             );
 
             routes.MapHttpRoute(
