@@ -31,8 +31,8 @@ namespace Entile.WebApiHost.Controllers
 
         public void AddHyperMedia(HttpRequestMessage request, T response)
         {
-            var links = Links();
-            var commands = Commands();
+            var links = Links(response);
+            var commands = Commands(response);
 
             if (links != null)
                 response.Links = links.Select(l => BuildLink(request, response, l.UriTemplate, l.Rel)).ToList();
@@ -41,12 +41,12 @@ namespace Entile.WebApiHost.Controllers
                 response.Commands = commands.Select(c => BuildCommand(request, response, c.UriTemplate, c.Name, c.Description, c.CommandType, c.Method)).ToList();
         }
 
-        protected virtual IEnumerable<LinkBuilder> Links()
+        protected virtual IEnumerable<LinkBuilder> Links(T response)
         {
             return null;
         }
 
-        protected virtual IEnumerable<CommandBuilder> Commands()
+        protected virtual IEnumerable<CommandBuilder> Commands(T response)
         {
             return null;
         }

@@ -19,19 +19,19 @@ namespace Entile.WebApiHost.Controllers
             _applier.RegisterProvider(new SubscriptionHyperMediaProvider());
         }
 
-        public HttpResponseMessage Post(Guid clientId, SubscriptionResource subscription)
+        public HttpResponseMessage Post(Guid clientId, SubscribeCommand command)
         {
             var subscriptionId = Guid.NewGuid();
-            var command = new SubscribeCommand(
-                clientId,
-                subscriptionId,
-                (Server.Domain.NotificationKind)Enum.Parse(typeof (Server.Domain.NotificationKind),
-                                                           subscription.NotificationKind), 
-                subscription.ParamUri, subscription.ExtendedInfo);
+            command.ClientId = clientId;
+            command.SubscriptionId = subscriptionId;
 
             _dispatcher.Dispatch(command);
-            
-            return new HttpResponseMessage(HttpStatusCode.Created);
+
+            var response = new HttpResponseMessage(HttpStatusCode.Created);
+            var subscriptionUri = new Uri(Request.RequestUri, "/api/clients/" + clientId + "/subscriptions/" + subscriptionId);
+            response.Headers.Location = subscriptionUri;
+
+            return response;
         }
     }
 }

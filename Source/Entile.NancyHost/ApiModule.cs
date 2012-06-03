@@ -95,7 +95,7 @@ namespace Entile.NancyHost
 
         private IMessage GetMessage(Type commandType)
         {
-            var binder = ModelBinderLocator.GetBinderForType(commandType);
+            var binder = ModelBinderLocator.GetBinderForType(commandType, this.Context);
             var command = binder.Bind(Context, commandType) as IMessage;
             foreach (var param in Context.Parameters)
             {

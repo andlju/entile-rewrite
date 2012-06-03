@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Entile.Server;
 using Entile.Server.Commands;
@@ -73,6 +74,8 @@ namespace Entile.WebApiHost.Controllers
         {
             var queries = new ClientQueries();
             var client = queries.GetClient(new GetClientQuery() { ClientId = clientId });
+            if (client == null)
+                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
 
             var response = new ClientResponse()
                                {
@@ -94,10 +97,11 @@ namespace Entile.WebApiHost.Controllers
         }
 
         // POST /api/clients
-        public HttpResponseMessage Post(ClientResource client)
+        public HttpResponseMessage Post(RegisterClientCommand command)
         {
             var id = Guid.NewGuid();
-            var command = new RegisterClientCommand() { ClientId = id, NotificationChannel = client.NotificationUri };
+            command.ClientId = id;
+
             _dispatcher.Dispatch(command);
             var clientUri = new Uri(Request.RequestUri, "/api/clients/" + id);
 
@@ -108,9 +112,9 @@ namespace Entile.WebApiHost.Controllers
         }
 
         // POST /api/clients/a42076d0-9728-48d9-ba6b-c6ed722fb49e
-        public HttpResponseMessage Post(Guid clientId, ClientResource client)
+        public HttpResponseMessage Post(Guid clientId, RegisterClientCommand command)
         {
-            var command = new RegisterClientCommand() { ClientId = clientId, NotificationChannel = client.NotificationUri };
+            command.ClientId = clientId;
             _dispatcher.Dispatch(command);
             var clientUri = new Uri(Request.RequestUri, "/api/clients/" + clientId);
 
@@ -121,10 +125,17 @@ namespace Entile.WebApiHost.Controllers
         }
 
         // DELETE /api/clients/a42076d0-9728-48d9-ba6b-c6ed722fb49e
-        public void Delete(Guid clientId)
+        public HttpResponseMessage Delete(Guid clientId, UnregisterClientCommand command)
         {
-            var command = new UnregisterClientCommand(clientId);
+            command.ClientId = clientId;
             _dispatcher.Dispatch(command);
+            
+            var response = new HttpResponseMessage(HttpStatusCode.Accepted);
+
+            var rootUri = new Uri(Request.RequestUri, "/api");
+            response.Headers.Location = rootUri;
+
+            return response;
         }
     }
 }

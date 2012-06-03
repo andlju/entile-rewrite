@@ -1,29 +1,153 @@
 
-<h1>Hej!</h1>
 
-<h2 data-bind="text: currentUri"></h2>
+<h1>Entile API</h1>
 
-<ul data-bind="foreach: links">
-    <li><a href="#" data-bind="text: Rel, attr: { 'href' : Uri }"></a></li>
-</ul>
-
-<ul data-bind="foreach: commands">
-    <li><a href="#" data-bind="text: Name, click: $parent.selectedCommand "></a></li>
-</ul>
-
-<form data-bind="with: selectedCommand">
-    <fieldset>
-        <legend data-bind="text: $parent.Name"></legend>
-        <div data-bind="foreach: Fields">
-            <label data-bind="text: Description"></label>
-            <input type="text"/>
+<div class="row">
+    <div class="offset2 span10">
+        <form class="form-horizontal">
+            <input type="text" data-bind="value: currentFilteredUri" class="span7"/>
+            <input type="submit" data-bind="click:refresh" value="Refresh"/>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="span2">
+        <ul data-bind="foreach: links" class="nav nav-list">
+            <li><a href="#" data-bind="text: rel, attr: { 'href' : uri }, click : $parent.followLink"></a></li>
+        </ul>
+    </div>
+    <script type="text/html" id="content-template">
+        <dt data-bind="text: name"></dt>
+        <dd>
+            <span data-bind="text: value"></span>
+            <div data-bind="template : { name: 'content-template', foreach: nested }" />
+        </dd>
+    </script>
+    <div class="span10">
+        <div data-bind="with: errorMessage">
+            <div class="alert alert-block alert-error">
+                <a class="close" href="#" data-bind="click: function() { $parent.errorMessage(null); }">×</a>
+                <h4 class="alert-heading" data-bind="text: title"></h4>
+                <span data-bind="text:details"></span>
+            </div>
         </div>
-    </fieldset>
-</form>
+        <div data-bind="with: locationMessage">
+            <div class="alert alert-block alert-info">
+                <a class="close" href="#" data-bind="click: function() { $parent.locationMessage(null); }">×</a>
+                <h4 class="alert-heading">Location</h4>
+                <a href="#" data-bind="text: $data, click: $parent.currentFilteredUri"></a>
+            </div>
+        </div>
+        <ul class="nav nav-tabs">
+            <li data-bind="css : {'active' : !(selectedCommand()) }">
+                <a href="#" data-bind="click: function() { selectedCommand(null); }">Content</a>
+            </li>
+            <!-- ko foreach: commands -->
+            <li data-bind="css : { 'active' : $parent.selectedCommand() == $data }"><a href="#" data-bind="text: name, attr: { 'href' : uri }, click: $parent.selectedCommand "></a></li>
+            <!-- /ko -->
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" data-bind="ifnot: selectedCommand">
+                <div class="well">
+                    <dl data-bind="template : { name: 'content-template', foreach: content }">
+                    </dl>
+                </div>
+            </div>
+            <div class="tab-pane active" data-bind="with: selectedCommand">
+                <form class="form-horizontal">
+                    <fieldset>
+                        <legend data-bind="text: description"></legend>
+                        <!-- ko foreach: fields -->
+                        <div class="control-group">
+                            <label class="control-label" data-bind="text: description"></label>
+                            <div class="controls">
+                                <input type="text" data-bind="value: value"/>
+                            </div>
+                        </div>
+                        <!-- /ko -->
+                    </fieldset>
+                    <div class="form-actions">
+                        <input type="submit" class="btn btn-primary" data-bind="value: method, click: $parent.sendCommand" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts
 {
     <script type="text/javascript">
+
+        function getDataContent(data) {
+            var content = [];
+            for (var f in data) {
+                if (f != 'Links' && f != 'Commands') {
+                    var val = data[f];
+                    var nested = [];
+                    if ($.isArray(val)) {
+                        var idx = 0;
+                        for (var e in val) {
+                            content.push({
+                                name: ko.observable(f + '[' + idx + ']'),
+                                value: ko.observable(),
+                                nested: ko.observableArray(getDataContent(val[e]))
+                            });
+                            idx++;
+                        }
+                    } else if ($.isPlainObject(val)) {
+                        nested = getDataContent(val);
+                        content.push({
+                            name: ko.observable(f),
+                            value: ko.observable(val),
+                            nested: ko.observableArray(nested)
+                        });
+                    } else {
+                        content.push({
+                            name: ko.observable(f),
+                            value: ko.observable(val),
+                            nested: ko.observableArray(nested)
+                        });
+                    }
+                }
+            }
+            return content;
+        }
+
+        function Link(rel, uri) {
+            var self = this;
+
+            self.rel = ko.observable(rel);
+            self.uri = ko.observable(uri);
+        }
+
+        function Command(name, description, method, uri, fields) {
+            var self = this;
+
+            self.name = ko.observable(name);
+            self.description = ko.observable(description);
+            self.method = ko.observable(method);
+            self.uri = ko.observable(uri);
+            self.fields = ko.observableArray(fields);
+
+            self.buildJson = function () {
+                var obj = new Object();
+                for (var field in fields) {
+                    obj[fields[field].name()] = fields[field].value();
+                }
+                return obj;
+            };
+        }
+
+        function Field(name, description, isOptional, defaultValue) {
+            var self = this;
+
+            self.name = ko.observable(name);
+            self.description = ko.observable(description);
+            self.isOptional = ko.observable(isOptional == true);
+
+            self.value = ko.observable(defaultValue);
+        }
         
         function Model(uri) {
 
@@ -33,23 +157,112 @@
             self.currentUri.subscribe(function (val) {
                 self.refresh();
             });
-            
+
+            self.currentFilteredUri = ko.computed({
+                read: self.currentUri,
+                write: function (value) {
+                    var lnk = document.createElement('a');
+                    lnk.setAttribute('href', value);
+                    self.currentUri(lnk.pathname + lnk.search);
+                }
+            });
+
+            self.content = ko.observableArray();
+
             self.links = ko.observableArray([]);
 
             self.commands = ko.observableArray([]);
             
             self.selectedCommand = ko.observable();
-            
-            self.refresh = function () {
-                $.getJSON(self.currentUri(), null, function (data, status, jqXhr) {
-                    if (status == 'success') {
-                        self.links(data.Links);
-                        self.commands(data.Commands);
+
+            self.followLink = function (link) {
+                self.currentFilteredUri(link.uri());
+            };
+
+            self.errorMessage = ko.observable();
+
+            self.locationMessage = ko.observable();
+
+            self.sendCommand = function () {
+                self.errorMessage(null);
+                self.locationMessage(null);
+                var cmd = self.selectedCommand();
+
+                var commandUri = cmd.uri();
+                var content = ko.toJSON(cmd.buildJson());
+                var method = cmd.method();
+
+                $.ajax({
+                    url: commandUri,
+                    type: method,
+                    contentType: 'application/json',
+                    data: content,
+                    dataType: 'json',
+                    success: function (data, status, jqXhr) {
+                        if (data != null) {
+                            self.updateFromModel(data);
+                        } else {
+                            var location = jqXhr.getResponseHeader('Location');
+
+                            if (location) {
+                                self.locationMessage(location);
+                            }
+                        }
+                    },
+                    error: function (jqXhr, textStatus, errorThrown) {
+                        var status = jqXhr.status;
+                        self.errorMessage({ title: 'Http ' + status, details: errorThrown });
                     }
                 });
             };
-        }
 
+            self.refresh = function () {
+                self.errorMessage(null);
+                self.locationMessage(null);
+                $.ajax({
+                    url: self.currentUri(),
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data, status, jqXhr) {
+                        if (data != null) {
+                            self.updateFromModel(data);
+                        } else {
+                            var location = jqXhr.getResponseHeader('Location');
+                            if (confirm('Location returned. Navigate to "' + location + '" ?'))
+                                self.currentFilteredUri(location);
+                        }
+                    },
+                    error: function(jqXhr, textStatus, errorThrown) {
+                        var status = jqXhr.status;
+                        self.errorMessage({ title: 'Http ' + status, details: errorThrown });
+                    }
+                });
+            };
+
+            self.updateFromModel = function (data) {
+
+                self.content(getDataContent(data));
+
+                var links = $.map(data.Links, function (linkData, idx) {
+                    return new Link(linkData.Rel, linkData.Uri);
+                });
+                self.links(links);
+
+                var commands = $.map(data.Commands, function (commandData, idx) {
+                    var fields = [];
+                    if (commandData.Fields != null) {
+                        fields = $.map(commandData.Fields, function (fieldData, idx) {
+                            return new Field(fieldData.Name, fieldData.Description, fieldData.Optional, '');
+                        });
+                    }
+                    return new Command(commandData.Name, commandData.Description, commandData.Method, commandData.Uri, fields);
+                });
+
+                self.commands(commands);
+                self.selectedCommand(null);
+            };
+        }
+        
         $(function () {
             var mainViewModel = new Model('/api');
             mainViewModel.refresh();
