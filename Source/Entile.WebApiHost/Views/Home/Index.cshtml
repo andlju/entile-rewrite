@@ -1,5 +1,4 @@
 
-
 <h1>Entile API</h1>
 
 <div class="row">
@@ -16,13 +15,24 @@
             <li><a href="#" data-bind="text: rel, attr: { 'href' : uri }, click : $parent.followLink"></a></li>
         </ul>
     </div>
-    <script type="text/html" id="content-template">
-        <dt data-bind="text: name"></dt>
-        <dd>
-            <span data-bind="text: value"></span>
-            <div data-bind="template : { name: 'content-template', foreach: nested }" />
-        </dd>
-    </script>
+	<script type="text/html" id="content-template">
+		<dt data-bind="text: name"></dt>
+		<dd>
+			<span data-bind="text: value"></span>
+			<div data-bind="template : { name: 'content-template', foreach: nested }" />
+		</dd>
+	</script>
+	<script type="text/html" id="field-template">
+		<div class="control-group">
+			<label class="control-label" data-bind="text: description"></label>
+			<div class="controls">
+				<div data-bind="template : { name: 'field-template', foreach: fields }"></div>
+				<div data-bind="if: fields().length < 1">
+					<input type="text" data-bind="value: value"/>
+				</div>
+            </div>
+        </div>
+	</script>
     <div class="span10">
         <div data-bind="with: errorMessage">
             <div class="alert alert-block alert-error">
@@ -57,14 +67,7 @@
                 <form class="form-horizontal">
                     <fieldset>
                         <legend data-bind="text: description"></legend>
-                        <!-- ko foreach: fields -->
-                        <div class="control-group">
-                            <label class="control-label" data-bind="text: description"></label>
-                            <div class="controls">
-                                <input type="text" data-bind="value: value"/>
-                            </div>
-                        </div>
-                        <!-- /ko -->
+						<div data-bind="template : { name: 'field-template', foreach: fields }"></div>
                     </fieldset>
                     <div class="form-actions">
                         <input type="submit" class="btn btn-primary" data-bind="value: method, click: $parent.sendCommand" />
@@ -79,199 +82,209 @@
 {
     <script type="text/javascript">
 
-        function getDataContent(data) {
-            var content = [];
-            for (var f in data) {
-                if (f != 'Links' && f != 'Commands') {
-                    var val = data[f];
-                    var nested = [];
-                    if ($.isArray(val)) {
-                        var idx = 0;
-                        for (var e in val) {
-                            content.push({
-                                name: f + '[' + idx + ']',
-                                value: null,
-                                nested: getDataContent(val[e])
-                            });
-                            idx++;
-                        }
-                    } else if ($.isPlainObject(val)) {
-                        nested = getDataContent(val);
-                        content.push({
-                            name: f,
-                            value: null,
-                            nested: nested
-                        });
-                    } else {
-                        content.push({
-                            name: f,
-                            value: val,
-                            nested: nested
-                        });
-                    }
-                }
-            }
-            return content;
-        }
+    	function getDataContent(data) {
+    		var content = [];
+    		for(var f in data) {
+    			if(f != 'Links' && f != 'Commands') {
+    				var val = data[f];
+    				var nested = [];
+    				if($.isArray(val)) {
+    					var idx = 0;
+    					for(var e in val) {
+    						content.push({
+    							name: f + '[' + idx + ']',
+    							value: null,
+    							nested: getDataContent(val[e])
+    						});
+    						idx++;
+    					}
+    				} else if($.isPlainObject(val)) {
+    					nested = getDataContent(val);
+    					content.push({
+    						name: f,
+    						value: null,
+    						nested: nested
+    					});
+    				} else {
+    					content.push({
+    						name: f,
+    						value: val,
+    						nested: nested
+    					});
+    				}
+    			}
+    		}
+    		return content;
+    	}
 
-        function Link(rel, uri) {
-            var self = this;
+    	function Link(data) {
+    		var self = this;
 
-            self.rel = ko.observable(rel);
-            self.uri = ko.observable(uri);
-        }
+    		self.rel = ko.observable(data.Rel);
+    		self.uri = ko.observable(data.Uri);
+    	}
 
-        function Command(name, description, method, uri, fields) {
-            var self = this;
+    	function Command(data) {
+    		var self = this;
 
-            self.name = ko.observable(name);
-            self.description = ko.observable(description);
-            self.method = ko.observable(method);
-            self.uri = ko.observable(uri);
-            self.fields = ko.observableArray(fields);
+    		self.name = ko.observable(data.Name);
+    		self.description = ko.observable(data.Description);
+    		self.method = ko.observable(data.Method);
+    		self.uri = ko.observable(data.Uri);
+    		self.fields = ko.observableArray([]);
 
-            self.buildJson = function () {
-                var obj = new Object();
-                for (var field in fields) {
-                    var val = fields[field].value();
-                    try {
-                        val = $.parseJSON(val);
-                    } catch(ex) {}
-                    
-                    obj[fields[field].name()] = val;
-                }
-                return obj;
-            };
-        }
+    		if(data.Fields) {
+    			self.fields($.map(data.Fields, function (f, i) { return new Field(f); }));
+    		}
 
-        function Field(name, description, isOptional, defaultValue) {
-            var self = this;
+    		self.buildJson = function () {
+    			var obj = new Object();
+    			var fields = this.fields();
+    			for(var fieldIdx in fields) {
+    				var field = fields[fieldIdx];
+    				var val;
+    				if(field.fields().length > 0) {
+    					val = self.buildJson.call(field);
+    				} else {
+    					val = field.value();
 
-            self.name = ko.observable(name);
-            self.description = ko.observable(description);
-            self.isOptional = ko.observable(isOptional == true);
+    					try {
+    						val = $.parseJSON(val);
+    					} catch(ex) {
+    					}
+    				}
+    				obj[field.name()] = val;
+    			}
+    			return obj;
+    		};
+    	}
 
-            self.value = ko.observable(defaultValue);
-        }
-        
-        function Model(uri) {
+    	function Field(data) {
+    		var self = this;
 
-            var self = this;
+    		self.name = ko.observable(data.Name);
+    		self.description = ko.observable(data.Description);
+    		self.isOptional = ko.observable(data.Optional == true);
+    		self.value = ko.observable();
 
-            self.currentUri = ko.observable(uri);
-            self.currentUri.subscribe(function (val) {
-                self.refresh();
-            });
+    		self.fields = ko.observableArray([]);
+    		if(data.Fields) {
+    			self.fields($.map(data.Fields, function (f, i) { return new Field(f); }));
+    		}
+    	}
 
-            self.currentFilteredUri = ko.computed({
-                read: self.currentUri,
-                write: function (value) {
-                    var lnk = document.createElement('a');
-                    lnk.setAttribute('href', value);
-                    self.currentUri(lnk.pathname + lnk.search);
-                }
-            });
+    	function Model(uri) {
 
-            self.content = ko.observableArray();
+    		var self = this;
 
-            self.links = ko.observableArray([]);
+    		self.currentUri = ko.observable(uri);
+    		self.currentUri.subscribe(function (val) {
+    			self.refresh();
+    		});
 
-            self.commands = ko.observableArray([]);
-            
-            self.selectedCommand = ko.observable();
+    		self.currentFilteredUri = ko.computed({
+    			read: self.currentUri,
+    			write: function (value) {
+    				var lnk = document.createElement('a');
+    				lnk.setAttribute('href', value);
+    				self.currentUri(lnk.pathname + lnk.search);
+    			}
+    		});
 
-            self.followLink = function (link) {
-                self.currentFilteredUri(link.uri());
-            };
+    		self.content = ko.observableArray();
 
-            self.errorMessage = ko.observable();
+    		self.links = ko.observableArray([]);
 
-            self.locationMessage = ko.observable();
+    		self.commands = ko.observableArray([]);
 
-            self.sendCommand = function () {
-                self.errorMessage(null);
-                self.locationMessage(null);
-                var cmd = self.selectedCommand();
+    		self.selectedCommand = ko.observable();
 
-                var commandUri = cmd.uri();
-                var content = ko.toJSON(cmd.buildJson());
-                var method = cmd.method();
+    		self.followLink = function (link) {
+    			self.currentFilteredUri(link.uri());
+    		};
 
-                $.ajax({
-                    url: commandUri,
-                    type: method,
-                    contentType: 'application/json',
-                    data: content,
-                    dataType: 'json',
-                    success: function (data, status, jqXhr) {
-                        if (data != null) {
-                            self.updateFromModel(data);
-                        } else {
-                            var location = jqXhr.getResponseHeader('Location');
+    		self.errorMessage = ko.observable();
 
-                            if (location) {
-                                self.locationMessage(location);
-                            }
-                        }
-                    },
-                    error: function (jqXhr, textStatus, errorThrown) {
-                        var status = jqXhr.status;
-                        self.errorMessage({ title: 'Http ' + status, details: errorThrown });
-                    }
-                });
-            };
+    		self.locationMessage = ko.observable();
 
-            self.refresh = function () {
-                self.errorMessage(null);
-                self.locationMessage(null);
-                $.ajax({
-                    url: self.currentUri(),
-                    type: 'GET',
-                    dataType: 'json',
-                    success: function(data, status, jqXhr) {
-                        if (data != null) {
-                            self.updateFromModel(data);
-                        } else {
-                            var location = jqXhr.getResponseHeader('Location');
-                            if (confirm('Location returned. Navigate to "' + location + '" ?'))
-                                self.currentFilteredUri(location);
-                        }
-                    },
-                    error: function(jqXhr, textStatus, errorThrown) {
-                        var status = jqXhr.status;
-                        self.errorMessage({ title: 'Http ' + status, details: errorThrown });
-                    }
-                });
-            };
+    		self.sendCommand = function () {
+    			self.errorMessage(null);
+    			self.locationMessage(null);
+    			var cmd = self.selectedCommand();
 
-            self.updateFromModel = function (data) {
+    			var commandUri = cmd.uri();
+    			var content = ko.toJSON(cmd.buildJson());
+    			var method = cmd.method();
 
-                self.content(getDataContent(data));
+    			$.ajax({
+    				url: commandUri,
+    				type: method,
+    				contentType: 'application/json',
+    				data: content,
+    				dataType: 'json',
+    				success: function (data, status, jqXhr) {
+    					if(data != null) {
+    						self.updateFromModel(data);
+    					}
 
-                var links = $.map(data.Links, function (linkData, idx) {
-                    return new Link(linkData.Rel, linkData.Uri);
-                });
-                self.links(links);
+    					var location = jqXhr.getResponseHeader('Location');
 
-                var commands = $.map(data.Commands, function (commandData, idx) {
-                    var fields = [];
-                    if (commandData.Fields != null) {
-                        fields = $.map(commandData.Fields, function (fieldData, idx) {
-                            return new Field(fieldData.Name, fieldData.Description, fieldData.Optional, '');
-                        });
-                    }
-                    return new Command(commandData.Name, commandData.Description, commandData.Method, commandData.Uri, fields);
-                });
+    					if(location) {
+    						self.locationMessage(location);
+    					}
+    				},
+    				error: function (jqXhr, textStatus, errorThrown) {
+    					var status = jqXhr.status;
+    					self.errorMessage({ title: 'Http ' + status, details: errorThrown });
+    				}
+    			});
+    		};
 
-                self.commands(commands);
-                self.selectedCommand(null);
-            };
-        }
-        
-        $(function () {
-            var mainViewModel = new Model('/api');
-            mainViewModel.refresh();
-            ko.applyBindings(mainViewModel);
-        });
+    		self.refresh = function () {
+    			self.errorMessage(null);
+    			self.locationMessage(null);
+    			$.ajax({
+    				url: self.currentUri(),
+    				type: 'GET',
+    				dataType: 'json',
+    				success: function (data, status, jqXhr) {
+    					if(data != null) {
+    						self.updateFromModel(data);
+    					} else {
+    						var location = jqXhr.getResponseHeader('Location');
+    						if(confirm('Location returned. Navigate to "' + location + '" ?'))
+    							self.currentFilteredUri(location);
+    					}
+    				},
+    				error: function (jqXhr, textStatus, errorThrown) {
+    					var status = jqXhr.status;
+    					self.errorMessage({ title: 'Http ' + status, details: errorThrown });
+    				}
+    			});
+    		};
+
+    		self.updateFromModel = function (data) {
+
+    			self.content(getDataContent(data));
+
+    			var links = $.map(data.Links, function (linkData, idx) {
+    				return new Link(linkData);
+    			});
+    			self.links(links);
+
+    			var commands = $.map(data.Commands, function (commandData, idx) {
+    				return new Command(commandData);
+    			});
+
+    			self.commands(commands);
+    			self.selectedCommand(null);
+    		};
+    	}
+
+    	$(function () {
+    		var mainViewModel = new Model('/api');
+    		mainViewModel.refresh();
+    		ko.applyBindings(mainViewModel);
+    	});
     </script>
 }
