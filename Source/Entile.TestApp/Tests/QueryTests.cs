@@ -18,7 +18,7 @@ namespace Entile.TestApp.Tests
         {
             _webClientFactory = new MockWebClientFactory();
             _webClientFactory.WebClient = _webClient = new MockWebClient();
-            _webClient.PrepareResponse("/api", new WebResponseEventArgs("http://localhost:3852/api/", 200, "{ \"Links\" : [ { \"Rel\" : \"Register\", \"Uri\" : \"http://localhost:3852/api/register\"} ] }"));
+            _webClient.PrepareResponse("http://localhost:6776/api/", new WebResponseEventArgs("http://localhost:6776/api/", 200, "{ \"Commands\" : [ { \"Name\" : \"register\", \"Uri\" : \"http://localhost:6776/register\", \"Method\" : \"POST\"} ] }"));
             ApiQueryBase.WebClientFactory = _webClientFactory;
         }
 

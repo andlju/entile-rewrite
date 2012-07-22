@@ -22,7 +22,7 @@ namespace Entile.TestApp.ViewModels
             _subscriptionId = subscriptionId;
             _viewContext.SetValue("SubscriptionId", _subscriptionId);
 
-            RegisterAction("Unsubscribe", l =>
+            RegisterLinkAction("Unsubscribe", l =>
                                               {
                                                   var action = new UnsubscribeCommand(_viewContext, l.Uri);
                                                   UnsubscribeCommand = action;

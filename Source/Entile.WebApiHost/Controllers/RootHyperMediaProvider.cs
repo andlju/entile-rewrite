@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Entile.Server.Commands;
+using Entile.Server.Queries;
 using Entile.WebApiHost.Models;
 
 namespace Entile.WebApiHost.Controllers
@@ -16,6 +17,11 @@ namespace Entile.WebApiHost.Controllers
         protected override IEnumerable<CommandBuilder> Commands(RootResponse response)
         {
             yield return Command<RegisterClientCommand>("/api/clients", "register", "Register client", "POST") ;
+        }
+
+        protected override IEnumerable<QueryBuilder> Queries(RootResponse response)
+        {
+            yield return Query<GetClientQuery>("/api/clients/{clientId}", "client", "Get client");
         }
     }
 }

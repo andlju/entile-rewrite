@@ -14,19 +14,12 @@ namespace Entile.TestApp.Actions
 
         protected override void OnResponse(string uri, int statusCode, string response)
         {
+            base.OnResponse(uri, statusCode, response);
+
             var jsonSerializer = new JsonSerializer();
 
             var clientModel = jsonSerializer.Deserialize<ClientModel>(new JsonTextReader(new StringReader(response)));
-
-            if (LinksReturned != null)
-                LinksReturned(this, new LinkResponseEventArgs(clientModel.Links));
-            if (ClientUpdated != null)
-                ClientUpdated(this, new ClientUpdatedEventArgs(clientModel));
         }
-
-        public event EventHandler<LinkResponseEventArgs> LinksReturned;
-
-        public event EventHandler<ClientUpdatedEventArgs> ClientUpdated;
 
     }
 }

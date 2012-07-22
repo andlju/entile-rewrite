@@ -30,8 +30,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.DemoApp", "Entile.De
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.TestApp", "Entile.TestApp\Entile.TestApp.csproj", "{409A8A3B-BB93-4E90-8AF8-3B8BE59C36C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.NancyHost", "Entile.NancyHost\Entile.NancyHost.csproj", "{8508C051-FE39-4776-ACE1-DD7B35073D97}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entile.WebApiHost", "Entile.WebApiHost\Entile.WebApiHost.csproj", "{CF052F19-5FBC-40B0-9E22-3DCCE712DEFC}"
 EndProject
 Global
@@ -60,10 +58,6 @@ Global
 		{409A8A3B-BB93-4E90-8AF8-3B8BE59C36C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{409A8A3B-BB93-4E90-8AF8-3B8BE59C36C5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{409A8A3B-BB93-4E90-8AF8-3B8BE59C36C5}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{8508C051-FE39-4776-ACE1-DD7B35073D97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8508C051-FE39-4776-ACE1-DD7B35073D97}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8508C051-FE39-4776-ACE1-DD7B35073D97}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8508C051-FE39-4776-ACE1-DD7B35073D97}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CF052F19-5FBC-40B0-9E22-3DCCE712DEFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CF052F19-5FBC-40B0-9E22-3DCCE712DEFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF052F19-5FBC-40B0-9E22-3DCCE712DEFC}.Release|Any CPU.ActiveCfg = Release|Any CPU

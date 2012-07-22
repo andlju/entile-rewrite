@@ -12,7 +12,7 @@
 <div class="row">
     <div class="span2">
         <ul data-bind="foreach: links" class="nav nav-list">
-            <li><a href="#" data-bind="text: rel, attr: { 'href' : uri }, click : $parent.followLink"></a></li>
+            <li><a href="#" data-bind="text: name, attr: { 'href' : uri }, click : $parent.followLink"></a></li>
         </ul>
     </div>
 	<script type="text/html" id="content-template">
@@ -49,29 +49,41 @@
             </div>
         </div>
         <ul class="nav nav-tabs">
-            <li data-bind="css : {'active' : !(selectedCommand()) }">
-                <a href="#" data-bind="click: function() { selectedCommand(null); }">Content</a>
+            <li data-bind="css : {'active' : !(selectedAction()) }">
+                <a href="#" data-bind="click: function() { selectedAction(null); }">Content</a>
             </li>
             <!-- ko foreach: commands -->
-            <li data-bind="css : { 'active' : $parent.selectedCommand() == $data }"><a href="#" data-bind="text: name, attr: { 'href' : uri }, click: $parent.selectedCommand "></a></li>
+            <li data-bind="css : { 'active' : $parent.selectedAction() == $data }"><a href="#" data-bind="text: name, attr: { 'href' : uri }, click: $parent.selectedAction "></a></li>
+            <!-- /ko -->
+            <!-- ko foreach: queries -->
+            <li data-bind="css : { 'active' : $parent.selectedAction() == $data }"><a href="#" data-bind="text: name, attr: { 'href' : uri }, click: $parent.selectedAction "></a></li>
             <!-- /ko -->
         </ul>
         <div class="tab-content">
-            <div class="tab-pane active" data-bind="ifnot: selectedCommand">
+            <div class="tab-pane active" data-bind="ifnot: selectedAction">
                 <div class="well">
                     <dl data-bind="template : { name: 'content-template', foreach: content }">
                     </dl>
                 </div>
             </div>
-            <div class="tab-pane active" data-bind="with: selectedCommand">
+            <div class="tab-pane active" data-bind="with: selectedAction">
                 <form class="form-horizontal">
                     <fieldset>
                         <legend data-bind="text: description"></legend>
-						<div data-bind="template : { name: 'field-template', foreach: fields }"></div>
+                        <!-- ko template : { name: 'field-template', foreach: fields } -->
+                        <!-- /ko -->
+
+                        <div class="control-group">
+			                <label class="control-label">Uri</label>
+			                <div class="controls">
+                                <input type="text" data-bind="value: uri" class="input-xlarge"/>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <input type="submit" class="btn btn-primary" data-bind="value: method, click: $parent.sendCommand" />
+                        </div>
                     </fieldset>
-                    <div class="form-actions">
-                        <input type="submit" class="btn btn-primary" data-bind="value: method, click: $parent.sendCommand" />
-                    </div>
                 </form>
             </div>
         </div>
@@ -85,7 +97,7 @@
     	function getDataContent(data) {
     		var content = [];
     		for(var f in data) {
-    			if(f != 'Links' && f != 'Commands') {
+    			if(f != 'Links' && f != 'Commands' && f != 'Queries') {
     				var val = data[f];
     				var nested = [];
     				if($.isArray(val)) {
@@ -117,10 +129,24 @@
     		return content;
     	}
 
+        function Query(data) {
+            var self = this;
+
+            self.name = ko.observable(data.Name);
+            self.description = ko.observable(data.Description);
+            self.uri = ko.observable(data.Uri);
+            self.method = ko.observable('GET');
+            self.fields = ko.observableArray([]);
+
+            if (data.Fields) {
+                self.fields($.map(data.Fields, function (f, i) { return new Field(f); }));
+            }
+        }
+        
     	function Link(data) {
     		var self = this;
 
-    		self.rel = ko.observable(data.Rel);
+    		self.name = ko.observable(data.Name);
     		self.uri = ko.observable(data.Uri);
     	}
 
@@ -197,7 +223,9 @@
 
     		self.commands = ko.observableArray([]);
 
-    		self.selectedCommand = ko.observable();
+    	    self.queries = ko.observableArray([]);
+
+    	    self.selectedAction = ko.observable();
 
     		self.followLink = function (link) {
     			self.currentFilteredUri(link.uri());
@@ -210,7 +238,7 @@
     		self.sendCommand = function () {
     			self.errorMessage(null);
     			self.locationMessage(null);
-    			var cmd = self.selectedCommand();
+    			var cmd = self.selectedAction();
 
     			var commandUri = cmd.uri();
     			var content = ko.toJSON(cmd.buildJson());
@@ -265,19 +293,32 @@
 
     		self.updateFromModel = function (data) {
 
-    			self.content(getDataContent(data));
+    		    self.content(getDataContent(data));
 
-    			var links = $.map(data.Links, function (linkData, idx) {
-    				return new Link(linkData);
-    			});
-    			self.links(links);
+    		    var links = $.map(data.Links, function (linkData, idx) {
+    		        return new Link(linkData);
+    		    });
+    		    self.links(links);
+    		    
+    		    if (data.Commands) {
+    		        var commands = $.map(data.Commands, function (commandData, idx) {
+    		            return new Command(commandData);
+    		        });
+    		        self.commands(commands);
+    		    } else {
+    		        self.commands([]);
+    		    }
 
-    			var commands = $.map(data.Commands, function (commandData, idx) {
-    				return new Command(commandData);
-    			});
+    		    if (data.Queries) {
+    		        var queries = $.map(data.Queries, function (queryData, idx) {
+    		            return new Query(queryData);
+    		        });
 
-    			self.commands(commands);
-    			self.selectedCommand(null);
+    		        self.queries(queries);
+    		    } else {
+    		        self.queries([]);
+    		    }
+    		    self.selectedAction(null);
     		};
     	}
 

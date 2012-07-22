@@ -18,36 +18,49 @@ namespace Entile.TestApp.ViewModels
             _clientId = Guid.Parse("fd40122f-9b15-44ed-af69-6c70eb9cb24a"); // TODO Get Id from state
             _viewContext.SetValue("ClientId", _clientId);
 
-            RegisterAction("Root", l =>
+            RegisterLinkAction("root", l =>
                                        {
                                            var action = new RootApiQuery(_viewContext, l.Uri);
                                            RootApiQuery = action;
                                        });
 
-            RegisterAction("Register", l =>
+            RegisterLinkAction("client", l =>
+                                             {
+                                                 var action = new ClientQuery(_viewContext, l.Uri);
+                                                 ClientQuery = action;
+                                             });
+
+            RegisterCommandAction("register", l =>
                                            {
                                                var action = new RegisterClientCommand(_viewContext, l.Uri);
                                                RegisterClientCommand = action;
                                            });
 
-            RegisterAction("Client", l =>
-                                         {
-                                             var action = new ClientQuery(_viewContext, l.Uri);
-                                             ClientQuery = action;
-                                         });
+            RegisterCommandAction("subscribe", l =>
+                                                   {
+                                                       var action = new SubscribeCommand(_viewContext, l.Uri);
+                                                       SubscribeCommand = action;
+                                                   });
 
-            RegisterAction("Subscribe", l =>
-                                            {
-                                                var action = new SubscribeCommand(_viewContext, l.Uri);
-                                                SubscribeCommand = action;
-                                            });
-
-            UpdateLinks(new[] { new LinkModel() { Rel = "Root", Uri = "http://localhost:4250/api/" }, });
+            UpdateLinks(new[] { new LinkModel() { Rel = "root", Uri = "http://localhost:6776/api/" }, });
         }
 
-        void LinksReturned(object sender, LinkResponseEventArgs e)
+        public void Initialize()
+        {
+            if (RootApiQuery == null)
+                throw new InvalidOperationException("No root query set");
+
+            RootApiQuery.Execute(null);
+        }
+
+        private void LinksReturned(object sender, LinkResponseEventArgs e)
         {
             UpdateLinks(e.Links);
+        }
+
+        private void CommandsReturned(object sender, CommandResponseEventArgs e)
+        {
+            UpdateCommands(e.Commands);
         }
 
         private bool _activated;
@@ -70,18 +83,39 @@ namespace Entile.TestApp.ViewModels
             get { return _clientId; }
         }
 
+        private RootApiQuery _rootApiQuery;
+        public RootApiQuery RootApiQuery
+        {
+            get { return _rootApiQuery; }
+            set
+            {
+                if (_rootApiQuery != null)
+                {
+                    _rootApiQuery.LinksReturned += LinksReturned;
+                    _rootApiQuery.CommandsReturned += CommandsReturned;
+                }
+                _rootApiQuery = value;
+                _rootApiQuery.LinksReturned += LinksReturned;
+                _rootApiQuery.CommandsReturned += CommandsReturned;
+                RaisePropertyChanged("RootApiQuery");
+            }
+        }
+
         private ClientQuery _clientQuery;
         public ClientQuery ClientQuery
         {
             get { return _clientQuery; }
             set
             {
-                if (_clientQuery != value)
+                if (_clientQuery != null)
                 {
-                    _clientQuery = value;
-                    _clientQuery.LinksReturned += LinksReturned;
-                    RaisePropertyChanged("ClientQuery");
+                    _clientQuery.LinksReturned -= LinksReturned;
+                    _clientQuery.CommandsReturned -= CommandsReturned;
                 }
+                _clientQuery = value;
+                _clientQuery.LinksReturned += LinksReturned;
+                _clientQuery.CommandsReturned += CommandsReturned;
+                RaisePropertyChanged("ClientQuery");
             }
         }
 
@@ -91,26 +125,12 @@ namespace Entile.TestApp.ViewModels
             get { return _registerClientCommand; }
             set
             {
-                if (_registerClientCommand != value)
+                if (_registerClientCommand != null)
                 {
-                    _registerClientCommand = value;
-                    RaisePropertyChanged("RegisterClientCommand");
+                    
                 }
-            }
-        }
-
-        private RootApiQuery _rootApiQuery;
-        public RootApiQuery RootApiQuery
-        {
-            get { return _rootApiQuery; }
-            set
-            {
-                if (_rootApiQuery!= value)
-                {
-                    _rootApiQuery = value;
-                    _rootApiQuery.LinksReturned += LinksReturned;
-                    RaisePropertyChanged("RootApiQuery");
-                }
+                _registerClientCommand = value;
+                RaisePropertyChanged("RegisterClientCommand");
             }
         }
 
@@ -120,11 +140,12 @@ namespace Entile.TestApp.ViewModels
             get { return _subscribeCommand; }
             set
             {
-                if (_subscribeCommand != value)
+                if (_subscribeCommand != null)
                 {
-                    _subscribeCommand = value;
-                    RaisePropertyChanged("SubscribeCommand");
+                    
                 }
+                _subscribeCommand = value;
+                RaisePropertyChanged("SubscribeCommand");
             }
         }
 

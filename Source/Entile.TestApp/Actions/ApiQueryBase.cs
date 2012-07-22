@@ -21,39 +21,13 @@ namespace Entile.TestApp.Actions
         }
     }
 
-    public class ApiCommandBase : ApiQueryBase
+    public class CommandResponseEventArgs : EventArgs
     {
-        public class FormDefinition
+        public IEnumerable<CommandModel> Commands { get; private set; }
+
+        public CommandResponseEventArgs(IEnumerable<CommandModel> commands)
         {
-            public string Action;
-            public Dictionary<string, string> Form;
-        }
-
-        public ApiCommandBase(IViewContext viewContext, string uri) : base(viewContext, uri)
-        {
-        }
-
-        protected override void OnResponse(string uri, int statusCode, string response)
-        {
-            JsonSerializer serializer = new JsonSerializer();
-            var formDef = serializer.Deserialize<FormDefinition>(new JsonTextReader(new StringReader(response)));
-
-            var keys = formDef.Form.Keys.ToArray();
-            foreach(var key in keys)
-            {
-                formDef.Form[key] = ViewContext.GetValue(key).ToString();
-            }
-
-            var webClient = WebClientFactory.CreateWebClient();
-            webClient.ResponseCompleted += CommandResponseCompleted;
-            var formData = new StringWriter();
-            serializer.Serialize(formData, formDef.Form);
-            webClient.SendRequest(uri, formDef.Action, formData.ToString());
-        }
-
-        void CommandResponseCompleted(object sender, WebResponseEventArgs e)
-        {
-            throw new NotImplementedException();
+            Commands = commands;
         }
     }
 
@@ -99,6 +73,20 @@ namespace Entile.TestApp.Actions
 
         public event EventHandler CanExecuteChanged;
 
-        protected abstract void OnResponse(string uri, int statusCode, string response);
+
+        protected virtual void OnResponse(string uri, int statusCode, string response)
+        {
+            var jsonSerializer = new JsonSerializer();
+            var hyperMediaModel = jsonSerializer.Deserialize<HyperMediaModel>(new JsonTextReader(new StringReader(response)));
+
+            if (LinksReturned != null && hyperMediaModel.Links != null)
+                LinksReturned(this, new LinkResponseEventArgs(hyperMediaModel.Links));
+
+            if (CommandsReturned != null && hyperMediaModel.Commands != null)
+                CommandsReturned(this, new CommandResponseEventArgs(hyperMediaModel.Commands));
+        }
+
+        public event EventHandler<LinkResponseEventArgs> LinksReturned;
+        public event EventHandler<CommandResponseEventArgs> CommandsReturned;
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using Entile.Server;
 using Entile.Server.Commands;
 using Entile.WebApiHost.Models;
 
@@ -24,34 +25,49 @@ namespace Entile.WebApiHost.Controllers
             public Type CommandType;
         }
 
+        protected class QueryBuilder
+        {
+            public string UriTemplate;
+            public string Name;
+            public string Description;
+            public Type QueryType;
+        }
+
         protected class LinkBuilder
         {
             public string UriTemplate;
-            public string Rel;
+            public string Name;
         }
 
         public void AddHyperMedia(HttpRequestMessage request, T response)
         {
             var links = Links(response);
             var commands = Commands(response);
+            var queries = Queries(response);
 
             if (links != null)
-                response.Links = links.Select(l => BuildLink(request, response, l.UriTemplate, l.Rel)).ToList();
-
+                response.Links = links.Select(l => BuildLink(request, response, l.UriTemplate, l.Name)).ToList();
+            if (queries != null)
+                response.Queries = queries.Select(q => BuildQuery(request, response, q.UriTemplate, q.Name, q.Description, q.QueryType)).ToList();
             if (commands != null)
                 response.Commands = commands.Select(c => BuildCommand(request, response, c.UriTemplate, c.Name, c.Description, c.CommandType, c.Method)).ToList();
         }
 
         public LinkDefinition GetLink(string name, HttpRequestMessage request, T response)
         {
-            var link = Links(response).FirstOrDefault(l => l.Rel == name);
+            var link = Links(response).FirstOrDefault(l => l.Name == name);
             if (link == null)
                 return null;
 
-            return BuildLink(request, response, link.UriTemplate, link.Rel); ;
+            return BuildLink(request, response, link.UriTemplate, link.Name); ;
         }
 
         protected virtual IEnumerable<LinkBuilder> Links(T response)
+        {
+            return null;
+        }
+
+        protected virtual IEnumerable<QueryBuilder> Queries(T response)
         {
             return null;
         }
@@ -61,9 +77,9 @@ namespace Entile.WebApiHost.Controllers
             return null;
         }
         
-        protected static LinkBuilder Link(string uriTemplate, string rel)
+        protected static LinkBuilder Link(string uriTemplate, string name)
         {
-            return new LinkBuilder() { Rel = rel, UriTemplate = uriTemplate};
+            return new LinkBuilder() { Name = name, UriTemplate = uriTemplate};
         }
 
         protected static CommandBuilder Command(string uriTemplate, string name, string description, string method = null)
@@ -74,6 +90,17 @@ namespace Entile.WebApiHost.Controllers
                 Name = name,
                 Description = description,
                 Method = method ?? "POST"
+            };
+        }
+
+        protected static QueryBuilder Query<TQuery>(string uriTemplate, string name, string description) where TQuery : IMessage
+        {
+            return new QueryBuilder()
+            {
+                UriTemplate = uriTemplate,
+                Name = name,
+                Description = description,
+                QueryType = typeof(TQuery)
             };
         }
 
@@ -92,6 +119,30 @@ namespace Entile.WebApiHost.Controllers
         private static Uri BuildUri(HttpRequestMessage request, string relativeUri)
         {
             return new Uri(request.RequestUri, relativeUri);
+        }
+
+        private static QueryDefinition BuildQuery(HttpRequestMessage request, T response, string uriTemplate, string name, string description, Type queryType)
+        {
+            var relativeUri = FillTemplate(uriTemplate, response);
+            var uri = BuildUri(request, relativeUri);
+            var def = new QueryDefinition()
+            {
+                Name = name,
+                Description = description,
+                Uri = uri
+            };
+            if (queryType != null)
+            {
+                var props = queryType.GetProperties();
+
+                def.Fields = props.Where(p => !GetKey(p)).Select(p => new FieldDefinition()
+                {
+                    Name = p.Name,
+                    Description = GetDescription(p),
+                    Optional = !GetRequired(p)
+                }).ToArray();
+            }
+            return def;
         }
 
         private static CommandDefinition BuildCommand(HttpRequestMessage request, T response, string uriTemplate, string name, string description, Type cmdType, string method)
@@ -147,7 +198,7 @@ namespace Entile.WebApiHost.Controllers
         {
             var relativeUri = FillTemplate(uriTemplate, response);
 
-            return new LinkDefinition() { Rel = rel, Uri = BuildUri(request, relativeUri) };
+            return new LinkDefinition() { Name = rel, Uri = BuildUri(request, relativeUri) };
         }
 
         private static string FillTemplate(string uriTemplate, object context)

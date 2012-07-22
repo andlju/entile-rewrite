@@ -5,8 +5,16 @@ namespace Entile.WebApiHost.Models
 {
     public class LinkDefinition
     {
-        public string Rel { get; set; }
+        public string Name { get; set; }
         public Uri Uri { get; set; }
+    }
+
+    public class QueryDefinition
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public Uri Uri { get; set; }
+        public FieldDefinition[] Fields { get; set; }
     }
 
     public class CommandDefinition
@@ -32,6 +40,7 @@ namespace Entile.WebApiHost.Models
         }
 
         public List<LinkDefinition> Links { get; set; }
+        public List<QueryDefinition> Queries { get; set; }
         public List<CommandDefinition> Commands { get; set; }
     }
 }
